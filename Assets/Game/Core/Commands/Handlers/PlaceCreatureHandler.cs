@@ -24,7 +24,12 @@ namespace Game.Core.Commands.Handlers
                 return RejectReason.FieldNotFound;
             if (field.IsRemoved)
                 return RejectReason.FieldRemoved;
-            return field.OccupantOf(command.Player) != null ? RejectReason.AlreadyOnField : RejectReason.None;
+            if (field.OccupantOf(command.Player) != null)
+                return RejectReason.AlreadyOnField;
+
+            return command.SignatureAbilityId == null
+                ? RejectReason.None
+                : context.Abilities.ValidateWithPlacement(command.Player, command.SignatureAbilityId.Value, field, creature);
         }
 
         protected override void Apply(PlaceCreature command, MatchContext context)
@@ -38,7 +43,7 @@ namespace Game.Core.Commands.Handlers
             field.Occupy(command.Player, creature, state.NextPlacementOrder());
             context.Events.Emit(new CreaturePlaced(command.Player, CardRef.From(creature), field.Id));
             context.Turns.CompleteMainAction();
-            context.Battles.StartIfContested(field);
+            context.Abilities.StartBattle(command.Player, field, command.SignatureAbilityId);
         }
     }
 }

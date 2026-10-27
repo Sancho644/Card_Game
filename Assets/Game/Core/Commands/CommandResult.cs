@@ -28,6 +28,11 @@ namespace Game.Core.Commands
         LegendaryLimitReached,
         SignatureCreatureNotInBattle,
         BlockedByFieldCondition,
+        BlockedByAbility,
+        InvalidTarget,
+        FieldLocked,
+        SignatureNeedsBattle,
+        NotAChoiceOption,
     }
 
     public sealed class CommandResult

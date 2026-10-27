@@ -31,6 +31,13 @@ namespace Game.Core.Effects
         public bool IsMet(BattleCalculation calculation, PlayerId caster) => calculation.FieldOpen == _mustBeOpen;
     }
 
+    /// <summary>The field is open and gives the caster's creature a bonus.</summary>
+    public sealed class FieldGivesBonusRequirement : IEffectRequirement
+    {
+        public bool IsMet(BattleCalculation calculation, PlayerId caster) =>
+            calculation.FieldOpen && calculation.FieldModifierFor(caster) > 0;
+    }
+
     /// <summary>
     /// The caster's creature is weaker than the opponent's, counting the effects applied before
     /// this one in play order.

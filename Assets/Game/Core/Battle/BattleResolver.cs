@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Game.Core.Cards;
+using System.Linq;
 using Game.Core.Effects;
 using Game.Core.State;
 
@@ -23,8 +23,8 @@ namespace Game.Core.Battle
 
     /// <summary>
     /// Turns a finished battle into final powers, a winner and consequences. Does not change state.
-    /// Order from docs/rules.md §6, «Подсчёт силы»:
-    /// condition cancellation, then field values, then other abilities in play order, then comparison and consequences.
+    /// Order from docs/rules.md §6, «Подсчёт силы»: field values, then other abilities in play order,
+    /// then comparison and consequences. A cancelled condition acts at no step.
     /// </summary>
     internal sealed class BattleResolver
     {
@@ -39,19 +39,8 @@ namespace Game.Core.Battle
 
         public BattleResolution Resolve(BattleState battle)
         {
-            var field = battle.Field;
-            var calculation = new BattleCalculation(
-                battle.Host,
-                (CreatureCard)field.OccupantOf(battle.Host).Definition,
-                (CreatureCard)field.OccupantOf(battle.Guest).Definition,
-                field.Definition,
-                field.IsOpen);
-
-            // A cancelled condition does not act at any step, whenever the cancelling ability was played.
-            ApplyAbilities(battle, calculation, BattleStep.ConditionControl);
-            var conditions = calculation.FieldOpen && calculation.FieldConditionActive
-                ? field.Definition.Conditions
-                : NoConditions;
+            var calculation = new BattleCalculation(battle);
+            var conditions = calculation.FieldConditionActive ? battle.Field.Definition.Conditions : NoConditions;
 
             // Step 1: field values, changed by conditions and then by abilities.
             foreach (var condition in conditions)
@@ -65,27 +54,25 @@ namespace Game.Core.Battle
             foreach (var condition in conditions)
                 condition.ModifyOutcome(calculation);
 
+            var hostPower = calculation.PowerOf(battle.Host);
+            var guestPower = calculation.PowerOf(battle.Guest);
             var winner = calculation.Comparison.DecideWinner(calculation);
-            var consequences = _consequenceTable.Build(battle.Host, winner, field.IsOpen);
-            foreach (var modifier in calculation.ConsequenceModifiers)
-                modifier.Modify(consequences);
+            if (winner == null && hostPower == guestPower)
+                winner = calculation.TieWinner;
 
-            return new BattleResolution(
-                calculation.PowerOf(battle.Host),
-                calculation.PowerOf(battle.Guest),
-                winner,
-                consequences);
+            var consequences = _consequenceTable.Build(battle.Host, winner, battle.Field.IsOpen);
+            foreach (var change in calculation.ConsequenceChanges)
+                change(consequences);
+
+            return new BattleResolution(hostPower, guestPower, winner, consequences);
         }
 
         private static void ApplyAbilities(BattleState battle, BattleCalculation calculation, BattleStep step)
         {
-            foreach (var played in battle.PlayedAbilities)
+            foreach (var played in battle.ActiveAbilities)
             {
-                foreach (var effect in played.Card.Effects)
-                {
-                    if (effect.Step == step)
-                        effect.Apply(calculation, played.Player);
-                }
+                foreach (var effect in played.Card.Effects.OfType<IBattleEffect>().Where(effect => effect.Step == step))
+                    effect.Apply(calculation, played.Player);
             }
         }
     }

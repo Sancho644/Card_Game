@@ -15,7 +15,9 @@ namespace Game.Core.Commands.Handlers
             var state = context.State;
             if (state.Player(command.Player).HasCreatureInHand)
                 return RejectReason.HandHasCreatures;
-            if (state.FindFieldWith(command.Player, command.CreatureId) == null)
+
+            var source = state.FindFieldWith(command.Player, command.CreatureId);
+            if (source == null)
                 return RejectReason.CreatureNotOnField;
 
             var target = state.FindField(command.TargetFieldId);
@@ -25,9 +27,13 @@ namespace Game.Core.Commands.Handlers
                 return RejectReason.FieldRemoved;
             if (target.OccupantOf(command.Player) != null)
                 return RejectReason.AlreadyOnField;
-            return target.OccupantOf(command.Player.Opponent()) == null
-                ? RejectReason.NoOpponentCreature
-                : RejectReason.None;
+            if (target.OccupantOf(command.Player.Opponent()) == null)
+                return RejectReason.NoOpponentCreature;
+
+            return command.SignatureAbilityId == null
+                ? RejectReason.None
+                : context.Abilities.ValidateWithPlacement(
+                    command.Player, command.SignatureAbilityId.Value, target, source.OccupantOf(command.Player));
         }
 
         protected override void Apply(Challenge command, MatchContext context)
@@ -42,7 +48,7 @@ namespace Game.Core.Commands.Handlers
             target.Occupy(command.Player, creature, state.NextPlacementOrder());
             context.Events.Emit(new CreatureMoved(command.Player, creature.Id, source.Id, target.Id));
             context.Turns.CompleteMainAction();
-            context.Battles.StartIfContested(target);
+            context.Abilities.StartBattle(command.Player, target, command.SignatureAbilityId);
         }
     }
 }

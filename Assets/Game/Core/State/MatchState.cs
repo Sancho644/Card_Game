@@ -8,6 +8,10 @@ namespace Game.Core.State
         ChoosingTurnOrder,
         Turn,
         Battle,
+
+        /// <summary>A player must choose a card (see <see cref="MatchState.PendingChoice"/>).</summary>
+        AwaitingChoice,
+
         Ended,
     }
 
@@ -20,6 +24,26 @@ namespace Game.Core.State
 
         public PlayerId? Winner { get; }
         public bool IsDraw => Winner == null;
+    }
+
+    public enum ChoicePurpose
+    {
+        /// <summary>Take one of the options from the discard pile into the hand.</summary>
+        TakeAbilityFromDiscard,
+    }
+
+    public sealed class PendingChoice
+    {
+        internal PendingChoice(PlayerId player, ChoicePurpose purpose, IReadOnlyList<CardInstance> options)
+        {
+            Player = player;
+            Purpose = purpose;
+            Options = options;
+        }
+
+        public PlayerId Player { get; }
+        public ChoicePurpose Purpose { get; }
+        public IReadOnlyList<CardInstance> Options { get; }
     }
 
     /// <summary>
@@ -42,11 +66,13 @@ namespace Game.Core.State
         public PlayerId? CoinTossWinner { get; internal set; }
         public PlayerId ActivePlayer { get; internal set; }
         public bool MainActionDone { get; internal set; }
+        public bool BattleHappenedThisTurn { get; internal set; }
 
         /// <summary>Main actions skipped in a row, across both players.</summary>
         public int ConsecutiveSkips { get; internal set; }
 
         public BattleState Battle { get; internal set; }
+        public PendingChoice PendingChoice { get; internal set; }
         public MatchResult Result { get; internal set; }
         public IReadOnlyList<FieldSlot> Fields => _fields;
 

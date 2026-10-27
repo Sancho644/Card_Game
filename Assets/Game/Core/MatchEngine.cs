@@ -88,6 +88,7 @@ namespace Game.Core
             new PlayAbilityHandler(),
             new ReadyHandler(),
             new EndTurnHandler(),
+            new ChooseCardHandler(),
         };
 
         private static void ValidateDecks(MatchSetup setup, CardCatalog catalog, GameRules rules)

@@ -25,6 +25,7 @@ namespace Game.Core.Flow
             _state.Phase = MatchPhase.Turn;
             _state.ActivePlayer = player;
             _state.MainActionDone = false;
+            _state.BattleHappenedThisTurn = false;
             // Each player may play one legendary per turn, own or opponent's, battle included (docs/rules.md §7).
             foreach (var id in PlayerIds.All)
                 _state.Player(id).LegendariesPlayedThisTurn = 0;

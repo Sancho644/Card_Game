@@ -16,6 +16,7 @@ namespace Game.Core.Flow
             Events = new EventLog();
             Turns = new TurnFlow(state, Events);
             Battles = new BattleFlow(state, rules, Events, Turns, new BattleResolver(new ConsequenceTable()));
+            Abilities = new AbilityFlow(this);
         }
 
         public MatchState State { get; }
@@ -24,5 +25,6 @@ namespace Game.Core.Flow
         public EventLog Events { get; }
         public TurnFlow Turns { get; }
         public BattleFlow Battles { get; }
+        public AbilityFlow Abilities { get; }
     }
 }

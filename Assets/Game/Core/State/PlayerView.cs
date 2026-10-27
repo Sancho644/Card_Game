@@ -24,6 +24,8 @@ namespace Game.Core.State
             OpponentHandCount = state.Player(viewer.Opponent()).Hand.Count;
             Fields = state.Fields.Select(field => new FieldView(field, viewer)).ToList();
             Battle = state.Battle == null ? null : new BattleView(state.Battle);
+            ChoosingPlayer = state.PendingChoice?.Player;
+            ChoiceOptions = state.PendingChoice == null ? new CardRef[0] : Refs(state.PendingChoice.Options);
 
             _wins = PlayerIds.All.Select(id => state.Player(id).Wins).ToArray();
             _discards = PlayerIds.All.Select(id => Refs(state.Player(id).Discard)).ToArray();
@@ -39,6 +41,11 @@ namespace Game.Core.State
         public int OpponentHandCount { get; }
         public IReadOnlyList<FieldView> Fields { get; }
         public BattleView Battle { get; }
+
+        /// <summary>The player who must choose a card, or null. Options come from public piles.</summary>
+        public PlayerId? ChoosingPlayer { get; }
+
+        public IReadOnlyList<CardRef> ChoiceOptions { get; }
 
         public int Wins(PlayerId player) => _wins[(int)player];
         public IReadOnlyList<CardRef> Discard(PlayerId player) => _discards[(int)player];
@@ -59,6 +66,7 @@ namespace Game.Core.State
             Owner = field.Owner;
             IsOpen = field.IsOpen;
             IsRemoved = field.IsRemoved;
+            IsLocked = field.IsLocked;
             // A closed field removed after a battle stays hidden from the opponent (docs/rules.md §6).
             CardId = field.IsOpen || field.Owner == viewer ? field.Definition.Id : null;
             _occupants = PlayerIds.All.Select(id => CardRef.From(field.OccupantOf(id))).ToArray();
@@ -72,6 +80,7 @@ namespace Game.Core.State
 
         public bool IsOpen { get; }
         public bool IsRemoved { get; }
+        public bool IsLocked { get; }
 
         /// <summary>Creatures stand face up, so both players see them.</summary>
         public CardRef Occupant(PlayerId player) => _occupants[(int)player];

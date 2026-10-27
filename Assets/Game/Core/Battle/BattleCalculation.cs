@@ -19,24 +19,25 @@ namespace Game.Core.Battle
     public sealed class BattleCalculation
     {
         private readonly CreatureCard[] _creatures = new CreatureCard[PlayerIds.All.Count];
+        private readonly bool[] _conditionApplies = new bool[PlayerIds.All.Count];
         private readonly Dictionary<Element, int>[] _fieldValues;
         private readonly int[] _abilityPower = new int[PlayerIds.All.Count];
-        private readonly List<IConsequenceModifier> _consequenceModifiers = new List<IConsequenceModifier>();
+        private readonly List<Action<BattleConsequences>> _consequenceChanges = new List<Action<BattleConsequences>>();
 
-        internal BattleCalculation(
-            PlayerId host,
-            CreatureCard hostCreature,
-            CreatureCard guestCreature,
-            FieldCard field,
-            bool fieldOpen)
+        internal BattleCalculation(BattleState battle)
         {
-            Host = host;
-            _creatures[(int)host] = hostCreature;
-            _creatures[(int)host.Opponent()] = guestCreature;
-            Field = field;
-            FieldOpen = fieldOpen;
+            Host = battle.Host;
+            Field = battle.Field.Definition;
+            FieldOpen = battle.Field.IsOpen;
+            FieldConditionActive = FieldOpen && !battle.IsConditionCancelled;
+            foreach (var player in PlayerIds.All)
+            {
+                _creatures[(int)player] = (CreatureCard)battle.Field.OccupantOf(player).Definition;
+                _conditionApplies[(int)player] = battle.ConditionAppliesTo(player);
+            }
+
             _fieldValues = PlayerIds.All
-                .Select(_ => field.Modifiers.ToDictionary(pair => pair.Key, pair => pair.Value))
+                .Select(_ => Field.Modifiers.ToDictionary(pair => pair.Key, pair => pair.Value))
                 .ToArray();
         }
 
@@ -45,16 +46,24 @@ namespace Game.Core.Battle
         public FieldCard Field { get; }
         public bool FieldOpen { get; }
 
-        /// <summary>Set to false by an effect that cancels the field condition.</summary>
-        public bool FieldConditionActive { get; set; } = true;
+        /// <summary>The field is open and its condition was not cancelled.</summary>
+        public bool FieldConditionActive { get; }
+
+        /// <summary>Winner when final powers are equal; null keeps the draw.</summary>
+        public PlayerId? TieWinner { get; set; }
 
         public IBattleComparison Comparison { get; set; } = new HigherPowerWins();
 
-        public IReadOnlyList<IConsequenceModifier> ConsequenceModifiers => _consequenceModifiers;
+        internal IReadOnlyList<Action<BattleConsequences>> ConsequenceChanges => _consequenceChanges;
 
         public CreatureCard CreatureOf(PlayerId player) => _creatures[(int)player];
 
         public BattleRole RoleOf(PlayerId player) => player == Host ? BattleRole.Host : BattleRole.Guest;
+
+        /// <summary>Whether the field condition acts on this player's creature.</summary>
+        public bool ConditionAppliesTo(PlayerId player) => _conditionApplies[(int)player];
+
+        public bool ConditionAppliesToBoth => _conditionApplies.All(applies => applies);
 
         /// <summary>Field bonuses and penalties by element, as they apply to this player's creature.</summary>
         public IReadOnlyDictionary<Element, int> FieldValuesFor(PlayerId player) => _fieldValues[(int)player];
@@ -75,7 +84,8 @@ namespace Game.Core.Battle
 
         public void AddPower(PlayerId player, int amount) => _abilityPower[(int)player] += amount;
 
-        public void AddConsequenceModifier(IConsequenceModifier modifier) =>
-            _consequenceModifiers.Add(modifier ?? throw new ArgumentNullException(nameof(modifier)));
+        /// <summary>Registers a change to the consequences, applied after the rules table.</summary>
+        public void ModifyConsequences(Action<BattleConsequences> change) =>
+            _consequenceChanges.Add(change ?? throw new ArgumentNullException(nameof(change)));
     }
 }

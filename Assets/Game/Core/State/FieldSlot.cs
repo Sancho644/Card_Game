@@ -22,6 +22,9 @@ namespace Game.Core.State
         public bool IsOpen { get; internal set; }
         public bool IsRemoved { get; internal set; }
 
+        /// <summary>The host cannot open the field in the next battle on it.</summary>
+        public bool IsLocked { get; internal set; }
+
         public bool IsContested => _occupants[0] != null && _occupants[1] != null;
 
         /// <summary>The player whose creature has stood on this field longer. Valid when contested.</summary>

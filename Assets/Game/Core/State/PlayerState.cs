@@ -42,5 +42,19 @@ namespace Game.Core.State
         internal void AddToDiscard(CardInstance card) => _discard.Add(card);
 
         internal void AddToOutOfGame(CardInstance card) => _outOfGame.Add(card);
+
+        internal void MoveDiscardToHand(CardInstance card)
+        {
+            if (!_discard.Remove(card))
+                throw new InvalidOperationException($"{card} is not in the discard pile of {Id}.");
+            _hand.Add(card);
+        }
+
+        internal void MoveOutOfGameToHand(CardInstance card)
+        {
+            if (!_outOfGame.Remove(card))
+                throw new InvalidOperationException($"{card} is not out of game for {Id}.");
+            _hand.Add(card);
+        }
     }
 }

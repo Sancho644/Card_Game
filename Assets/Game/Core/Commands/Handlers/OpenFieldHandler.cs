@@ -1,4 +1,3 @@
-using Game.Core.Events;
 using Game.Core.Flow;
 using Game.Core.State;
 
@@ -6,7 +5,7 @@ namespace Game.Core.Commands.Handlers
 {
     /// <summary>
     /// Opening is a free action: the host still plays an ability or presses Ready afterwards.
-    /// It resets the opponent's readiness so they can respond (agreed with the author).
+    /// It resets the opponent's readiness so they can respond (docs/rules.md §6).
     /// </summary>
     internal sealed class OpenFieldHandler : CommandHandler<OpenField>
     {
@@ -19,14 +18,14 @@ namespace Game.Core.Commands.Handlers
                 return RejectReason.NotYourTurn;
             if (battle.Host != command.Player)
                 return RejectReason.NotFieldOwner;
-            return battle.Field.IsOpen ? RejectReason.FieldAlreadyOpen : RejectReason.None;
+            if (battle.Field.IsOpen)
+                return RejectReason.FieldAlreadyOpen;
+            return battle.Field.IsLocked ? RejectReason.FieldLocked : RejectReason.None;
         }
 
         protected override void Apply(OpenField command, MatchContext context)
         {
-            var field = context.State.Battle.Field;
-            field.IsOpen = true;
-            context.Events.Emit(new FieldOpened(field.Id, field.Definition.Id));
+            context.Battles.OpenField();
             context.Battles.ResetReadiness(command.Player.Opponent());
         }
     }
