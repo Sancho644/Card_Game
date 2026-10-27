@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Cards.CreatureDef
   _id: creature.stone-beetle
   _displayName: "\u041A\u0430\u043C\u0435\u043D\u043D\u044B\u0439 \u0436\u0443\u043A"
-  _description: "\u0417\u0435\u043C\u043B\u044F, \u0441\u0438\u043B\u0430 150."
+  _description: 
   _rarity: 0
   _art: {fileID: 0}
   _frame: {fileID: 0}

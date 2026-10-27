@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Cards.CreatureDef
   _id: creature.radiant-stag
   _displayName: "\u041B\u0443\u0447\u0438\u0441\u0442\u044B\u0439 \u043E\u043B\u0435\u043D\u044C"
-  _description: "\u0421\u0432\u0435\u0442, \u0441\u0438\u043B\u0430 150."
+  _description: 
   _rarity: 0
   _art: {fileID: 0}
   _frame: {fileID: 0}

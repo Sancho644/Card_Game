@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Cards.CreatureDef
   _id: creature.prince-of-abyss
   _displayName: "\u041A\u043D\u044F\u0437\u044C \u0411\u0435\u0437\u0434\u043D\u044B"
-  _description: "\u0422\u044C\u043C\u0430, \u0441\u0438\u043B\u0430 250."
+  _description: 
   _rarity: 2
   _art: {fileID: 0}
   _frame: {fileID: 0}

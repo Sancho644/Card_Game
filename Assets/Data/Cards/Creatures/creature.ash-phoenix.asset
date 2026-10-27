@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Cards.CreatureDef
   _id: creature.ash-phoenix
   _displayName: "\u041F\u0435\u043F\u0435\u043B\u044C\u043D\u044B\u0439 \u0444\u0435\u043D\u0438\u043A\u0441"
-  _description: "\u041E\u0433\u043E\u043D\u044C, \u0441\u0438\u043B\u0430 200."
+  _description: 
   _rarity: 1
   _art: {fileID: 0}
   _frame: {fileID: 0}

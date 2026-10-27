@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Cards.CreatureDef
   _id: creature.whirlwind-griffin
   _displayName: "\u0412\u0438\u0445\u0440\u0435\u0432\u043E\u0439 \u0433\u0440\u0438\u0444\u043E\u043D"
-  _description: "\u0412\u0435\u0442\u0435\u0440, \u0441\u0438\u043B\u0430 200."
+  _description: 
   _rarity: 1
   _art: {fileID: 0}
   _frame: {fileID: 0}

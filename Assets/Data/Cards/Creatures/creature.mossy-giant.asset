@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Cards.CreatureDef
   _id: creature.mossy-giant
   _displayName: "\u041C\u0448\u0438\u0441\u0442\u044B\u0439 \u0432\u0435\u043B\u0438\u043A\u0430\u043D"
-  _description: "\u0417\u0435\u043C\u043B\u044F, \u0441\u0438\u043B\u0430 200."
+  _description: 
   _rarity: 1
   _art: {fileID: 0}
   _frame: {fileID: 0}

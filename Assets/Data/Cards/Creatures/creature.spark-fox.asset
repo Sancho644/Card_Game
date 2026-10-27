@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Cards.CreatureDef
   _id: creature.spark-fox
   _displayName: "\u0418\u0441\u043A\u0440\u043E\u0432\u043E\u0439 \u043B\u0438\u0441"
-  _description: "\u041E\u0433\u043E\u043D\u044C, \u0441\u0438\u043B\u0430 150."
+  _description: 
   _rarity: 0
   _art: {fileID: 0}
   _frame: {fileID: 0}

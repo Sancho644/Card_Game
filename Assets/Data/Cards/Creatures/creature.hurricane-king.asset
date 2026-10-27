@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Cards.CreatureDef
   _id: creature.hurricane-king
   _displayName: "\u0426\u0430\u0440\u044C \u0423\u0440\u0430\u0433\u0430\u043D\u043E\u0432"
-  _description: "\u0412\u0435\u0442\u0435\u0440, \u0441\u0438\u043B\u0430 250."
+  _description: 
   _rarity: 2
   _art: {fileID: 0}
   _frame: {fileID: 0}
