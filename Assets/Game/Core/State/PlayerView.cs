@@ -59,7 +59,7 @@ namespace Game.Core.State
             Owner = field.Owner;
             IsOpen = field.IsOpen;
             IsRemoved = field.IsRemoved;
-            // TODO(rules): a removed closed field stays hidden from the opponent. See docs/decisions.md.
+            // A closed field removed after a battle stays hidden from the opponent (docs/rules.md §6).
             CardId = field.IsOpen || field.Owner == viewer ? field.Definition.Id : null;
             _occupants = PlayerIds.All.Select(id => CardRef.From(field.OccupantOf(id))).ToArray();
         }

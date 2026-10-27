@@ -27,9 +27,18 @@ namespace Game.Core.Effects
             _mustBeOpen = mustBeOpen;
         }
 
-        // TODO(rules): checked against the field state at resolution, not at the moment the ability
-        // was played. See docs/decisions.md.
+        /// <summary>Checked at the power count, not when the ability was played (docs/rules.md §6).</summary>
         public bool IsMet(BattleCalculation calculation, PlayerId caster) => calculation.FieldOpen == _mustBeOpen;
+    }
+
+    /// <summary>
+    /// The caster's creature is weaker than the opponent's, counting the effects applied before
+    /// this one in play order.
+    /// </summary>
+    public sealed class WeakerThanOpponentRequirement : IEffectRequirement
+    {
+        public bool IsMet(BattleCalculation calculation, PlayerId caster) =>
+            calculation.PowerOf(caster) < calculation.PowerOf(caster.Opponent());
     }
 
     /// <summary>The caster's creature has the given element.</summary>

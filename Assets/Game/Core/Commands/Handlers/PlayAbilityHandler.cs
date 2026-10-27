@@ -48,8 +48,7 @@ namespace Game.Core.Commands.Handlers
             var player = context.State.Player(command.Player);
             var card = player.FindInHand(command.AbilityId);
 
-            // TODO(rules): the card goes to the discard pile at once; its effect lasts until the battle ends.
-            // See docs/decisions.md.
+            // The card goes to the discard pile at once; its effect lasts until the battle ends (docs/rules.md §6).
             player.RemoveFromHand(card);
             player.AddToDiscard(card);
             if (card.Definition.Rarity == Rarity.Legendary)

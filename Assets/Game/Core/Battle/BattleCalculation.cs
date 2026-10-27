@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Game.Core.Cards;
 using Game.Core.State;
 
@@ -12,12 +13,13 @@ namespace Game.Core.Battle
     }
 
     /// <summary>
-    /// Working state of a battle being resolved. Field modifiers come first, then ability
-    /// effects in play order; a later effect may overwrite what an earlier one set.
+    /// Working state of a battle being resolved. Field values are kept per player, because some
+    /// effects change them for one creature only.
     /// </summary>
     public sealed class BattleCalculation
     {
         private readonly CreatureCard[] _creatures = new CreatureCard[PlayerIds.All.Count];
+        private readonly Dictionary<Element, int>[] _fieldValues;
         private readonly int[] _abilityPower = new int[PlayerIds.All.Count];
         private readonly List<IConsequenceModifier> _consequenceModifiers = new List<IConsequenceModifier>();
 
@@ -33,16 +35,15 @@ namespace Game.Core.Battle
             _creatures[(int)host.Opponent()] = guestCreature;
             Field = field;
             FieldOpen = fieldOpen;
-            FieldModifiers = field.Modifiers;
+            _fieldValues = PlayerIds.All
+                .Select(_ => field.Modifiers.ToDictionary(pair => pair.Key, pair => pair.Value))
+                .ToArray();
         }
 
         public PlayerId Host { get; }
         public PlayerId Guest => Host.Opponent();
         public FieldCard Field { get; }
         public bool FieldOpen { get; }
-
-        /// <summary>Bonuses and penalties in force. Effects may replace them, e.g. to invert or double.</summary>
-        public IReadOnlyDictionary<Element, int> FieldModifiers { get; set; }
 
         /// <summary>Set to false by an effect that cancels the field condition.</summary>
         public bool FieldConditionActive { get; set; } = true;
@@ -55,8 +56,19 @@ namespace Game.Core.Battle
 
         public BattleRole RoleOf(PlayerId player) => player == Host ? BattleRole.Host : BattleRole.Guest;
 
+        /// <summary>Field bonuses and penalties by element, as they apply to this player's creature.</summary>
+        public IReadOnlyDictionary<Element, int> FieldValuesFor(PlayerId player) => _fieldValues[(int)player];
+
+        /// <summary>Changes every field value for this player's creature, e.g. to invert or double it.</summary>
+        public void MapFieldValues(PlayerId player, Func<int, int> map)
+        {
+            var values = _fieldValues[(int)player];
+            foreach (var element in values.Keys.ToList())
+                values[element] = map(values[element]);
+        }
+
         public int FieldModifierFor(PlayerId player) =>
-            FieldOpen && FieldModifiers.TryGetValue(CreatureOf(player).Element, out var value) ? value : 0;
+            FieldOpen && _fieldValues[(int)player].TryGetValue(CreatureOf(player).Element, out var value) ? value : 0;
 
         public int PowerOf(PlayerId player) =>
             CreatureOf(player).Power + FieldModifierFor(player) + _abilityPower[(int)player];

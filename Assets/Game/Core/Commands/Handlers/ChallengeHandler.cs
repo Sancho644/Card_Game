@@ -36,8 +36,8 @@ namespace Game.Core.Commands.Handlers
             var source = state.FindFieldWith(command.Player, command.CreatureId);
             var target = state.FindField(command.TargetFieldId);
 
-            // TODO(rules): the moved creature counts as placed on the target now, so the opponent
-            // (already standing there) acts first in the battle. See docs/decisions.md.
+            // A moved creature counts as placed at the moment of moving, so the opponent,
+            // already standing there, acts first in the battle (docs/rules.md §6).
             var creature = source.Vacate(command.Player);
             target.Occupy(command.Player, creature, state.NextPlacementOrder());
             context.Events.Emit(new CreatureMoved(command.Player, creature.Id, source.Id, target.Id));

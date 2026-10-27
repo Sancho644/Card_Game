@@ -64,12 +64,22 @@ namespace Game.Core.Tests
             string guestCreature,
             GameRules rules = null,
             DeckList player1Deck = null,
+            DeckList player2Deck = null) =>
+            BattleOnP1Field(TestCards.Forge, hostCreature, guestCreature, rules, player1Deck, player2Deck);
+
+        /// <summary>The same as <see cref="BattleOnP1Forge"/>, on another field from Player1's deck.</summary>
+        public static MatchDriver BattleOnP1Field(
+            string field,
+            string hostCreature,
+            string guestCreature,
+            GameRules rules = null,
+            DeckList player1Deck = null,
             DeckList player2Deck = null)
         {
             var driver = Begin(P1, rules, player1Deck, player2Deck);
-            driver.Place(P1, hostCreature, P1, TestCards.Forge);
+            driver.Place(P1, hostCreature, P1, field);
             driver.EndTurn(P1);
-            driver.Place(P2, guestCreature, P1, TestCards.Forge);
+            driver.Place(P2, guestCreature, P1, field);
             return driver;
         }
 

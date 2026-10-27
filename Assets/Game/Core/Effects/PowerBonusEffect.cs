@@ -17,6 +17,8 @@ namespace Game.Core.Effects
             _requirements = requirements ?? new IEffectRequirement[0];
         }
 
+        public BattleStep Step => BattleStep.Power;
+
         public void Apply(BattleCalculation calculation, PlayerId caster)
         {
             if (_requirements.All(requirement => requirement.IsMet(calculation, caster)))

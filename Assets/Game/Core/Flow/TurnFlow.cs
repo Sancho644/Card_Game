@@ -25,7 +25,7 @@ namespace Game.Core.Flow
             _state.Phase = MatchPhase.Turn;
             _state.ActivePlayer = player;
             _state.MainActionDone = false;
-            // TODO(rules): the legendary limit counts per player turn, battle included. See docs/decisions.md.
+            // Each player may play one legendary per turn, own or opponent's, battle included (docs/rules.md §7).
             foreach (var id in PlayerIds.All)
                 _state.Player(id).LegendariesPlayedThisTurn = 0;
             _events.Emit(new TurnStarted(player));
@@ -59,8 +59,7 @@ namespace Game.Core.Flow
             return hasCreatureOnField && hasTarget;
         }
 
-        // TODO(rules): the "after" window is closed by an explicit EndTurn; without a main action it is a skip.
-        // See docs/decisions.md.
+        /// <summary>Closes the "after" window. Without a main action the turn counts as a skip (docs/decisions.md).</summary>
         public void EndTurn(PlayerId player)
         {
             if (!_state.MainActionDone)

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Game.Core.Cards;
+using Game.Core.Effects;
 using Game.Core.State;
 
 namespace Game.Core.Battle
@@ -19,9 +21,15 @@ namespace Game.Core.Battle
         public BattleConsequences Consequences { get; }
     }
 
-    /// <summary>Turns a finished battle into final powers, a winner and consequences. Does not change state.</summary>
+    /// <summary>
+    /// Turns a finished battle into final powers, a winner and consequences. Does not change state.
+    /// Order from docs/rules.md §6, «Подсчёт силы»:
+    /// condition cancellation, then field values, then other abilities in play order, then comparison and consequences.
+    /// </summary>
     internal sealed class BattleResolver
     {
+        private static readonly IReadOnlyList<FieldCondition> NoConditions = new FieldCondition[0];
+
         private readonly ConsequenceTable _consequenceTable;
 
         public BattleResolver(ConsequenceTable consequenceTable)
@@ -39,19 +47,23 @@ namespace Game.Core.Battle
                 field.Definition,
                 field.IsOpen);
 
-            foreach (var played in battle.PlayedAbilities)
-            {
-                foreach (var effect in played.Card.Effects)
-                    effect.Apply(calculation, played.Player);
-            }
+            // A cancelled condition does not act at any step, whenever the cancelling ability was played.
+            ApplyAbilities(battle, calculation, BattleStep.ConditionControl);
+            var conditions = calculation.FieldOpen && calculation.FieldConditionActive
+                ? field.Definition.Conditions
+                : NoConditions;
 
-            // TODO(rules): conditions run after abilities so a later ability can cancel them.
-            // See docs/decisions.md.
-            if (calculation.FieldOpen && calculation.FieldConditionActive)
-            {
-                foreach (var condition in field.Definition.Conditions)
-                    condition.Apply(calculation);
-            }
+            // Step 1: field values, changed by conditions and then by abilities.
+            foreach (var condition in conditions)
+                condition.ModifyFieldValues(calculation);
+            ApplyAbilities(battle, calculation, BattleStep.FieldValues);
+
+            // Step 2: the other abilities in play order.
+            ApplyAbilities(battle, calculation, BattleStep.Power);
+
+            // Step 3: conditions that change the comparison and the consequences.
+            foreach (var condition in conditions)
+                condition.ModifyOutcome(calculation);
 
             var winner = calculation.Comparison.DecideWinner(calculation);
             var consequences = _consequenceTable.Build(battle.Host, winner, field.IsOpen);
@@ -63,6 +75,18 @@ namespace Game.Core.Battle
                 calculation.PowerOf(battle.Guest),
                 winner,
                 consequences);
+        }
+
+        private static void ApplyAbilities(BattleState battle, BattleCalculation calculation, BattleStep step)
+        {
+            foreach (var played in battle.PlayedAbilities)
+            {
+                foreach (var effect in played.Card.Effects)
+                {
+                    if (effect.Step == step)
+                        effect.Apply(calculation, played.Player);
+                }
+            }
         }
     }
 }

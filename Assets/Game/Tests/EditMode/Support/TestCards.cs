@@ -15,6 +15,8 @@ namespace Game.Core.Tests
         public const string Plain = "test.field.plain";
         public const string Forge = "test.field.forge";
         public const string Temple = "test.field.temple";
+        public const string DoublingLake = "test.field.doubling-lake";
+        public const string HumbleHall = "test.field.humble-hall";
 
         public const string Fire180 = "test.creature.fire180";
         public const string Water200 = "test.creature.water200";
@@ -30,12 +32,19 @@ namespace Game.Core.Tests
         public const string GuestBoost = "test.ability.guest50";
         public const string ClosedFieldBoost = "test.ability.closed50";
         public const string FireBoost = "test.ability.fire60";
+        public const string Desperation = "test.ability.desperation60";
+        public const string Mirror = "test.ability.mirror";
+        public const string CancelCondition = "test.ability.cancel-condition";
 
         public static CardCatalog Catalog() => new CardCatalog(new CardDefinition[]
         {
             new FieldCard(Plain, Rarity.Common, Modifiers((Element.Light, 40))),
             new FieldCard(Forge, Rarity.Epic, Modifiers((Element.Fire, 60), (Element.Water, -30))),
             new FieldCard(Temple, Rarity.Legendary, Modifiers((Element.Light, 80))),
+            new FieldCard(DoublingLake, Rarity.Epic, Modifiers((Element.Fire, 50), (Element.Water, -20)),
+                new[] { new DoubleFieldValuesCondition() }),
+            new FieldCard(HumbleHall, Rarity.Legendary, Modifiers((Element.Fire, 60)),
+                new[] { new LowerPowerWinsCondition() }),
 
             new CreatureCard(Fire180, Rarity.Common, Element.Fire, 180),
             new CreatureCard(Water200, Rarity.Epic, Element.Water, 200),
@@ -56,16 +65,22 @@ namespace Game.Core.Tests
                 new PowerBonusEffect(50, new FieldStateRequirement(mustBeOpen: false))),
             BattleAbility(FireBoost, Rarity.Common,
                 new PowerBonusEffect(60, new CreatureElementRequirement(Element.Fire))),
+            BattleAbility(Desperation, Rarity.Common,
+                new PowerBonusEffect(60, new WeakerThanOpponentRequirement())),
+            BattleAbility(Mirror, Rarity.Epic, new InvertFieldValuesEffect()),
+            BattleAbility(CancelCondition, Rarity.Epic, new CancelFieldConditionEffect()),
         });
 
-        /// <summary>A valid deck for the default rules; ability slots can be swapped.</summary>
+        /// <summary>A valid deck for the default rules; epic/legendary fields and ability slots can be swapped.</summary>
         public static DeckList Deck(
             string commonAbility = Boost50,
             string epicAbility = Boost40,
-            string legendaryAbility = Gambit) =>
+            string legendaryAbility = Gambit,
+            string epicField = Forge,
+            string legendaryField = Temple) =>
             new DeckList(new[]
             {
-                Plain, Forge, Temple,
+                Plain, epicField, legendaryField,
                 Fire180, Water200, Earth250,
                 commonAbility, epicAbility, legendaryAbility,
             });

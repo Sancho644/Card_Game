@@ -52,10 +52,7 @@ namespace Game.Core.Flow
             _events.Emit(new ReadinessReset(player));
         }
 
-        /// <summary>
-        /// Applies the result. The turn then continues for the active player.
-        /// TODO(rules): see docs/decisions.md, "the turn continues after a battle".
-        /// </summary>
+        /// <summary>Applies the result. The turn then continues for the active player: the "after" window (docs/rules.md §5).</summary>
         public void Resolve()
         {
             var battle = _state.Battle;
