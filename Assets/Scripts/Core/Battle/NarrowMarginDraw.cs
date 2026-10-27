@@ -15,6 +15,8 @@ namespace Game.Core.Battle
             _margin = margin;
         }
 
+        public ComparisonRule Rule => ComparisonRule.NarrowMarginDraw;
+
         public PlayerId? DecideWinner(BattleCalculation calculation)
         {
             var difference = Math.Abs(calculation.PowerOf(calculation.Host) - calculation.PowerOf(calculation.Guest));

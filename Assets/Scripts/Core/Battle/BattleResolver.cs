@@ -38,26 +38,30 @@ namespace Game.Core.Battle
             foreach (var condition in conditions)
                 condition.ModifyOutcome(calculation);
 
-            var hostPower = calculation.PowerOf(battle.Host);
-            var guestPower = calculation.PowerOf(battle.Guest);
+            var host = calculation.BreakdownOf(battle.Host);
+            var guest = calculation.BreakdownOf(battle.Guest);
             var winner = calculation.Comparison.DecideWinner(calculation);
-            if (winner == null && hostPower == guestPower)
+            var tieBroken = winner == null && host.FinalPower == guest.FinalPower && calculation.TieWinner != null;
+            if (tieBroken)
                 winner = calculation.TieWinner;
 
             var consequences = _consequenceTable.Build(battle.Host, winner, battle.Field.IsOpen);
             foreach (var change in calculation.ConsequenceChanges)
                 change(consequences);
 
-            return new BattleResolution(hostPower, guestPower, winner, consequences);
+            return new BattleResolution(host, guest, calculation.Comparison.Rule, tieBroken, winner, consequences);
         }
 
         private static void ApplyAbilities(BattleState battle, BattleCalculation calculation, BattleStep step)
         {
             foreach (var played in battle.ActiveAbilities)
             {
+                calculation.CurrentSource = played.Instance;
                 foreach (var effect in played.Card.Effects.OfType<IBattleEffect>().Where(effect => effect.Step == step))
                     effect.Apply(calculation, played.Player);
             }
+
+            calculation.CurrentSource = null;
         }
     }
 }

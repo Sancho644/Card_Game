@@ -6,6 +6,8 @@ namespace Game.Core.Effects
     /// <summary>Cancels the last common or epic ability the opponent played in this battle.</summary>
     public sealed class CancelLastOpponentAbilityEffect : IPlayEffect
     {
+        public AbilityTargetKinds Targets => AbilityTargetKinds.None;
+
         public RejectReason Validate(PlayContext context) => RejectReason.None;
 
         public void Apply(PlayContext context) =>

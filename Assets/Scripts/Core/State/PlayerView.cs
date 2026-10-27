@@ -17,6 +17,7 @@ namespace Game.Core.State
         {
             Viewer = viewer;
             Phase = state.Phase;
+            AwaitingPlayer = AwaitingPlayerOf(state);
             ActivePlayer = state.ActivePlayer;
             CoinTossWinner = state.CoinTossWinner;
             Result = state.Result;
@@ -34,6 +35,12 @@ namespace Game.Core.State
 
         public PlayerId Viewer { get; }
         public MatchPhase Phase { get; }
+
+        /// <summary>
+        /// The player whose decision the match waits for: the coin toss winner, the active player,
+        /// the player acting in the battle or the one choosing a card. Null before the start and after the end.
+        /// </summary>
+        public PlayerId? AwaitingPlayer { get; }
         public PlayerId ActivePlayer { get; }
         public PlayerId? CoinTossWinner { get; }
         public MatchResult Result { get; }
@@ -54,5 +61,22 @@ namespace Game.Core.State
 
         private static IReadOnlyList<CardRef> Refs(IEnumerable<CardInstance> cards) =>
             cards.Select(CardRef.From).ToList();
+
+        private static PlayerId? AwaitingPlayerOf(MatchState state)
+        {
+            switch (state.Phase)
+            {
+                case MatchPhase.ChoosingTurnOrder:
+                    return state.CoinTossWinner;
+                case MatchPhase.Turn:
+                    return state.ActivePlayer;
+                case MatchPhase.Battle:
+                    return state.Battle.CurrentActor;
+                case MatchPhase.AwaitingChoice:
+                    return state.PendingChoice.Player;
+                default:
+                    return null;
+            }
+        }
     }
 }

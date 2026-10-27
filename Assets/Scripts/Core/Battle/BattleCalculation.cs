@@ -16,6 +16,8 @@ namespace Game.Core.Battle
         private readonly bool[] _conditionApplies = new bool[PlayerIds.All.Count];
         private readonly Dictionary<Element, int>[] _fieldValues;
         private readonly int[] _abilityPower = new int[PlayerIds.All.Count];
+        private readonly List<PowerContribution>[] _contributions =
+            PlayerIds.All.Select(_ => new List<PowerContribution>()).ToArray();
         private readonly List<Action<BattleConsequences>> _consequenceChanges = new List<Action<BattleConsequences>>();
 
         internal BattleCalculation(BattleState battle)
@@ -52,6 +54,9 @@ namespace Game.Core.Battle
 
         internal IReadOnlyList<Action<BattleConsequences>> ConsequenceChanges => _consequenceChanges;
 
+        /// <summary>The ability whose effects are being applied; recorded with every power change.</summary>
+        internal CardInstance CurrentSource { get; set; }
+
         public CreatureCard CreatureOf(PlayerId player) => _creatures[(int)player];
 
         public BattleRole RoleOf(PlayerId player) => player == Host ? BattleRole.Host : BattleRole.Guest;
@@ -76,7 +81,19 @@ namespace Game.Core.Battle
         public int PowerOf(PlayerId player) =>
             CreatureOf(player).Power + FieldModifierFor(player) + _abilityPower[(int)player];
 
-        public void AddPower(PlayerId player, int amount) => _abilityPower[(int)player] += amount;
+        public void AddPower(PlayerId player, int amount)
+        {
+            _abilityPower[(int)player] += amount;
+            _contributions[(int)player].Add(new PowerContribution(CardRef.From(CurrentSource), amount));
+        }
+
+        /// <summary>The player's power by the steps of the count, as it stands now.</summary>
+        public PowerBreakdown BreakdownOf(PlayerId player) =>
+            new PowerBreakdown(
+                CreatureOf(player).Power,
+                FieldModifierFor(player),
+                _contributions[(int)player].ToList(),
+                PowerOf(player));
 
         /// <summary>Registers a change to the consequences, applied after the rules table.</summary>
         public void ModifyConsequences(Action<BattleConsequences> change) =>

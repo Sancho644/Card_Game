@@ -6,6 +6,8 @@ namespace Game.Core.Effects
     /// <summary>Returns one of your used abilities, other than this one, from the discard pile. Target: CardId.</summary>
     public sealed class ReturnAbilityFromDiscardEffect : IPlayEffect
     {
+        public AbilityTargetKinds Targets => AbilityTargetKinds.Card;
+
         public RejectReason Validate(PlayContext context)
         {
             var id = context.Targets.CardId;

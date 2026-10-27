@@ -10,6 +10,8 @@ namespace Game.Core.Effects
     /// </summary>
     public sealed class ScoutEffect : IPlayEffect
     {
+        public AbilityTargetKinds Targets => AbilityTargetKinds.Field;
+
         public RejectReason Validate(PlayContext context)
         {
             var closedFields = context.State.Fields.Where(field => IsClosedFieldOf(field, context.Opponent)).ToList();

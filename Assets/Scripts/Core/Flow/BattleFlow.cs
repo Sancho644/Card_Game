@@ -137,7 +137,8 @@ namespace Game.Core.Flow
         {
             var battle = _state.Battle;
             var resolution = _resolver.Resolve(battle);
-            _events.Emit(new BattleResolved(battle.Field.Id, resolution.HostPower, resolution.GuestPower, resolution.Winner));
+            _events.Emit(new BattleResolved(
+                battle.Field.Id, resolution.Host, resolution.Guest, resolution.Rule, resolution.TieBroken, resolution.Winner));
 
             var consequences = resolution.Consequences;
             ApplyConsequences(battle.Field, consequences);

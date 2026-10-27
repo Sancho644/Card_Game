@@ -6,6 +6,8 @@ namespace Game.Core.Effects
     /// <summary>Returns one of your creatures that is out of the game to your hand. Target: CardId.</summary>
     public sealed class ReturnCreatureFromOutOfGameEffect : IPlayEffect
     {
+        public AbilityTargetKinds Targets => AbilityTargetKinds.Card;
+
         public RejectReason Validate(PlayContext context)
         {
             var id = context.Targets.CardId;

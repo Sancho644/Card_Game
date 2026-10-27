@@ -5,6 +5,8 @@ namespace Game.Core.Effects
     /// <summary>The host opens the battle's field at once if it is closed (and not locked).</summary>
     public sealed class OpenBattleFieldEffect : IPlayEffect
     {
+        public AbilityTargetKinds Targets => AbilityTargetKinds.None;
+
         public RejectReason Validate(PlayContext context) => RejectReason.None;
 
         // TODO(rules): a locked field («Запертое поле») stays closed even under this effect. See docs/decisions.md.

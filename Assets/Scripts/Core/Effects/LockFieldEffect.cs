@@ -5,6 +5,8 @@ namespace Game.Core.Effects
     /// <summary>Locks one of the opponent's closed fields: the host cannot open it in the next battle on it. Target: FieldId.</summary>
     public sealed class LockFieldEffect : IPlayEffect
     {
+        public AbilityTargetKinds Targets => AbilityTargetKinds.Field;
+
         public RejectReason Validate(PlayContext context)
         {
             var id = context.Targets.FieldId;

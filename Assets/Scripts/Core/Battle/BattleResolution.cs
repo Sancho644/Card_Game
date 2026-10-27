@@ -4,16 +4,29 @@ namespace Game.Core.Battle
 {
     public sealed class BattleResolution
     {
-        internal BattleResolution(int hostPower, int guestPower, PlayerId? winner, BattleConsequences consequences)
+        internal BattleResolution(
+            PowerBreakdown host,
+            PowerBreakdown guest,
+            ComparisonRule rule,
+            bool tieBroken,
+            PlayerId? winner,
+            BattleConsequences consequences)
         {
-            HostPower = hostPower;
-            GuestPower = guestPower;
+            Host = host;
+            Guest = guest;
+            Rule = rule;
+            TieBroken = tieBroken;
             Winner = winner;
             Consequences = consequences;
         }
 
-        public int HostPower { get; }
-        public int GuestPower { get; }
+        public PowerBreakdown Host { get; }
+        public PowerBreakdown Guest { get; }
+        public ComparisonRule Rule { get; }
+
+        /// <summary>Powers were equal and an effect («Перевес») gave the win to one side.</summary>
+        public bool TieBroken { get; }
+
         public PlayerId? Winner { get; }
         public BattleConsequences Consequences { get; }
     }

@@ -17,6 +17,8 @@ namespace Game.Core.Effects
             _ownCreature = ownCreature;
         }
 
+        public AbilityTargetKinds Targets => AbilityTargetKinds.Creature | AbilityTargetKinds.Field;
+
         public RejectReason Validate(PlayContext context)
         {
             var owner = Owner(context);

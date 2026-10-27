@@ -21,6 +21,7 @@ namespace Game.Core
     {
         private readonly MatchContext _context;
         private readonly Dictionary<Type, ICommandHandler> _handlers;
+        private readonly LegalActionFinder _legalActions;
 
         public MatchEngine(MatchSetup setup, CardCatalog catalog, GameRules rules, IRandom random)
         {
@@ -32,6 +33,7 @@ namespace Game.Core
             ValidateDecks(setup, catalog, rules);
             _context = new MatchContext(CreateState(setup, catalog), rules, random);
             _handlers = CreateHandlers().ToDictionary(handler => handler.CommandType);
+            _legalActions = new LegalActionFinder(_context.State, Validate);
         }
 
         /// <summary>Authoritative state, for the server and tests. Clients should use <see cref="GetView"/>.</summary>
@@ -60,22 +62,30 @@ namespace Game.Core
 
         public CommandResult Execute(GameCommand command)
         {
-            if (command == null)
-                throw new ArgumentNullException(nameof(command));
-            if (State.Phase == MatchPhase.Ended)
-                return CommandResult.Rejected(RejectReason.MatchOver);
-            if (State.Phase == MatchPhase.NotStarted)
-                return CommandResult.Rejected(RejectReason.WrongPhase);
-            if (!_handlers.TryGetValue(command.GetType(), out var handler))
-                return CommandResult.Rejected(RejectReason.UnknownCommand);
-
-            var reason = handler.Validate(command, _context);
+            var reason = Validate(command);
             if (reason != RejectReason.None)
                 return CommandResult.Rejected(reason);
 
-            handler.Apply(command, _context);
+            _handlers[command.GetType()].Apply(command, _context);
             return CommandResult.Accepted(_context.Events.Drain());
         }
+
+        /// <summary>Checks a command without changing anything. <see cref="RejectReason.None"/> means it would be accepted.</summary>
+        public RejectReason Validate(GameCommand command)
+        {
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
+            if (State.Phase == MatchPhase.Ended)
+                return RejectReason.MatchOver;
+            if (State.Phase == MatchPhase.NotStarted)
+                return RejectReason.WrongPhase;
+            return _handlers.TryGetValue(command.GetType(), out var handler)
+                ? handler.Validate(command, _context)
+                : RejectReason.UnknownCommand;
+        }
+
+        /// <summary>Every command the player may send right now. Presentation and AI choose only from this list.</summary>
+        public IReadOnlyList<GameCommand> GetLegalActions(PlayerId player) => _legalActions.Find(player);
 
         public PlayerView GetView(PlayerId viewer) => new PlayerView(State, viewer);
 

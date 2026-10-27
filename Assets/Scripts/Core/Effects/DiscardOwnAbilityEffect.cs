@@ -9,6 +9,8 @@ namespace Game.Core.Effects
     /// </summary>
     public sealed class DiscardOwnAbilityEffect : IPlayEffect
     {
+        public AbilityTargetKinds Targets => AbilityTargetKinds.Card;
+
         public RejectReason Validate(PlayContext context)
         {
             var others = context.AbilitiesInHand(context.Caster).Where(card => card.Id != context.Ability.Id).ToList();
