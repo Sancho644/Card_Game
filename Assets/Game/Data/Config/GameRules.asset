@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11155bf6b44fdbb449c7bc28003eb254, type: 3}
+  m_Name: GameRules
+  m_EditorClassIdentifier: Game.Data::Game.Data.Config.GameRulesConfig
+  _winsToWin: 3
+  _legendaryAbilitiesPerTurn: 1
+  _drawRule: 0
+  _fieldRarities: 000000000100000002000000i
+  _creatureRarities: 000000000100000002000000i
+  _abilityRarities: 000000000100000002000000i
+  _turnOrderChoiceSeconds: 10
+  _turnSeconds: 45
+  _battleDecisionSeconds: 15

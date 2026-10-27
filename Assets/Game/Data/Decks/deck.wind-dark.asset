@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79d168955e5bfe4bb8be3a0a4867343, type: 3}
+  m_Name: deck.wind-dark
+  m_EditorClassIdentifier: Game.Data::Game.Data.Decks.DeckDef
+  _id: deck.wind-dark
+  _displayName: "\u0412\u0435\u0442\u0435\u0440 \u0438 \u0422\u044C\u043C\u0430"
+  _cards:
+  - {fileID: 11400000, guid: 1afa99a68eddd084aaec76db63e4379d, type: 2}
+  - {fileID: 11400000, guid: 9e30a0af4d9a3b9468342c130e306775, type: 2}
+  - {fileID: 11400000, guid: 29eb388fd392c7e47a0d37efe429d2ea, type: 2}
+  - {fileID: 11400000, guid: 4715264fba6fdf641b0e283ac4f59780, type: 2}
+  - {fileID: 11400000, guid: def2839f8a743fe4d9acdc373b4bc603, type: 2}
+  - {fileID: 11400000, guid: bd11a34c64739844abe3b1ec985eb4b4, type: 2}
+  - {fileID: 11400000, guid: c6c1630f2dcf540459c3b81950c797c4, type: 2}
+  - {fileID: 11400000, guid: ffefcb3b10295524cbcb05048e987465, type: 2}
+  - {fileID: 11400000, guid: 1546c46cc86fabe4b92a9e9c7172ea93, type: 2}

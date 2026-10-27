@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f560161524e404c8bf7bed8a7e8130, type: 3}
+  m_Name: ability.hidden-strength
+  m_EditorClassIdentifier: Game.Data::Game.Data.Cards.AbilityDef
+  _id: ability.hidden-strength
+  _displayName: "\u0421\u043A\u0440\u044B\u0442\u0430\u044F \u0441\u0438\u043B\u0430"
+  _description: "+50, \u0435\u0441\u043B\u0438 \u043A\u0430\u0440\u0442\u0430 \u043F\u043E\u043B\u044F \u0432 \u044D\u0442\u043E\u0439 \u0431\u0438\u0442\u0432\u0435 \u0437\u0430\u043A\u0440\u044B\u0442\u0430."
+  _rarity: 0
+  _art: {fileID: 0}
+  _frame: {fileID: 0}
+  _timing: 4
+  _effects:
+  - rid: 1305724550549602386
+  _boundCreature: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1305724550549602386
+      type: {class: PowerBonusData, ns: Game.Data.Effects, asm: Game.Data}
+      data:
+        Amount: 50
+        Requirements:
+        - rid: 1305724550549602387
+    - rid: 1305724550549602387
+      type: {class: FieldStateRequirementData, ns: Game.Data.Effects, asm: Game.Data}
+      data:
+        MustBeOpen: 0

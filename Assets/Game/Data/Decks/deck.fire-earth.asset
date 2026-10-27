@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79d168955e5bfe4bb8be3a0a4867343, type: 3}
+  m_Name: deck.fire-earth
+  m_EditorClassIdentifier: Game.Data::Game.Data.Decks.DeckDef
+  _id: deck.fire-earth
+  _displayName: "\u041E\u0433\u043E\u043D\u044C \u0438 \u0417\u0435\u043C\u043B\u044F"
+  _cards:
+  - {fileID: 11400000, guid: 86b00f61465823c45a094f613bd54d41, type: 2}
+  - {fileID: 11400000, guid: 8abc8e125a036fd4bb3c2689b08fb885, type: 2}
+  - {fileID: 11400000, guid: b51925f44e726ff4092faebdc525988b, type: 2}
+  - {fileID: 11400000, guid: 56cdd89906695314797b6955e4ac287d, type: 2}
+  - {fileID: 11400000, guid: abaf4dec08ab87c40b2d7a548adb3e11, type: 2}
+  - {fileID: 11400000, guid: ccd6d17e7384535408bd6d5e73dc18f0, type: 2}
+  - {fileID: 11400000, guid: c2d8f9df6efd99e4493a691706c8c856, type: 2}
+  - {fileID: 11400000, guid: 80b3aea347068734fb11415726450bdc, type: 2}
+  - {fileID: 11400000, guid: 6de3607116013b04fb0eb87f04ea7fab, type: 2}

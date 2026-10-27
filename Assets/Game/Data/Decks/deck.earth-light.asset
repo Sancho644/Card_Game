@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79d168955e5bfe4bb8be3a0a4867343, type: 3}
+  m_Name: deck.earth-light
+  m_EditorClassIdentifier: Game.Data::Game.Data.Decks.DeckDef
+  _id: deck.earth-light
+  _displayName: "\u0417\u0435\u043C\u043B\u044F \u0438 \u0421\u0432\u0435\u0442"
+  _cards:
+  - {fileID: 11400000, guid: 2c7f9eded06fa3e419f76e7db49f58d5, type: 2}
+  - {fileID: 11400000, guid: 1077f5e8b54233f48bd2fbc89634ec3a, type: 2}
+  - {fileID: 11400000, guid: da56dceabe847704f8b88c5e560ca8aa, type: 2}
+  - {fileID: 11400000, guid: d4a620e05baa63343915d8ab8441ea5a, type: 2}
+  - {fileID: 11400000, guid: 1bffa7a681144044093733f947097887, type: 2}
+  - {fileID: 11400000, guid: 5a54403ad8b79864b92ad0c26dcc3501, type: 2}
+  - {fileID: 11400000, guid: 864f2d613c4181845aaaa59ce5167556, type: 2}
+  - {fileID: 11400000, guid: 51c68a10968fef542806e11086806c7b, type: 2}
+  - {fileID: 11400000, guid: ad2d2f559b108114099710779dcc3054, type: 2}

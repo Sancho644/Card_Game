@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f560161524e404c8bf7bed8a7e8130, type: 3}
+  m_Name: ability.forge-flame
+  m_EditorClassIdentifier: Game.Data::Game.Data.Cards.AbilityDef
+  _id: ability.forge-flame
+  _displayName: "\u041F\u043B\u0430\u043C\u044F \u0433\u043E\u0440\u043D\u0430"
+  _description: "+80 \u0441\u0438\u043B\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0430 \u0438 \u221220 \u0441\u0438\u043B\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0430 \u0441\u043E\u043F\u0435\u0440\u043D\u0438\u043A\u0430."
+  _rarity: 2
+  _art: {fileID: 0}
+  _frame: {fileID: 0}
+  _timing: 6
+  _effects:
+  - rid: 1305724550549602428
+  - rid: 1305724550549602429
+  _boundCreature: {fileID: 11400000, guid: ccd6d17e7384535408bd6d5e73dc18f0, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1305724550549602428
+      type: {class: PowerBonusData, ns: Game.Data.Effects, asm: Game.Data}
+      data:
+        Amount: 80
+        Requirements: []
+    - rid: 1305724550549602429
+      type: {class: OpponentPowerData, ns: Game.Data.Effects, asm: Game.Data}
+      data:
+        Amount: -20

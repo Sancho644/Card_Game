@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f560161524e404c8bf7bed8a7e8130, type: 3}
+  m_Name: ability.dawn
+  m_EditorClassIdentifier: Game.Data::Game.Data.Cards.AbilityDef
+  _id: ability.dawn
+  _displayName: "\u0420\u0430\u0441\u0441\u0432\u0435\u0442"
+  _description: "+70 \u0441\u0438\u043B\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0430. \u0423\u0441\u043B\u043E\u0432\u0438\u0435 \u043E\u0442\u043A\u0440\u044B\u0442\u043E\u0439 \u043A\u0430\u0440\u0442\u044B \u043F\u043E\u043B\u044F \u043D\u0435 \u0434\u0435\u0439\u0441\u0442\u0432\u0443\u0435\u0442 \u043D\u0430 \u044D\u0442\u043E \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u043E."
+  _rarity: 2
+  _art: {fileID: 0}
+  _frame: {fileID: 0}
+  _timing: 6
+  _effects:
+  - rid: 1305724550549602436
+  - rid: 1305724550549602437
+  _boundCreature: {fileID: 11400000, guid: 8c7ec60556cd0064fab99852b64ca404, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1305724550549602436
+      type: {class: PowerBonusData, ns: Game.Data.Effects, asm: Game.Data}
+      data:
+        Amount: 70
+        Requirements: []
+    - rid: 1305724550549602437
+      type: {class: ConditionImmunityData, ns: Game.Data.Effects, asm: Game.Data}
+      data: 

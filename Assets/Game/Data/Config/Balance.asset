@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0149d007e23781b4883389c837288b64, type: 3}
+  m_Name: Balance
+  m_EditorClassIdentifier: Game.Data::Game.Data.Config.BalanceConfig
+  _rarities:
+  - Rarity: 0
+    CreaturePower:
+      Min: 100
+      Max: 200
+    FieldBonus:
+      Min: 30
+      Max: 50
+    FieldBonusElements:
+      Min: 1
+      Max: 2
+    AbilityPower:
+      Min: 30
+      Max: 60
+  - Rarity: 1
+    CreaturePower:
+      Min: 150
+      Max: 250
+    FieldBonus:
+      Min: 50
+      Max: 80
+    FieldBonusElements:
+      Min: 2
+      Max: 3
+    AbilityPower:
+      Min: 40
+      Max: 70
+  - Rarity: 2
+    CreaturePower:
+      Min: 200
+      Max: 300
+    FieldBonus:
+      Min: 80
+      Max: 120
+    FieldBonusElements:
+      Min: 3
+      Max: 4
+    AbilityPower:
+      Min: 0
+      Max: 0
+  _signatureAbilityPower:
+    Min: 60
+    Max: 100

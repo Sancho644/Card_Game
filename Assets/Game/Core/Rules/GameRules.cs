@@ -5,19 +5,32 @@ using Game.Core.Cards;
 
 namespace Game.Core.Rules
 {
-    /// <summary>Tunable match settings. Filled from GameRulesConfig (stage 2); defaults follow docs/rules.md.</summary>
+    /// <summary>How a draw is settled. Open question 1 in docs/rules.md; alternatives go here.</summary>
+    public enum DrawRule
+    {
+        /// <summary>No win; both creatures return to hand; an open field is removed, a closed one stays.</summary>
+        BothReturnToHand,
+    }
+
+    /// <summary>Tunable match settings, filled from GameRulesConfig; defaults follow docs/rules.md.</summary>
     public sealed class GameRules
     {
-        public GameRules(int winsToWin, int legendaryAbilitiesPerTurn, DeckRules deck)
+        public GameRules(
+            int winsToWin,
+            int legendaryAbilitiesPerTurn,
+            DeckRules deck,
+            DrawRule drawRule = DrawRule.BothReturnToHand)
         {
             WinsToWin = winsToWin;
             LegendaryAbilitiesPerTurn = legendaryAbilitiesPerTurn;
             Deck = deck ?? throw new ArgumentNullException(nameof(deck));
+            DrawRule = drawRule;
         }
 
         public int WinsToWin { get; }
         public int LegendaryAbilitiesPerTurn { get; }
         public DeckRules Deck { get; }
+        public DrawRule DrawRule { get; }
 
         public static GameRules Default => new GameRules(3, 1, DeckRules.Default);
     }

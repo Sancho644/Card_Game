@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d065ba1fbb7a7a47afd2e3ef7fae9bd, type: 3}
+  m_Name: field.mountain-path
+  m_EditorClassIdentifier: Game.Data::Game.Data.Cards.FieldDef
+  _id: field.mountain-path
+  _displayName: "\u0413\u043E\u0440\u043D\u0430\u044F \u0442\u0440\u043E\u043F\u0430"
+  _description: "\u0417\u0435\u043C\u043B\u044F +40, \u0412\u0435\u0442\u0435\u0440 +30."
+  _rarity: 0
+  _art: {fileID: 0}
+  _frame: {fileID: 0}
+  _modifiers:
+  - Element: 2
+    Value: 40
+  - Element: 5
+    Value: 30
+  _conditions: []
+  references:
+    version: 2
+    RefIds: []
