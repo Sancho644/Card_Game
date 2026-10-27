@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Game.Core;
+using Game.Core.Battle;
 using Game.Core.Commands;
 using Game.Core.Events;
 using Game.Core.State;
@@ -23,5 +24,8 @@ namespace Game.Services.Match
         PlayerView GetView(PlayerId viewer);
 
         IReadOnlyList<GameCommand> GetLegalActions(PlayerId player);
+
+        /// <summary>The current battle's powers, counted as for the final result; null outside a battle.</summary>
+        BattlePower GetBattlePower();
     }
 }

@@ -5,7 +5,7 @@ namespace Game.Presentation.Cards
     /// <summary>What the face of a card shows, built from card data.</summary>
     public sealed class CardFace
     {
-        public CardFace(string title, string stats, string body, string rarity, Color frameColor, Color rarityColor)
+        public CardFace(string title, string stats, string body, string rarity, Color frameColor, Color rarityColor, bool hasCondition = false)
         {
             Title = title;
             Stats = stats;
@@ -13,6 +13,7 @@ namespace Game.Presentation.Cards
             Rarity = rarity;
             FrameColor = frameColor;
             RarityColor = rarityColor;
+            HasCondition = hasCondition;
         }
 
         public string Title { get; }
@@ -24,5 +25,8 @@ namespace Game.Presentation.Cards
         public string Rarity { get; }
         public Color FrameColor { get; }
         public Color RarityColor { get; }
+
+        /// <summary>A field card with a condition: the face shows the condition badge.</summary>
+        public bool HasCondition { get; }
     }
 }

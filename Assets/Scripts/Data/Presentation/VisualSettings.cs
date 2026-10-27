@@ -38,6 +38,13 @@ namespace Game.Data.Presentation
         [SerializeField] private Color _selected = new Color(1.00f, 0.90f, 0.20f);
         [SerializeField] private Color _target = new Color(0.25f, 0.85f, 1.00f);
         [SerializeField] private Color _battle = new Color(1.00f, 0.45f, 0.15f);
+        [SerializeField] private Color _dropTarget = new Color(1.00f, 1.00f, 1.00f);
+
+        [Header("Battle")]
+        [SerializeField, Range(0.2f, 1f)] private float _closedFieldBrightness = 0.5f;
+        [SerializeField] private Color _powerBadge = new Color(0.10f, 0.10f, 0.12f);
+        [SerializeField] private Color _powerUp = new Color(0.25f, 0.80f, 0.30f);
+        [SerializeField] private Color _powerDown = new Color(0.90f, 0.25f, 0.20f);
 
         public Color AbilityFrame => _abilityFrame;
         public Color NeutralFrame => _neutralFrame;
@@ -48,6 +55,16 @@ namespace Game.Data.Presentation
         public Color Selected => _selected;
         public Color Target => _target;
         public Color Battle => _battle;
+
+        /// <summary>The target under the dragged card, where it would land if released now.</summary>
+        public Color DropTarget => _dropTarget;
+
+        /// <summary>How bright the owner sees the face of their own closed field (1 is normal).</summary>
+        public float ClosedFieldBrightness => _closedFieldBrightness;
+
+        public Color PowerBadge => _powerBadge;
+        public Color PowerUp => _powerUp;
+        public Color PowerDown => _powerDown;
 
         public Color FrameColorOf(Element element)
         {

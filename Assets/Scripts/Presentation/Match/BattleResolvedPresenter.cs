@@ -7,7 +7,10 @@ using Game.Presentation.Ui;
 
 namespace Game.Presentation.Match
 {
-    /// <summary>Shows the power breakdown and the consequences, and waits until the player continues.</summary>
+    /// <summary>
+    /// Shows the battle result and its consequences, with the power count step by step one button away,
+    /// and waits until the player continues.
+    /// </summary>
     public sealed class BattleResolvedPresenter : IEventPresenter
     {
         private readonly BattleSummaryBuilder _summary;
@@ -28,14 +31,25 @@ namespace Game.Presentation.Match
 
             var battle = context.PreviousView.Battle;
             var field = context.PreviousView.Field(battle.FieldId);
-            var body = _summary.Build(
+            var consequences = Consequences(context);
+            var summary = _summary.BuildShort(result, battle.Host, consequences);
+            var details = _summary.BuildDetails(
                 result,
                 battle.Host,
                 field.Occupant(battle.Host).InstanceId,
                 field.Occupant(battle.Guest).InstanceId,
-                Consequences(context));
+                consequences);
+
             context.Enqueue(new WaitForPlayerStep(done =>
-                _dialog.Show(_summary.Title, body, _texts.Get(UiTextKeys.Continue), done)));
+            {
+                void ShowSummary() => _dialog.Show(
+                    _summary.Title, summary, _texts.Get(UiTextKeys.Continue), done, _texts.Get(UiTextKeys.BreakdownDetails), ShowDetails);
+
+                void ShowDetails() => _dialog.Show(
+                    _summary.Title, details, _texts.Get(UiTextKeys.Continue), done, _texts.Get(UiTextKeys.BreakdownBack), ShowSummary);
+
+                ShowSummary();
+            }));
         }
 
         private static IReadOnlyList<GameEvent> Consequences(PresentationContext context) =>

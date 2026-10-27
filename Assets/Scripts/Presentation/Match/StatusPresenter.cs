@@ -1,4 +1,5 @@
 using System.Text;
+using Game.Core.Battle;
 using Game.Core.State;
 using Game.Data.Presentation;
 using Game.Presentation.Ui;
@@ -10,20 +11,29 @@ namespace Game.Presentation.Match
     {
         private readonly TopBarView _topBar;
         private readonly TextPanelView _battlePanel;
+        private readonly TextPanelView _ruleBadge;
         private readonly PlayerNames _names;
         private readonly CardNameLookup _lookup;
         private readonly UiTexts _texts;
 
-        public StatusPresenter(TopBarView topBar, TextPanelView battlePanel, PlayerNames names, CardNameLookup lookup, UiTexts texts)
+        public StatusPresenter(
+            TopBarView topBar,
+            TextPanelView battlePanel,
+            TextPanelView ruleBadge,
+            PlayerNames names,
+            CardNameLookup lookup,
+            UiTexts texts)
         {
             _topBar = topBar;
             _battlePanel = battlePanel;
+            _ruleBadge = ruleBadge;
             _names = names;
             _lookup = lookup;
             _texts = texts;
         }
 
-        public void Show(PlayerView view)
+        /// <param name="power">The engine's current count of the battle, for the comparison rule badge; null outside a battle.</param>
+        public void Show(PlayerView view, BattlePower power)
         {
             var score = _texts.Format(
                 UiTextKeys.Score,
@@ -36,9 +46,11 @@ namespace Game.Presentation.Match
 
             if (view.Battle == null)
             {
-                _battlePanel.Hide();
+                Hide();
                 return;
             }
+
+            ShowRule(power?.Rule ?? ComparisonRule.HigherPowerWins);
 
             var battle = view.Battle;
             var field = view.Field(battle.FieldId);
@@ -52,7 +64,28 @@ namespace Game.Presentation.Match
             _battlePanel.Show(text.ToString());
         }
 
-        public void Hide() => _battlePanel.Hide();
+        public void Hide()
+        {
+            _battlePanel.Hide();
+            _ruleBadge.Hide();
+        }
+
+        /// <summary>A badge when an open field condition changes how the powers are compared.</summary>
+        private void ShowRule(ComparisonRule rule)
+        {
+            switch (rule)
+            {
+                case ComparisonRule.LowerPowerWins:
+                    _ruleBadge.Show(_texts.Get(UiTextKeys.RuleLower));
+                    break;
+                case ComparisonRule.NarrowMarginDraw:
+                    _ruleBadge.Show(_texts.Get(UiTextKeys.RuleNarrow));
+                    break;
+                default:
+                    _ruleBadge.Hide();
+                    break;
+            }
+        }
 
         private string Ready(BattleView battle, PlayerId player) =>
             battle.IsReady(player) ? " — " + _texts.Get(UiTextKeys.BattleReady) : "";

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Game.Core;
+using Game.Core.Battle;
 using Game.Core.Cards;
 using Game.Core.Commands;
 using Game.Core.Events;
@@ -44,5 +45,7 @@ namespace Game.Services.Match
         public PlayerView GetView(PlayerId viewer) => Engine.GetView(viewer);
 
         public IReadOnlyList<GameCommand> GetLegalActions(PlayerId player) => Engine.GetLegalActions(player);
+
+        public BattlePower GetBattlePower() => Engine.GetBattlePower();
     }
 }

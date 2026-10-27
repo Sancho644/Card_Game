@@ -42,11 +42,12 @@ namespace Game.Presentation.Table
             var sequence = DOTween.Sequence();
             var visible = new HashSet<int>();
 
-            void Move(CardRef card, TableSide owner, CardPose pose, string status = null)
+            void Move(CardRef card, TableSide owner, CardPose pose, string status = null, float brightness = 1f)
             {
                 visible.Add(card.InstanceId);
                 var cardView = _registry.GetOrCreate(card.InstanceId, card.CardId, _layout.Spawn(owner));
                 cardView.SetStatus(status);
+                cardView.SetDimming(brightness);
                 var tween = cardView.MoveTo(pose, duration);
                 if (tween != null)
                     sequence.Join(tween);
@@ -64,7 +65,9 @@ namespace Game.Presentation.Table
                     var pose = field.IsRemoved
                         ? _layout.Pile(side, PileKind.RemovedFields, removed++, known)
                         : _layout.Field(side, i, fields.Count, known);
-                    Move(new CardRef(field.Id, field.CardId), side, pose, StatusOf(field));
+                    // The owner sees the face of a closed field, darkened; the opponent sees its back.
+                    var brightness = known && !field.IsOpen && !field.IsRemoved ? _visual.ClosedFieldBrightness : 1f;
+                    Move(new CardRef(field.Id, field.CardId), side, pose, StatusOf(field), brightness);
 
                     foreach (var occupantOwner in PlayerIds.All)
                     {
@@ -113,8 +116,9 @@ namespace Game.Presentation.Table
         {
             foreach (var card in _registry.All)
                 card.SetBattle(null);
-            if (view.Battle != null)
-                _registry.Find(view.Battle.FieldId)?.SetBattle(_visual.Battle);
+            var field = view.Battle == null ? null : _registry.Find(view.Battle.FieldId);
+            if (field != null)
+                field.SetBattle(_visual.Battle);
         }
 
         private string StatusOf(FieldView field)

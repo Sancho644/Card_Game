@@ -11,6 +11,11 @@ namespace Game.Data.Presentation
         public const string HiddenCard = "card.hidden";
         public const string FieldClosed = "card.closed";
         public const string FieldLocked = "card.locked";
+        public const string SkipReasonPrefix = "skip.";
+        public const string SkipBanner = "skip.banner";
+        public const string BreakdownDetails = "button.details";
+        public const string BreakdownBack = "button.back";
+        public const string ResultPowers = "result.powers";
 
         public const string EndTurn = "button.end-turn";
         public const string Ready = "button.ready";

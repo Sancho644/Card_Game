@@ -32,7 +32,8 @@ namespace Game.Presentation.Cards
                 card.Description,
                 _texts.Get(UiTextKeys.RarityPrefix + card.Rarity),
                 FrameColorOf(card),
-                rarity.Color);
+                rarity.Color,
+                card is FieldDef field && field.Conditions.Count > 0);
         }
 
         public string NameOf(string cardId)

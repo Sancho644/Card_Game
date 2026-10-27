@@ -27,7 +27,7 @@ namespace Game.Presentation.Match
             Add<TurnStarted>(e => Line(UiTextKeys.LogTurn, _names.Of(e.Player)));
             Add<CreaturePlaced>(e => Line(UiTextKeys.LogPlaced, _names.Of(e.Player), _faces.NameOf(e.Creature.CardId)));
             Add<CreatureMoved>(e => Line(UiTextKeys.LogMoved, _names.Of(e.Player), _lookup.NameOf(e.CreatureId)));
-            Add<MainActionSkipped>(e => Line(UiTextKeys.LogSkipped, _names.Of(e.Player)));
+            Add<MainActionSkipped>(e => Line(UiTextKeys.LogSkipped, _names.Of(e.Player), Line(UiTextKeys.SkipReasonPrefix + e.Reason)));
             Add<BattleStarted>(e => Line(UiTextKeys.LogBattle, _lookup.NameOf(e.FieldId), _names.Of(e.FirstActor)));
             Add<FieldOpened>(e => Line(UiTextKeys.LogFieldOpened, _faces.NameOf(e.CardId)));
             Add<AbilityPlayed>(e => Line(UiTextKeys.LogAbility, _names.Of(e.Player), _faces.NameOf(e.Ability.CardId)));

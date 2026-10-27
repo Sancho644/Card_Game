@@ -7,7 +7,7 @@ using Game.Data.Presentation;
 
 namespace Game.Presentation.Match
 {
-    /// <summary>The text of the power breakdown panel: both creatures step by step, the rule, the consequences.</summary>
+    /// <summary>The texts of the battle result panel: a short result and, on request, the power count step by step.</summary>
     public sealed class BattleSummaryBuilder
     {
         private readonly UiTexts _texts;
@@ -23,15 +23,35 @@ namespace Game.Presentation.Match
 
         public string Title => _texts.Get(UiTextKeys.BreakdownTitle);
 
+        /// <summary>The result in a few lines: both powers, the rule if unusual, the winner and the consequences.</summary>
         /// <param name="consequences">The events that followed the result in the same batch.</param>
-        public string Build(BattleResolved result, PlayerId host, int hostCreature, int guestCreature, IReadOnlyList<GameEvent> consequences)
+        public string BuildShort(BattleResolved result, PlayerId host, IReadOnlyList<GameEvent> consequences)
+        {
+            var text = new StringBuilder();
+            text.Append(_texts.Format(
+                UiTextKeys.ResultPowers,
+                _names.Of(host),
+                result.HostPower,
+                _names.Of(host.Opponent()),
+                result.GuestPower)).Append('\n');
+            AppendOutcome(text, result, consequences);
+            return text.ToString().TrimEnd();
+        }
+
+        /// <summary>Both creatures step by step, then the same outcome as the short text.</summary>
+        public string BuildDetails(BattleResolved result, PlayerId host, int hostCreature, int guestCreature, IReadOnlyList<GameEvent> consequences)
         {
             var text = new StringBuilder();
             AppendSide(text, host, hostCreature, result.Host);
             text.Append('\n');
             AppendSide(text, host.Opponent(), guestCreature, result.Guest);
             text.Append('\n');
+            AppendOutcome(text, result, consequences);
+            return text.ToString().TrimEnd();
+        }
 
+        private void AppendOutcome(StringBuilder text, BattleResolved result, IReadOnlyList<GameEvent> consequences)
+        {
             if (result.Rule == ComparisonRule.LowerPowerWins)
                 text.Append(_texts.Get(UiTextKeys.RuleLower)).Append('\n');
             else if (result.Rule == ComparisonRule.NarrowMarginDraw)
@@ -58,8 +78,6 @@ namespace Game.Presentation.Match
                         break;
                 }
             }
-
-            return text.ToString().TrimEnd();
         }
 
         private void AppendSide(StringBuilder text, PlayerId player, int creature, PowerBreakdown power)

@@ -27,6 +27,7 @@ namespace Game.Presentation.Match
         private readonly UiTexts _texts;
         private LocalHumanController _current;
         private PlayerView _view;
+        private bool _disposed;
 
         public HumanDecisionUi(
             IReadOnlyList<LocalHumanController> humans,
@@ -62,8 +63,15 @@ namespace Game.Presentation.Match
             _selector.CommandChosen += Submit;
         }
 
+        /// <summary>Stops listening; after this the views are never touched, they may already be destroyed.</summary>
         public void Dispose()
         {
+            if (_disposed)
+                return;
+
+            _disposed = true;
+            _current = null;
+            _view = null;
             foreach (var human in _humans)
             {
                 human.DecisionRequested -= OnDecisionRequested;
@@ -77,6 +85,9 @@ namespace Game.Presentation.Match
 
         public void HideAll()
         {
+            if (_disposed)
+                return;
+
             _current = null;
             _view = null;
             _interaction.Enabled = false;
@@ -89,6 +100,9 @@ namespace Game.Presentation.Match
 
         private void OnDecisionRequested(LocalHumanController human, PlayerView view, IReadOnlyList<GameCommand> actions)
         {
+            if (_disposed)
+                return;
+
             _current = human;
             _view = view;
             _lookup.Remember(view);

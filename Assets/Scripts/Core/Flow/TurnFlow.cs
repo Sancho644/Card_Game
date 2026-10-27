@@ -48,16 +48,20 @@ namespace Game.Core.Flow
         }
 
         /// <summary>Whether the player could place a creature or, with no creatures in hand, challenge.</summary>
-        public bool HasLegalMainAction(PlayerId player)
+        public bool HasLegalMainAction(PlayerId player) => SkipReasonOf(player) == SkipReason.None;
+
+        /// <summary>Why the player has no main action, or <see cref="SkipReason.None"/> if they have one.</summary>
+        public SkipReason SkipReasonOf(PlayerId player)
         {
             var fields = _state.Fields.Where(field => !field.IsRemoved).ToList();
             if (_state.Player(player).HasCreatureInHand)
-                return fields.Any(field => field.OccupantOf(player) == null);
+                return fields.Any(field => field.OccupantOf(player) == null) ? SkipReason.None : SkipReason.NoFreeField;
 
-            var hasCreatureOnField = fields.Any(field => field.OccupantOf(player) != null);
+            if (!fields.Any(field => field.OccupantOf(player) != null))
+                return SkipReason.NoCreatures;
             var hasTarget = fields.Any(field =>
                 field.OccupantOf(player.Opponent()) != null && field.OccupantOf(player) == null);
-            return hasCreatureOnField && hasTarget;
+            return hasTarget ? SkipReason.None : SkipReason.NoChallengeTarget;
         }
 
         /// <summary>Closes the "after" window. Without a main action the turn counts as a skip (docs/decisions.md).</summary>
@@ -66,7 +70,7 @@ namespace Game.Core.Flow
             if (!_state.MainActionDone)
             {
                 _state.ConsecutiveSkips++;
-                _events.Emit(new MainActionSkipped(player));
+                _events.Emit(new MainActionSkipped(player, SkipReasonOf(player)));
             }
 
             _events.Emit(new TurnEnded(player));

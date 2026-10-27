@@ -15,9 +15,18 @@ MonoBehaviour:
   _moveDuration: 0.35
   _abilityShowSeconds: 0.8
   _fastForwardScale: 4
+  _bannerSeconds: 1.6
+  _powerPopupSeconds: 1.1
   _longPressSeconds: 0.5
   _dragThresholdPixels: 14
+  _dropPadding: 0.03
+  _dropRadius: 0.12
   _handSpacing: 1.45
   _handFanDegrees: 3
   _handTiltDegrees: 40
+  _handScreenMargin: 0.03
+  _fieldScale: 1.15
+  _creatureOnFieldScale: 0.75
+  _creatureOverlap: 0.12
+  _topBarShare: 0.14
   _logLines: 60

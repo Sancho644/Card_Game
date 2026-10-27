@@ -15,7 +15,8 @@ namespace Game.Core.Flow
             Random = random;
             Events = new EventLog();
             Turns = new TurnFlow(state, Events);
-            Battles = new BattleFlow(state, rules, Events, Turns, new BattleResolver(new ConsequenceTable(rules.DrawRule)));
+            PowerCounter = new BattlePowerCounter();
+            Battles = new BattleFlow(state, rules, Events, Turns, new BattleResolver(PowerCounter, new ConsequenceTable(rules.DrawRule)));
             Abilities = new AbilityFlow(this);
         }
 
@@ -24,6 +25,7 @@ namespace Game.Core.Flow
         public IRandom Random { get; }
         public EventLog Events { get; }
         public TurnFlow Turns { get; }
+        public BattlePowerCounter PowerCounter { get; }
         public BattleFlow Battles { get; }
         public AbilityFlow Abilities { get; }
     }

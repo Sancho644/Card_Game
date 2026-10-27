@@ -11,6 +11,7 @@ namespace Game.Presentation.Animation
         private readonly Queue<IAnimationStep> _steps = new Queue<IAnimationStep>();
         private IAnimationStep _current;
         private bool _pumping;
+        private bool _stopped;
 
         public event Action Idle;
 
@@ -18,7 +19,12 @@ namespace Game.Presentation.Animation
 
         public void Enqueue(IAnimationStep step)
         {
-            _steps.Enqueue(step ?? throw new ArgumentNullException(nameof(step)));
+            if (step == null)
+                throw new ArgumentNullException(nameof(step));
+            if (_stopped)
+                return;
+
+            _steps.Enqueue(step);
             Pump();
         }
 
@@ -33,9 +39,20 @@ namespace Game.Presentation.Animation
             current?.Complete();
         }
 
+        /// <summary>
+        /// Drops every step without finishing it and ignores new ones: the scene is unloading and finishing
+        /// a step could touch destroyed objects.
+        /// </summary>
+        public void Stop()
+        {
+            _stopped = true;
+            _steps.Clear();
+            _current = null;
+        }
+
         private void Pump()
         {
-            if (_pumping)
+            if (_pumping || _stopped)
                 return;
 
             _pumping = true;
@@ -53,7 +70,7 @@ namespace Game.Presentation.Animation
 
         private void OnStepDone(IAnimationStep step)
         {
-            if (_current != step)
+            if (_stopped || _current != step)
                 return;
 
             _current = null;

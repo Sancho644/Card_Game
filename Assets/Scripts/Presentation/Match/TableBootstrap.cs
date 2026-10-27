@@ -41,6 +41,8 @@ namespace Game.Presentation.Match
         [SerializeField] private EventLogView _log;
         [SerializeField] private ActionBarView _actionBar;
         [SerializeField] private TextPanelView _battlePanel;
+        [SerializeField] private TextPanelView _ruleBadge;
+        [SerializeField] private BannerView _banner;
         [SerializeField] private TextPanelView _prompt;
         [SerializeField] private DialogView _breakdown;
         [SerializeField] private DialogView _turnOrder;
@@ -53,10 +55,13 @@ namespace Game.Presentation.Match
         private MatchFlow _flow;
         private TableInteraction _interaction;
         private HumanDecisionUi _decisions;
+        private AnimationQueue _queue;
 
         private void Awake()
         {
-            _layout.Configure(_settings.HandSpacing, _settings.HandFanDegrees, _settings.HandTiltDegrees);
+            _layout.Configure(_settings, _camera);
+            var framer = _camera.GetComponent<CameraFramer>();
+            framer.Configure(_layout.FramingPoints, _settings.TopBarShare);
             _pointer.Configure(_settings.LongPressSeconds, _settings.DragThresholdPixels);
             _actionBar.Init(_texts.Get(UiTextKeys.EndTurn), _texts.Get(UiTextKeys.Ready), _texts.Get(UiTextKeys.OpenField), _texts.Get(UiTextKeys.Cancel));
             _log.Init(_settings.LogLines);
@@ -66,17 +71,19 @@ namespace Game.Presentation.Match
             var rules = _rules.ToRules();
             var faces = new CardFaceBuilder(_database, _visual, _texts);
             var registry = new CardViewRegistry(_cardPrefab, _cardRoot, faces, _visual);
-            var queue = new AnimationQueue();
+            var queue = _queue = new AnimationQueue();
             var sync = new TableSync(_layout, registry, _settings, _visual, _texts);
             var names = new PlayerNames(_texts);
             var lookup = new CardNameLookup(faces);
             var hotSeat = new HotSeatDirector();
             var selector = new ActionSelector();
             var humans = new[] { new LocalHumanController(PlayerId.Player1), new LocalHumanController(PlayerId.Player2) };
-            var status = new StatusPresenter(_topBar, _battlePanel, names, lookup, _texts);
+            var status = new StatusPresenter(_topBar, _battlePanel, _ruleBadge, names, lookup, _texts);
+            var power = new BattlePowerPresenter(
+                registry, new FloatingTextSpawner(_cardRoot, _camera), new PowerDiff(lookup), _visual, _settings);
 
             _interaction = new TableInteraction(
-                _pointer, new TableRaycaster(_camera), registry, selector, _zoom, faces, queue, _visual, _settings);
+                _pointer, new TableRaycaster(_camera), registry, selector, new DropTargetPicker(), _zoom, faces, queue, _visual, _settings);
             _decisions = new HumanDecisionUi(
                 humans, selector, _interaction, _actionBar, _turnOrder, _options, _prompt, names, lookup, _texts);
 
@@ -87,6 +94,7 @@ namespace Game.Presentation.Match
                 new TableMovePresenter(),
                 new BattleResolvedPresenter(new BattleSummaryBuilder(_texts, names, lookup), _breakdown, _texts),
                 new ScoutedPresenter(_breakdown, faces, _texts),
+                new SkipPresenter(_banner, names, _texts, _settings),
             };
 
             _flow = new MatchFlow(
@@ -102,6 +110,7 @@ namespace Game.Presentation.Match
                     hotSeat,
                     humans,
                     status,
+                    power,
                     _handoff,
                     _matchEnd,
                     names,
@@ -111,18 +120,21 @@ namespace Game.Presentation.Match
                 () =>
                 {
                     queue.Clear();
+                    power.Reset();
                     registry.Clear();
                     lookup.Clear();
                     hotSeat.Reset();
                     _decisions.HideAll();
                     _log.Clear();
                     status.Hide();
+                    _banner.Hide();
                     _zoom.Hide();
                     foreach (var dialog in new[] { _breakdown, _turnOrder, _handoff, _matchEnd })
                         dialog.Hide();
                 });
 
             _interaction.ResyncRequested += () => _flow.Presenter?.Resync();
+            framer.Changed += () => _flow.Presenter?.Resync();
             _topBar.ShowBothHandsChanged += show =>
             {
                 hotSeat.ShowBothHands = show;
@@ -132,11 +144,16 @@ namespace Game.Presentation.Match
 
         private void Start() => _flow.Begin();
 
+        /// <summary>
+        /// The scene is unloading and other objects may already be destroyed: first everything stops
+        /// listening, then the match is dropped quietly, without updating any view.
+        /// </summary>
         private void OnDestroy()
         {
-            _flow?.Presenter?.Dispose();
+            _queue?.Stop();
             _decisions?.Dispose();
             _interaction?.Dispose();
+            _flow?.Presenter?.Dispose();
         }
     }
 }

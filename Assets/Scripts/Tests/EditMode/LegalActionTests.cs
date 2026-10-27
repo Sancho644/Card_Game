@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Core.Commands;
 using Game.Core.Decks;
+using Game.Core.Events;
 using NUnit.Framework;
 using static Game.Core.Tests.MatchDriver;
 using static Game.Core.Tests.TestCards;
@@ -114,6 +115,7 @@ namespace Game.Core.Tests
                 Deck(commonAbility: ClosedFieldBoost, epicAbility: Blockade, legendaryAbility: DarkPrice, epicField: DoublingLake),
             };
             var ended = 0;
+            var skipReasons = new HashSet<SkipReason>();
 
             for (var seed = 1; seed <= 40; seed++)
             {
@@ -128,7 +130,18 @@ namespace Game.Core.Tests
 
                     var actions = d.Engine.GetLegalActions(awaiting.Value);
                     Assert.IsNotEmpty(actions, $"seed {seed}, step {step}: {awaiting} has nothing to do in {d.State.Phase}");
-                    d.Ok(actions[random.Next(actions.Count)]);
+                    var command = actions[random.Next(actions.Count)];
+                    var expectedSkip = command is EndTurn && !d.State.MainActionDone ? ExpectedSkipReason(d, awaiting.Value) : SkipReason.None;
+                    var logged = d.Log.Count;
+                    d.Ok(command);
+
+                    var skip = d.Log.Skip(logged).OfType<MainActionSkipped>().SingleOrDefault();
+                    Assert.AreEqual(expectedSkip == SkipReason.None, skip == null, $"seed {seed}, step {step}");
+                    if (expectedSkip != SkipReason.None)
+                    {
+                        Assert.AreEqual(expectedSkip, skip?.Reason, $"seed {seed}, step {step}");
+                        skipReasons.Add(expectedSkip);
+                    }
                 }
 
                 if (d.State.Result != null)
@@ -136,6 +149,16 @@ namespace Game.Core.Tests
             }
 
             Assert.Greater(ended, 0, "At least some random matches reach the end.");
+            Assert.Greater(skipReasons.Count, 1, "Random matches skip turns for different reasons.");
+        }
+
+        /// <summary>The skip reason worked out from the public state, independently of the engine.</summary>
+        private static SkipReason ExpectedSkipReason(MatchDriver d, State.PlayerId player)
+        {
+            var fields = d.State.Fields.Where(field => !field.IsRemoved).ToList();
+            if (d.State.Player(player).HasCreatureInHand)
+                return SkipReason.NoFreeField;
+            return fields.Any(field => field.OccupantOf(player) != null) ? SkipReason.NoChallengeTarget : SkipReason.NoCreatures;
         }
     }
 }

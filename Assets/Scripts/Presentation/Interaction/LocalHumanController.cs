@@ -39,6 +39,8 @@ namespace Game.Presentation.Interaction
             DecisionCancelled?.Invoke(this);
         }
 
+        public void AbandonDecision() => _submit = null;
+
         /// <summary>Sends the player's choice. Only commands from the offered list should come here.</summary>
         public void Submit(GameCommand command)
         {

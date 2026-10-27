@@ -86,6 +86,6 @@ namespace Game.Presentation.Cards
         private CardView Spawn(CardPose pose) => Object.Instantiate(_prefab, pose.Position, pose.Rotation, _root);
 
         private void Bind(CardView view, int instanceId, string cardId) =>
-            view.Bind(instanceId, cardId, _faces.Build(cardId), _visual.CardBody, _visual.CardBack, _visual.CardText);
+            view.Bind(instanceId, cardId, _faces.Build(cardId), _visual.CardBody, _visual.CardBack, _visual.CardText, _visual.PowerBadge);
     }
 }

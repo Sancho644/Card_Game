@@ -15,7 +15,13 @@ namespace Game.Services.Match
 
         void RequestDecision(PlayerView view, IReadOnlyList<GameCommand> legalActions, Action<GameCommand> submit);
 
-        /// <summary>The decision is no longer needed, e.g. a new match was started.</summary>
+        /// <summary>The decision is no longer needed, e.g. a new match was started. The controller may update its interface.</summary>
         void CancelDecision();
+
+        /// <summary>
+        /// Drops a pending decision without any visible reaction: the match is being shut down and the
+        /// interface may already be destroyed.
+        /// </summary>
+        void AbandonDecision();
     }
 }

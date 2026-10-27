@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Game.Core.Battle;
 using Game.Core.Cards;
 using Game.Core.Commands;
 using Game.Core.Commands.Handlers;
@@ -88,6 +89,12 @@ namespace Game.Core
         public IReadOnlyList<GameCommand> GetLegalActions(PlayerId player) => _legalActions.Find(player);
 
         public PlayerView GetView(PlayerId viewer) => new PlayerView(State, viewer);
+
+        /// <summary>
+        /// The current battle's powers by the same count as the final result, or null outside a battle.
+        /// Public information, the same for both players.
+        /// </summary>
+        public BattlePower GetBattlePower() => State.Battle == null ? null : _context.PowerCounter.Power(State.Battle);
 
         private static IEnumerable<ICommandHandler> CreateHandlers() => new ICommandHandler[]
         {

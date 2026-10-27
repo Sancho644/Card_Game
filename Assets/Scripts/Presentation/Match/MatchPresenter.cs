@@ -28,6 +28,7 @@ namespace Game.Presentation.Match
         private readonly HotSeatDirector _hotSeat;
         private readonly IReadOnlyList<IPlayerController> _controllers;
         private readonly StatusPresenter _status;
+        private readonly BattlePowerPresenter _power;
         private readonly DialogView _handoff;
         private readonly DialogView _matchEnd;
         private readonly PlayerNames _names;
@@ -45,6 +46,7 @@ namespace Game.Presentation.Match
             HotSeatDirector hotSeat,
             IReadOnlyList<IPlayerController> controllers,
             StatusPresenter status,
+            BattlePowerPresenter power,
             DialogView handoff,
             DialogView matchEnd,
             PlayerNames names,
@@ -59,6 +61,7 @@ namespace Game.Presentation.Match
             _hotSeat = hotSeat;
             _controllers = controllers;
             _status = status;
+            _power = power;
             _handoff = handoff;
             _matchEnd = matchEnd;
             _names = names;
@@ -74,18 +77,32 @@ namespace Game.Presentation.Match
         }
 
         /// <summary>Moves every card back to its place, e.g. after a cancelled drag or the debug switch.</summary>
-        public void Resync() => _queue.Enqueue(CreateSync());
+        public void Resync()
+        {
+            if (!_disposed)
+                _queue.Enqueue(CreateSync());
+        }
 
+        /// <summary>
+        /// Stops reacting to the match. Touches no views: it runs both before a new match, when the table is
+        /// reset separately, and when the scene is unloading and the views may already be destroyed.
+        /// </summary>
         public void Dispose()
         {
+            if (_disposed)
+                return;
+
             _disposed = true;
             _session.EventsProduced -= OnEvents;
             foreach (var controller in _controllers)
-                controller.CancelDecision();
+                controller.AbandonDecision();
         }
 
         private void OnEvents(IReadOnlyList<GameEvent> batch)
         {
+            if (_disposed)
+                return;
+
             var view = ViewerView();
             _lookup.Remember(view);
             var context = new PresentationContext(batch, _lastView, view, _queue, CreateSync);
@@ -99,6 +116,7 @@ namespace Game.Presentation.Match
             }
 
             context.EnqueueSync();
+            _power.Present(_session.GetBattlePower(), context);
             _queue.Enqueue(RequestDecision);
         }
 
@@ -110,7 +128,7 @@ namespace Game.Presentation.Match
             var view = ViewerView();
             _lastView = view;
             _lookup.Remember(view);
-            _status.Show(view);
+            _status.Show(view, _session.GetBattlePower());
 
             if (view.Phase == MatchPhase.Ended)
             {
@@ -135,6 +153,9 @@ namespace Game.Presentation.Match
 
         private void Submit(GameCommand command)
         {
+            if (_disposed)
+                return;
+
             var result = _session.Submit(command);
             if (result.IsAccepted)
                 return;

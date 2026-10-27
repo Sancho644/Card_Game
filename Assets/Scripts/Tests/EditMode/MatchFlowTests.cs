@@ -123,7 +123,10 @@ namespace Game.Core.Tests
             d.EndTurn(P1);
             d.EndTurn(P2);
 
-            Assert.AreEqual(2, d.Log.OfType<MainActionSkipped>().Count());
+            var skips = d.Log.OfType<MainActionSkipped>().ToList();
+            Assert.AreEqual(2, skips.Count);
+            Assert.AreEqual(SkipReason.NoChallengeTarget, skips[0].Reason, "Player1 holds the only field and has nothing to challenge.");
+            Assert.AreEqual(SkipReason.NoCreatures, skips[1].Reason, "Player2 has no creatures anywhere.");
             Assert.AreEqual(P1, d.Last<MatchEnded>().Winner);
         }
 
