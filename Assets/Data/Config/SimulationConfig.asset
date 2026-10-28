@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 423e84e670940e341b9fca8ab3871864, type: 3}
   m_Name: SimulationConfig
   m_EditorClassIdentifier: Game.Data::Game.Data.Config.SimulationConfig
+  _balanceVariant: {fileID: 0}
   _games: 5000
   _seed: 1
   _decks: []
