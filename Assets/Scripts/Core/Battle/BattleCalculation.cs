@@ -67,9 +67,10 @@ namespace Game.Core.Battle
                 values[element] = map(values[element]);
         }
 
-        // TODO(rules): penalties are ignored whatever the other step 1 effects and their play order,
-        // so a bonus turned into a penalty («Зеркало бонусов») is ignored too. See docs/decisions.md.
-        /// <summary>The field's penalties do not act on this player's creature («Рассвет»).</summary>
+        /// <summary>
+        /// The field's penalties do not act on this player's creature («Рассвет»): whatever the value ends up
+        /// after step 1 and in any play order, so a bonus turned into a penalty («Зеркало бонусов») is ignored too.
+        /// </summary>
         public void IgnoreFieldPenalties(PlayerId player) => _ignoresFieldPenalties[(int)player] = true;
 
         public int FieldModifierFor(PlayerId player)

@@ -28,6 +28,7 @@ namespace Game.Core.Tests
         public const string TrophyField = "test.field.trophy";
         public const string HostHomeField = "test.field.host-home";
         public const string Quarry = "test.field.quarry";
+        public const string Hillside = "test.field.hillside";
 
         public const string Fire180 = "test.creature.fire180";
         public const string Water200 = "test.creature.water200";
@@ -92,6 +93,7 @@ namespace Game.Core.Tests
             new FieldCard(HostHomeField, Rarity.Common, Modifiers((Element.Fire, 40), (Element.Water, -30)),
                 new[] { new PenaltiesOnlyForGuestCondition() }),
             new FieldCard(Quarry, Rarity.Common, Modifiers((Element.Fire, 40), (Element.Earth, -40))),
+            new FieldCard(Hillside, Rarity.Common, Modifiers((Element.Earth, 40), (Element.Fire, -40))),
 
             new CreatureCard(Fire180, Rarity.Common, Element.Fire, 180),
             new CreatureCard(Water200, Rarity.Epic, Element.Water, 200),

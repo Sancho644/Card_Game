@@ -280,6 +280,22 @@ namespace Game.Core.Tests
         }
 
         [Test]
+        public void Dawn_BonusTurnedIntoPenaltyLater_IsIgnored()
+        {
+            var d = BattleOnP1Field(Hillside, Earth250, Fire180,
+                player1Deck: Deck(legendaryAbility: Dawn, commonField: Hillside),
+                player2Deck: Deck(epicAbility: Mirror));
+            d.Open(P1);
+            d.Play(P1, Dawn);
+            d.Play(P2, Mirror);
+            d.Ready(P1);
+            d.Ready(P2);
+
+            Assert.AreEqual(250 + 70, d.Last<BattleResolved>().HostPower, "Earth +40 mirrored to −40 is ignored.");
+            Assert.AreEqual(180 + 40, d.Last<BattleResolved>().GuestPower);
+        }
+
+        [Test]
         public void Dawn_FieldConditionStillActs()
         {
             var d = BattleOnP1Field(SacrificeField, Earth250, Fire180,
