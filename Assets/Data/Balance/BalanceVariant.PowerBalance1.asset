@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e221f7c2bc0236d44866203279141b70, type: 3}
+  m_Name: BalanceVariant.PowerBalance1
+  m_EditorClassIdentifier: Game.Data::Game.Data.Cards.BalanceVariantDef
+  _id: power-balance1
+  _displayName: "\u0421\u0438\u043B\u0430 + \u0411\u0430\u043B\u0430\u043D\u0441 1"
+  _basedOn: {fileID: 11400000, guid: 11873acc5caf906408e687ddf2ab51bf, type: 2}
+  _overrides:
+  - {fileID: 11400000, guid: c31cfe29f4a3e7d43be670be2e890cb0, type: 2}
+  - {fileID: 11400000, guid: 93a2e6b25f71f05489bd1a149939a194, type: 2}
+  - {fileID: 11400000, guid: 3349e52dcfdfabc4fbcbafaa29494f11, type: 2}
+  - {fileID: 11400000, guid: fc806703c1532cc40951b10bfe81918e, type: 2}
+  - {fileID: 11400000, guid: 9944c6c741c680d47a4390d2f94134f9, type: 2}
+  - {fileID: 11400000, guid: bd1860e1eb4ff4b43ab85a4988d49b94, type: 2}
+  - {fileID: 11400000, guid: f797d21d0b055dc439c8aacab6508fea, type: 2}
+  - {fileID: 11400000, guid: 184ddd2553a7bd04e9ee22fbd0366bd9, type: 2}
+  - {fileID: 11400000, guid: 0df011f89558b304488c52f4dc1a53d0, type: 2}
