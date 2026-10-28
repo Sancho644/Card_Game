@@ -44,7 +44,7 @@ namespace Game.Simulation.Editor
 
         public SimulationOptions MainRun() => new SimulationOptions
         {
-            Name = $"Основной прогон: {ProfileName(Config.Player1ProfileId)} против {ProfileName(Config.Player2ProfileId)}",
+            Name = $"Основной прогон: ИИ «{ProfileName(Config.Player1ProfileId)}» против ИИ «{ProfileName(Config.Player2ProfileId)}»",
             Games = Config.Games,
             Seed = Config.Seed,
             Decks = Config.Decks.Where(deck => deck != null).Select(deck => deck.ToDeckList()).ToList(),
@@ -56,7 +56,7 @@ namespace Game.Simulation.Editor
         /// <summary>The stronger profile against the weaker one, seats alternating, with its own seed.</summary>
         public SimulationOptions StrengthRun() => new SimulationOptions
         {
-            Name = $"Проверка силы: {ProfileName(Config.StrongProfileId)} против {ProfileName(Config.WeakProfileId)}",
+            Name = $"Проверка силы: ИИ «{ProfileName(Config.StrongProfileId)}» против ИИ «{ProfileName(Config.WeakProfileId)}»",
             Games = Config.StrengthGames,
             Seed = Config.Seed + 1,
             Decks = Config.Decks.Where(deck => deck != null).Select(deck => deck.ToDeckList()).ToList(),

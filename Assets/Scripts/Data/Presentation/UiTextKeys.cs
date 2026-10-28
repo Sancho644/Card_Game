@@ -5,6 +5,19 @@ namespace Game.Data.Presentation
     {
         public const string Player1 = "player.1";
         public const string Player2 = "player.2";
+        public const string PlayerYou = "player.you";
+        public const string PlayerOpponent = "player.opponent";
+        public const string MenuTitle = "menu.title";
+        public const string MenuVersusAi = "menu.versus-ai";
+        public const string MenuHotSeat = "menu.hot-seat";
+        public const string MenuDeck = "menu.deck";
+        public const string MenuDifficulty = "menu.difficulty";
+        public const string MenuChooseDeck = "menu.choose-deck";
+        public const string MenuChooseSecondDeck = "menu.choose-second-deck";
+        public const string MenuChooseDifficulty = "menu.choose-difficulty";
+        public const string SearchTitle = "search.title";
+        public const string SearchHint = "search.hint";
+        public const string ToMenu = "button.to-menu";
         public const string ElementPrefix = "element.";
         public const string RarityPrefix = "rarity.";
         public const string CardPower = "card.power";

@@ -55,6 +55,7 @@ namespace Game.Presentation.Match
             foreach (var human in _humans)
             {
                 human.DecisionRequested += OnDecisionRequested;
+                human.ReactionOffered += OnDecisionRequested;
                 human.DecisionCancelled += OnDecisionCancelled;
             }
 
@@ -75,6 +76,7 @@ namespace Game.Presentation.Match
             foreach (var human in _humans)
             {
                 human.DecisionRequested -= OnDecisionRequested;
+                human.ReactionOffered -= OnDecisionRequested;
                 human.DecisionCancelled -= OnDecisionCancelled;
             }
 

@@ -5,6 +5,7 @@
         "Game.Core",
         "Game.Data",
         "Game.Services",
+        "Game.AI",
         "Unity.InputSystem",
         "Unity.TextMeshPro",
         "UnityEngine.UI",

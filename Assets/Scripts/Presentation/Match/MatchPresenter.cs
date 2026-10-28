@@ -17,7 +17,9 @@ namespace Game.Presentation.Match
     /// <summary>
     /// Runs one match on the table: turns each batch of engine events into animation steps, then asks
     /// the deciding player's controller for the next command. In hot-seat a hand-off screen comes first
-    /// whenever the deciding player changes.
+    /// whenever the deciding player changes. Against an opponent elsewhere (the AI, later the network) only
+    /// the local player has a controller here; while the opponent decides, the local player is offered the
+    /// actions the rules allow out of turn.
     /// </summary>
     public sealed class MatchPresenter : IDisposable
     {
@@ -27,6 +29,7 @@ namespace Game.Presentation.Match
         private readonly TableSync _sync;
         private readonly HotSeatDirector _hotSeat;
         private readonly IReadOnlyList<IPlayerController> _controllers;
+        private readonly MatchMode _mode;
         private readonly StatusPresenter _status;
         private readonly BattlePowerPresenter _power;
         private readonly DialogView _handoff;
@@ -45,6 +48,7 @@ namespace Game.Presentation.Match
             TableSync sync,
             HotSeatDirector hotSeat,
             IReadOnlyList<IPlayerController> controllers,
+            MatchMode mode,
             StatusPresenter status,
             BattlePowerPresenter power,
             DialogView handoff,
@@ -60,6 +64,7 @@ namespace Game.Presentation.Match
             _sync = sync;
             _hotSeat = hotSeat;
             _controllers = controllers;
+            _mode = mode;
             _status = status;
             _power = power;
             _handoff = handoff;
@@ -103,6 +108,10 @@ namespace Game.Presentation.Match
             if (_disposed)
                 return;
 
+            // The state changed, possibly by the opponent while a local player was deciding: ask again later.
+            foreach (var controller in _controllers)
+                controller.CancelDecision();
+
             var view = ViewerView();
             _lookup.Remember(view);
             var context = new PresentationContext(batch, _lastView, view, _queue, CreateSync);
@@ -140,15 +149,35 @@ namespace Game.Presentation.Match
             if (awaiting == null)
                 return;
 
-            if (awaiting.Value != _hotSeat.Viewer)
+            var controller = _controllers.FirstOrDefault(candidate => candidate.Player == awaiting.Value);
+            if (controller == null)
+            {
+                OfferReactions();
+                return;
+            }
+
+            if (_mode.ShowsHandoff && awaiting.Value != _hotSeat.Viewer)
             {
                 _queue.Enqueue(HandoffStep(awaiting.Value));
                 _queue.Enqueue(RequestDecision);
                 return;
             }
 
-            var controller = _controllers.First(candidate => candidate.Player == awaiting.Value);
             controller.RequestDecision(view, _session.GetLegalActions(awaiting.Value), Submit);
+        }
+
+        /// <summary>The opponent decides elsewhere; local players may still play what the rules allow on its turn.</summary>
+        private void OfferReactions()
+        {
+            if (!_mode.OffersReactions)
+                return;
+
+            foreach (var controller in _controllers)
+            {
+                var legal = _session.GetLegalActions(controller.Player);
+                if (legal.Count > 0)
+                    controller.OfferReaction(_session.GetView(controller.Player), legal, Submit);
+            }
         }
 
         private void Submit(GameCommand command)
@@ -198,7 +227,7 @@ namespace Game.Presentation.Match
                 view.Wins(PlayerId.Player1),
                 _names.Of(PlayerId.Player2),
                 view.Wins(PlayerId.Player2));
-            _matchEnd.Show(title, score, _texts.Get(UiTextKeys.NewMatch), _newMatch);
+            _matchEnd.Show(title, score, _texts.Get(UiTextKeys.ToMenu), _newMatch);
         }
 
         private IAnimationStep CreateSync() =>
