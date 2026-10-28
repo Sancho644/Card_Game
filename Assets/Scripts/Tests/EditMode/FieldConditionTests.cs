@@ -194,20 +194,5 @@ namespace Game.Core.Tests
             Assert.AreEqual(200, d.Last<BattleResolved>().HostPower, "Water −30 does not act on the host.");
             Assert.AreEqual(180 + 40, d.Last<BattleResolved>().GuestPower);
         }
-
-        [Test]
-        public void ImmuneCreature_IsNotAffectedByCondition()
-        {
-            var deck = Deck(legendaryAbility: Dawn, legendaryField: SacrificeField);
-            var d = BattleOnP1Field(SacrificeField, Earth250, Fire180, player1Deck: deck);
-            d.Open(P1);
-            d.Play(P1, Dawn);
-            d.Ready(P2);
-            d.Ready(P1);
-
-            Assert.AreEqual(250 + 70, d.Last<BattleResolved>().HostPower);
-            Assert.AreEqual(P1, d.Last<BattleResolved>().Winner);
-            Assert.IsTrue(d.InHand(P1, Earth250), "«Жертва» does not act on the immune winner.");
-        }
     }
 }

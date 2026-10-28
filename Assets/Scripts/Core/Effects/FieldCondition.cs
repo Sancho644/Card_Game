@@ -10,6 +10,9 @@ namespace Game.Core.Effects
     /// </summary>
     public abstract class FieldCondition
     {
+        /// <summary>After the battle, or a retreat from it, the field is not removed and stays open.</summary>
+        public virtual bool KeepsField => false;
+
         /// <summary>Validation hook: may forbid an ability from being played.</summary>
         public virtual bool AllowsAbility(AbilityCard ability, PlayerId player, BattleState battle) => true;
 

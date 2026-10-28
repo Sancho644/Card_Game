@@ -13,7 +13,7 @@ namespace Game.Core.Battle
     public sealed class BattleCalculation
     {
         private readonly CreatureCard[] _creatures = new CreatureCard[PlayerIds.All.Count];
-        private readonly bool[] _conditionApplies = new bool[PlayerIds.All.Count];
+        private readonly bool[] _ignoresFieldPenalties = new bool[PlayerIds.All.Count];
         private readonly Dictionary<Element, int>[] _fieldValues;
         private readonly int[] _abilityPower = new int[PlayerIds.All.Count];
         private readonly List<PowerContribution>[] _contributions =
@@ -25,12 +25,9 @@ namespace Game.Core.Battle
             Host = battle.Host;
             Field = battle.Field.Definition;
             FieldOpen = battle.Field.IsOpen;
-            FieldConditionActive = FieldOpen && !battle.IsConditionCancelled;
+            FieldConditionActive = battle.IsConditionActive;
             foreach (var player in PlayerIds.All)
-            {
                 _creatures[(int)player] = (CreatureCard)battle.Field.OccupantOf(player).Definition;
-                _conditionApplies[(int)player] = battle.ConditionAppliesTo(player);
-            }
 
             _fieldValues = PlayerIds.All
                 .Select(_ => Field.Modifiers.ToDictionary(pair => pair.Key, pair => pair.Value))
@@ -50,8 +47,6 @@ namespace Game.Core.Battle
 
         public IBattleComparison Comparison { get; set; } = new HigherPowerWins();
 
-        public bool ConditionAppliesToBoth => _conditionApplies.All(applies => applies);
-
         internal IReadOnlyList<Action<BattleConsequences>> ConsequenceChanges => _consequenceChanges;
 
         /// <summary>The ability whose effects are being applied; recorded with every power change.</summary>
@@ -60,9 +55,6 @@ namespace Game.Core.Battle
         public CreatureCard CreatureOf(PlayerId player) => _creatures[(int)player];
 
         public BattleRole RoleOf(PlayerId player) => player == Host ? BattleRole.Host : BattleRole.Guest;
-
-        /// <summary>Whether the field condition acts on this player's creature.</summary>
-        public bool ConditionAppliesTo(PlayerId player) => _conditionApplies[(int)player];
 
         /// <summary>Field bonuses and penalties by element, as they apply to this player's creature.</summary>
         public IReadOnlyDictionary<Element, int> FieldValuesFor(PlayerId player) => _fieldValues[(int)player];
@@ -75,8 +67,17 @@ namespace Game.Core.Battle
                 values[element] = map(values[element]);
         }
 
-        public int FieldModifierFor(PlayerId player) =>
-            FieldOpen && _fieldValues[(int)player].TryGetValue(CreatureOf(player).Element, out var value) ? value : 0;
+        // TODO(rules): penalties are ignored whatever the other step 1 effects and their play order,
+        // so a bonus turned into a penalty («Зеркало бонусов») is ignored too. See docs/decisions.md.
+        /// <summary>The field's penalties do not act on this player's creature («Рассвет»).</summary>
+        public void IgnoreFieldPenalties(PlayerId player) => _ignoresFieldPenalties[(int)player] = true;
+
+        public int FieldModifierFor(PlayerId player)
+        {
+            if (!FieldOpen || !_fieldValues[(int)player].TryGetValue(CreatureOf(player).Element, out var value))
+                return 0;
+            return _ignoresFieldPenalties[(int)player] ? Math.Max(value, 0) : value;
+        }
 
         public int PowerOf(PlayerId player) =>
             CreatureOf(player).Power + FieldModifierFor(player) + _abilityPower[(int)player];

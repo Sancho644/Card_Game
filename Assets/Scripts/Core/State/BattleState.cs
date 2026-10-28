@@ -34,11 +34,11 @@ namespace Game.Core.State
         /// <summary>An ability in force cancelled the field condition.</summary>
         public bool IsConditionCancelled => ActiveAbilities.Any(played => played.Has<IConditionCanceller>());
 
-        /// <summary>Whether the field condition acts on this player's creature.</summary>
-        public bool ConditionAppliesTo(PlayerId player) =>
-            Field.IsOpen &&
-            !IsConditionCancelled &&
-            !ActiveAbilities.Any(played => played.Player == player && played.Has<IConditionImmunity>());
+        /// <summary>The field is open and its condition was not cancelled: the condition acts on both creatures.</summary>
+        public bool IsConditionActive => Field.IsOpen && !IsConditionCancelled;
+
+        /// <summary>An active condition keeps the field open after the battle («Нерушимая»).</summary>
+        public bool FieldStays => IsConditionActive && Field.Definition.Conditions.Any(condition => condition.KeepsField);
 
         public bool IsReady(PlayerId player) => _ready[(int)player];
 

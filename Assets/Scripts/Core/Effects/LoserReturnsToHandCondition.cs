@@ -9,8 +9,7 @@ namespace Game.Core.Effects
             calculation.ModifyConsequences(consequences =>
             {
                 var loser = consequences.Loser;
-                if (loser != null && calculation.ConditionAppliesTo(loser.Value) &&
-                    consequences.FateOf(loser.Value) == CreatureFate.OutOfGame)
+                if (loser != null && consequences.FateOf(loser.Value) == CreatureFate.OutOfGame)
                     consequences.SetFate(loser.Value, CreatureFate.ReturnsToHand);
             });
     }

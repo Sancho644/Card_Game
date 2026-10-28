@@ -9,10 +9,7 @@ namespace Game.Core.Effects
         public override void ModifyFieldValues(BattleCalculation calculation)
         {
             foreach (var player in PlayerIds.All)
-            {
-                if (calculation.ConditionAppliesTo(player))
-                    calculation.MapFieldValues(player, value => value * 2);
-            }
+                calculation.MapFieldValues(player, value => value * 2);
         }
     }
 }

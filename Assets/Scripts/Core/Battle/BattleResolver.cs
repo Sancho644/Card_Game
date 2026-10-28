@@ -30,6 +30,8 @@ namespace Game.Core.Battle
             var consequences = _consequenceTable.Build(battle.Host, winner, battle.Field.IsOpen);
             foreach (var change in calculation.ConsequenceChanges)
                 change(consequences);
+            if (battle.FieldStays)
+                consequences.FieldRemoved = false;
 
             return new BattleResolution(host, guest, calculation.Comparison.Rule, tieBroken, winner, consequences);
         }

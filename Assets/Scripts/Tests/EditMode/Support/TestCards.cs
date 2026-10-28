@@ -27,6 +27,7 @@ namespace Game.Core.Tests
         public const string SacrificeField = "test.field.sacrifice";
         public const string TrophyField = "test.field.trophy";
         public const string HostHomeField = "test.field.host-home";
+        public const string Quarry = "test.field.quarry";
 
         public const string Fire180 = "test.creature.fire180";
         public const string Water200 = "test.creature.water200";
@@ -90,6 +91,7 @@ namespace Game.Core.Tests
                 new[] { new LoserReturnsToHandCondition() }),
             new FieldCard(HostHomeField, Rarity.Common, Modifiers((Element.Fire, 40), (Element.Water, -30)),
                 new[] { new PenaltiesOnlyForGuestCondition() }),
+            new FieldCard(Quarry, Rarity.Common, Modifiers((Element.Fire, 40), (Element.Earth, -40))),
 
             new CreatureCard(Fire180, Rarity.Common, Element.Fire, 180),
             new CreatureCard(Water200, Rarity.Epic, Element.Water, 200),
@@ -135,7 +137,7 @@ namespace Game.Core.Tests
                 new PowerBonusEffect(80), new OpponentPowerEffect(-20)),
             Signature(StormRush, AbilityTiming.BeforeBattle, new PowerBonusEffect(70), new TakeFirstBattleTurnEffect()),
             Signature(Dawn, AbilityTiming.BeforeBattle | AbilityTiming.InBattle,
-                new PowerBonusEffect(70), new ConditionImmunityEffect()),
+                new PowerBonusEffect(70), new IgnoreFieldPenaltiesEffect()),
             Signature(DarkPrice, AbilityTiming.BeforeBattle | AbilityTiming.InBattle,
                 new PowerBonusEffect(100), new DiscardOwnAbilityEffect()),
         });

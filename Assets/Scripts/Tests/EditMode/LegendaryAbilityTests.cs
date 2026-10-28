@@ -106,6 +106,38 @@ namespace Game.Core.Tests
         }
 
         [Test]
+        public void Retreat_FromUnbreakableField_FieldAndOpponentCreatureStay()
+        {
+            var d = BattleOnP1Field(UnbreakableField, Fire180, Water200,
+                player1Deck: Deck(legendaryField: UnbreakableField), player2Deck: Deck(legendaryAbility: Retreat));
+            d.Open(P1);
+            d.Ready(P1);
+            d.Play(P2, Retreat);
+
+            var field = d.Field(P1, UnbreakableField);
+            Assert.IsFalse(field.IsRemoved);
+            Assert.IsTrue(field.IsOpen);
+            Assert.AreEqual(Fire180, field.OccupantOf(P1).Definition.Id);
+            Assert.IsTrue(d.InHand(P2, Water200));
+        }
+
+        [Test]
+        public void Retreat_FromUnbreakableField_WithCancelledCondition_RemovesIt()
+        {
+            var d = BattleOnP1Field(UnbreakableField, Fire180, Water200,
+                player1Deck: Deck(legendaryField: UnbreakableField),
+                player2Deck: Deck(epicAbility: CancelCondition, legendaryAbility: Retreat));
+            d.Open(P1);
+            d.Ready(P1);
+            d.Play(P2, CancelCondition);
+            d.Ready(P1);
+            d.Play(P2, Retreat);
+
+            Assert.IsTrue(d.Field(P1, UnbreakableField).IsRemoved);
+            Assert.IsTrue(d.InHand(P1, Fire180));
+        }
+
+        [Test]
         public void CommonAbility_OnOpponentTurn_Rejected()
         {
             var d = BattleOnP1Forge(Fire180, Water200);
@@ -197,6 +229,68 @@ namespace Game.Core.Tests
 
             d.Ready(P2);
             Assert.IsFalse(forge.IsLocked, "The lock lasts for one battle.");
+        }
+
+        [Test]
+        public void LockedField_ForcedRevealDoesNotOpenIt()
+        {
+            var d = Begin(P1, player1Deck: Deck(legendaryAbility: LockField), player2Deck: Deck(epicAbility: ForcedReveal));
+            var forge = d.Field(P2, Forge);
+            d.Ok(new PlayAbility(P1, d.Id(P1, LockField), new AbilityTargets(fieldId: forge.Id)));
+            d.Place(P1, Fire180, P2, Forge);
+            d.EndTurn(P1);
+            d.Place(P2, Water200, P2, Forge);
+            d.Ready(P1);
+            d.Play(P2, ForcedReveal);
+
+            Assert.IsFalse(forge.IsOpen);
+            Assert.IsFalse(d.Log.OfType<FieldOpened>().Any());
+        }
+
+        // ---- «Рассвет» ----
+
+        [Test]
+        public void Dawn_FieldPenaltyDoesNotActOnCreature()
+        {
+            var d = BattleOnP1Field(Quarry, Earth250, Fire180,
+                player1Deck: Deck(legendaryAbility: Dawn, commonField: Quarry));
+            d.Open(P1);
+            d.Play(P1, Dawn);
+            d.Ready(P2);
+            d.Ready(P1);
+
+            Assert.AreEqual(250 + 70, d.Last<BattleResolved>().HostPower, "Earth −40 is ignored.");
+            Assert.AreEqual(180 + 40, d.Last<BattleResolved>().GuestPower);
+        }
+
+        [Test]
+        public void Dawn_PenaltyTurnedIntoBonus_StillActs()
+        {
+            var d = BattleOnP1Field(Quarry, Earth250, Fire180,
+                player1Deck: Deck(legendaryAbility: Dawn, commonField: Quarry),
+                player2Deck: Deck(epicAbility: Mirror));
+            d.Open(P1);
+            d.Play(P1, Dawn);
+            d.Play(P2, Mirror);
+            d.Ready(P1);
+            d.Ready(P2);
+
+            Assert.AreEqual(250 + 70 + 40, d.Last<BattleResolved>().HostPower);
+            Assert.AreEqual(180 - 40, d.Last<BattleResolved>().GuestPower);
+        }
+
+        [Test]
+        public void Dawn_FieldConditionStillActs()
+        {
+            var d = BattleOnP1Field(SacrificeField, Earth250, Fire180,
+                player1Deck: Deck(legendaryAbility: Dawn, legendaryField: SacrificeField));
+            d.Open(P1);
+            d.Play(P1, Dawn);
+            d.Ready(P2);
+            d.Ready(P1);
+
+            Assert.AreEqual(P1, d.Last<BattleResolved>().Winner);
+            Assert.IsTrue(d.IsOut(P1, Earth250), "«Жертва» acts on the winner with «Рассвет».");
         }
 
         [Test]

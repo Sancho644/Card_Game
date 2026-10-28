@@ -14,7 +14,7 @@ namespace Game.Core.Effects
             calculation.ModifyConsequences(consequences =>
             {
                 var winner = consequences.Winner;
-                if (winner != null && calculation.ConditionAppliesTo(winner.Value))
+                if (winner != null)
                     consequences.RequestChoice(new ChoiceRequest(
                         winner.Value,
                         ChoicePurpose.TakeAbilityFromDiscard,

@@ -9,7 +9,6 @@ namespace Game.Core.Effects
 
         public RejectReason Validate(PlayContext context) => RejectReason.None;
 
-        // TODO(rules): a locked field («Запертое поле») stays closed even under this effect. See docs/decisions.md.
         public void Apply(PlayContext context) => context.OpenBattleField();
     }
 }

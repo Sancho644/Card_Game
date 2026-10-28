@@ -105,8 +105,8 @@ namespace Game.Core.Flow
         }
 
         /// <summary>
-        /// The player's creature returns to hand, the battle ends without a winner, the opponent's creature
-        /// stays and an open field is removed.
+        /// The player's creature returns to hand and the battle ends without a winner. An open field is
+        /// removed and the opponent's creature returns to hand too, unless the field stays («Нерушимая»).
         /// </summary>
         public void Retreat(PlayerId player)
         {
@@ -117,10 +117,7 @@ namespace Game.Core.Flow
             _state.Player(player).AddToHand(creature);
             _events.Emit(new CreatureReturnedToHand(player, creature.Id));
 
-            // TODO(rules): the retreat card text removes an open field; «Нерушимая» is not consulted,
-            // since it speaks of the field after a resolved battle. The opponent's creature cannot stay
-            // on a removed field, so it returns to its owner's hand. See docs/decisions.md.
-            if (field.IsOpen)
+            if (field.IsOpen && !_state.Battle.FieldStays)
             {
                 var opponent = player.Opponent();
                 var staying = field.Vacate(opponent);

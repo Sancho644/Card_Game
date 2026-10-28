@@ -60,9 +60,7 @@ namespace Game.Core.Flow
 
             if (battle != null)
             {
-                // TODO(rules): a creature immune to the condition («Рассвет») frees its owner from
-                // ability restrictions too. See docs/decisions.md.
-                if (battle.ConditionAppliesTo(player) &&
+                if (battle.IsConditionActive &&
                     battle.Field.Definition.Conditions.Any(condition => !condition.AllowsAbility(ability, player, battle)))
                     return RejectReason.BlockedByFieldCondition;
                 if (battle.IsForbiddenByAbilities(ability, player))
@@ -84,8 +82,6 @@ namespace Game.Core.Flow
         /// Checks a signature ability played together with placing (or moving) its creature on the field.
         /// The placement must start a battle; the creature is not on the field yet.
         /// </summary>
-        // TODO(rules): there is no pause before a battle, so the signature ability goes with the placement
-        // command, and only when the placement starts a battle. See docs/decisions.md.
         public RejectReason ValidateWithPlacement(PlayerId player, int abilityId, FieldSlot field, CardInstance creature)
         {
             if (field.OccupantOf(player.Opponent()) == null)
