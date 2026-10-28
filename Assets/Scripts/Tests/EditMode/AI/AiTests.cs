@@ -116,6 +116,50 @@ namespace Game.AI.Tests
             Assert.GreaterOrEqual(compared, 5, "Too few decisions compared before the views diverged.");
         }
 
+        /// <summary>
+        /// «Возврат силы» after a battle on the AI's own turn, with a spent ability in the discard pile:
+        /// the engine offers it and the AI plays it instead of ending the turn.
+        /// </summary>
+        [Test]
+        public void ReturnOfPower_AfterBattleOnOwnTurn_OfferedAndPlayed()
+        {
+            var cards = new FirstCardSet();
+            var deck = new DeckList(new[]
+            {
+                "field.warm-hearth", "field.forge", "field.eternal-beacon",
+                "creature.spark-fox", "creature.ash-phoenix", "creature.lord-of-crimson-forge",
+                "ability.surge", "ability.intercept", "ability.return-of-power",
+            });
+            var engine = new MatchEngine(new MatchSetup(deck, deck), cards.Catalog, cards.Rules, new XorShiftRandom(3));
+            engine.Start();
+            int Card(PlayerId owner, string cardId) =>
+                engine.State.Player(owner).Hand.Concat(engine.State.Player(owner).Discard).First(card => card.Definition.Id == cardId).Id;
+            void Do(GameCommand command) =>
+                Assert.IsTrue(engine.Execute(command).IsAccepted, $"{command.GetType().Name} by {command.Player} rejected");
+
+            var coinWinner = engine.State.CoinTossWinner.Value;
+            Do(new ChooseTurnOrder(coinWinner, goFirst: coinWinner == P2));
+            var field = engine.State.Fields.First(slot => slot.Owner == P1 && slot.Definition.Id == "field.warm-hearth").Id;
+            Do(new PlaceCreature(P2, Card(P2, "creature.spark-fox"), field));
+            Do(new EndTurn(P2));
+            Do(new PlaceCreature(P1, Card(P1, "creature.ash-phoenix"), field));
+            Do(new Ready(P2));
+            Do(new PlayAbility(P1, Card(P1, "ability.surge")));
+            Do(new Ready(P2));
+            Do(new Ready(P1));
+            Assert.AreEqual(MatchPhase.Turn, engine.State.Phase);
+            Assert.AreEqual(P1, engine.State.ActivePlayer);
+
+            var legal = engine.GetLegalActions(P1);
+            var returnPower = Card(P1, "ability.return-of-power");
+            var offered = legal.OfType<PlayAbility>().Where(play => play.AbilityId == returnPower).ToList();
+            Assert.AreEqual(1, offered.Count, "«Возврат силы» should be offered once, aimed at «Прилив сил».");
+            Assert.AreEqual(Card(P1, "ability.surge"), offered[0].Targets.CardId);
+
+            var brain = new AiBrain(P1, cards.Normal, cards.Catalog, cards.Rules, new XorShiftRandom(5));
+            Assert.AreSame(offered[0], brain.Decide(engine.GetView(P1), legal));
+        }
+
         private static (DeckList, DeckList) TwoDecksWithSameCreatures(FirstCardSet cards)
         {
             var builder = new RandomDeckBuilder(cards.Catalog, cards.Rules.Deck);

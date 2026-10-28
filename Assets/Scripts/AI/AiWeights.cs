@@ -19,6 +19,12 @@ namespace Game.AI
         public double EpicAbility { get; set; } = 8;
         public double LegendaryAbility { get; set; } = 12;
 
+        /// <summary>
+        /// An ability that brings back a spent ability is worth this share of the best one it could bring back
+        /// (at least a common one): it has no other use, and the return still needs a battle on your turn.
+        /// </summary>
+        public double ReturnedCardShare { get; set; } = 0.5;
+
         /// <summary>A field card not removed from the table.</summary>
         public double FieldCard { get; set; } = 4;
 

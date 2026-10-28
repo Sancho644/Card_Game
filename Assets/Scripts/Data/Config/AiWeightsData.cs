@@ -14,6 +14,8 @@ namespace Game.Data.Config
         [SerializeField] private float _commonAbility = 6;
         [SerializeField] private float _epicAbility = 8;
         [SerializeField] private float _legendaryAbility = 12;
+        [SerializeField, Range(0, 1), Tooltip("Value of an ability that returns a spent one, as a share of the best card it could return")]
+        private float _returnedCardShare = 0.5f;
         [SerializeField] private float _fieldCard = 4;
         [SerializeField] private float _lockedField = 3;
         [SerializeField] private float _fieldAffinityPerPower = 0.1f;
@@ -32,6 +34,7 @@ namespace Game.Data.Config
             CommonAbility = _commonAbility,
             EpicAbility = _epicAbility,
             LegendaryAbility = _legendaryAbility,
+            ReturnedCardShare = _returnedCardShare,
             FieldCard = _fieldCard,
             LockedField = _lockedField,
             FieldAffinityPerPower = _fieldAffinityPerPower,

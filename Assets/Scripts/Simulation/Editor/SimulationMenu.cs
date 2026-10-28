@@ -30,11 +30,14 @@ namespace Game.Simulation.Editor
             var report = new StringBuilder();
             try
             {
-                var main = RunWithProgress(runner, assets.MainRun());
-                if (main == null)
-                    return;
-                WriteFile($"sim-{stamp}-games.csv", new CsvReportWriter().Write(main.Records));
-                report.Append(writer.WriteMain(main));
+                foreach (var options in assets.MainRuns())
+                {
+                    var main = RunWithProgress(runner, options);
+                    if (main == null)
+                        return;
+                    WriteFile($"sim-{stamp}-games-{options.DeckMode.ToString().ToLowerInvariant()}.csv", new CsvReportWriter().Write(main.Records));
+                    report.Append(writer.WriteMain(main));
+                }
 
                 if (assets.Config.StrengthGames > 0)
                 {
@@ -62,7 +65,7 @@ namespace Game.Simulation.Editor
                 return;
 
             var config = assets.Config;
-            var options = config.ReplayStrengthRun ? assets.StrengthRun() : assets.MainRun();
+            var options = config.ReplayStrengthRun ? assets.StrengthRun() : assets.MainRun(config.ReplaySynergyDecks ? SimulationDeckMode.Synergy : SimulationDeckMode.Random);
             var log = new StringBuilder();
             var record = new SimulationRunner(assets.Catalog, assets.Rules)
                 .RunGame(options, config.ReplayIndex, config.ReplaySeed, batch => Dump(batch, log));

@@ -24,10 +24,11 @@ namespace Game.Simulation
             var text = new StringBuilder();
             Header(text, summary);
 
-            text.AppendLine("Партии");
-            Line(text, "Победы первого игрока", Percent(summary.FirstPlayerWins));
-            Line(text, "Победы второго игрока", Percent(summary.SecondPlayerWins));
-            Line(text, "Ничьи в партиях", Percent(summary.MatchDraws));
+            text.AppendLine("Партии (доли побед — среди партий с победителем, в скобках 95% интервал Уилсона)");
+            var first = summary.FirstPlayerWins;
+            Line(text, "Победы первого игрока", $"{WithInterval(first)} из {first.Trials}");
+            Line(text, "Победы второго игрока", Percent(1 - first.Share));
+            Line(text, "Ничьи в партиях", Percent(summary.MatchDraws) + " завершённых партий");
             Line(text, "Средняя длина, ходов", Number(summary.AverageTurns));
             Line(text, "Средняя длина, битв", Number(summary.AverageBattles));
             text.AppendLine();
@@ -53,11 +54,15 @@ namespace Game.Simulation
                 Line(text, element.ToString(), $"{Percent(wins)} в {battles} битвах");
             text.AppendLine();
 
-            text.AppendLine("Карты: в колодах (партий) · использована (доля партий) · использований за партию · победы колод с картой");
-            foreach (var card in summary.Cards.OrderByDescending(card => card.WinShare))
+            text.AppendLine("Карты: в колодах (партий) · использована (доля партий) · использований за партию · " +
+                            "победы колод с картой среди партий с победителем [95% интервал]");
+            text.AppendLine("  * — интервал не включает 50%");
+            foreach (var card in summary.Cards.OrderByDescending(card => card.WinShare.Share))
             {
-                text.AppendLine(string.Format(Culture, "  {0,-28} {1,5} · {2,6} · {3,5} · {4,6}",
-                    _cardName(card.CardId), card.DeckGames, Percent(card.UsedShare), Number(card.UsesPerGame), Percent(card.WinShare)));
+                var wins = card.WinShare;
+                text.AppendLine(string.Format(Culture, "  {0,-28} {1,5} · {2,6} · {3,5} · {4} {5}",
+                    _cardName(card.CardId), card.DeckGames, Percent(card.UsedShare), Number(card.UsesPerGame),
+                    WithInterval(wins), wins.ExcludesHalf ? "*" : ""));
             }
 
             Problems(text, summary);
@@ -71,9 +76,11 @@ namespace Game.Simulation
             Header(text, summary);
             var first = summary.Options.Player1Profile.Id;
             var second = summary.Options.Player2Profile.Id;
-            Line(text, $"Победы «{first}»", Percent(summary.ProfileWins(first)));
-            Line(text, $"Победы «{second}»", Percent(summary.ProfileWins(second)));
-            Line(text, "Ничьи", Percent(summary.MatchDraws));
+            var firstWins = summary.ProfileWins(first);
+            text.AppendLine("  Доли побед — среди партий с победителем, в скобках 95% интервал Уилсона");
+            Line(text, $"Победы «{first}»", $"{WithInterval(firstWins)} из {firstWins.Trials}");
+            Line(text, $"Победы «{second}»", WithInterval(summary.ProfileWins(second)));
+            Line(text, "Ничьи", Percent(summary.MatchDraws) + " завершённых партий");
             Line(text, "Средняя длина, ходов", Number(summary.AverageTurns));
             Problems(text, summary);
             return text.ToString();
@@ -85,11 +92,20 @@ namespace Game.Simulation
             text.AppendLine($"== {options.Name} ==");
             text.AppendLine($"Партий: {summary.Records.Count}, завершено: {summary.Completed.Count}, " +
                             $"зависло: {summary.Hung.Count()}, ошибок: {summary.Failed.Count()}");
-            text.AppendLine($"Seed: {options.Seed}, колоды: {(options.Decks.Count == 0 ? "случайные допустимые" : options.Decks.Count + " заданных")}, " +
+            text.AppendLine($"Seed: {options.Seed}, колоды: {DeckSource(options)}, " +
                             $"ИИ: {options.Player1Profile.Id} / {options.Player2Profile.Id}" +
                             (options.AlternateSeats ? " (места чередуются)" : "") +
                             $", лимит ходов: {options.TurnLimit}, порядок ходов: монета 50/50");
             text.AppendLine();
+        }
+
+        private static string DeckSource(SimulationOptions options)
+        {
+            if (options.Decks.Count > 0)
+                return options.Decks.Count + " заданных";
+            return options.DeckMode == SimulationDeckMode.Synergy
+                ? $"с синергией (существа под бонусы своих карт поля, {Percent(options.SynergyRandomShare)} слотов существ — случайно)"
+                : "случайные допустимые";
         }
 
         private static void Problems(StringBuilder text, SimulationSummary summary)
@@ -105,6 +121,9 @@ namespace Game.Simulation
             text.AppendLine(string.Format(Culture, "  {0,-34} {1}", label + ":", value));
 
         private static string Percent(double share) => share.ToString("P1", Culture);
+
+        private static string WithInterval(ShareEstimate estimate) =>
+            string.Format(Culture, "{0,7} [{1:0.0}–{2:0.0}]", Percent(estimate.Share), estimate.Low * 100, estimate.High * 100);
 
         private static string Number(double value) => value.ToString("0.0", Culture);
     }

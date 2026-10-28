@@ -6,20 +6,22 @@ using Game.Core.State;
 namespace Game.AI
 {
     /// <summary>
-    /// Scores a forecast position for one player: own features minus the opponent's, plus the expected
-    /// result of the battle in progress. Features: wins, creatures still in play, abilities in hand,
+    /// Scores a forecast position for one player: the score, or the expected result of the battle in progress,
+    /// plus own features minus the opponent's. Features: creatures still in play, abilities in hand,
     /// field cards on the table and how well waiting creatures suit their fields.
     /// </summary>
     internal sealed class PositionEvaluator
     {
         private readonly AiWeights _weights;
         private readonly CardValues _values;
+        private readonly IMatchScoreValue _score;
         private readonly BattleOutlook _battle;
 
-        public PositionEvaluator(AiWeights weights, CardValues values, BattleOutlook battle)
+        public PositionEvaluator(AiWeights weights, CardValues values, IMatchScoreValue score, BattleOutlook battle)
         {
             _weights = weights;
             _values = values;
+            _score = score;
             _battle = battle;
         }
 
@@ -33,17 +35,15 @@ namespace Game.AI
             }
 
             var value = Side(state, me) - Side(state, me.Opponent());
-            if (state.Battle != null)
-                value += _battle.Expectation(engine, me);
-            return value;
+            return value + (state.Battle != null ? _battle.Expectation(engine, me) : _score.Value(state, me));
         }
 
         private double Side(MatchState state, PlayerId player)
         {
             var own = state.Player(player);
-            var value = own.Wins * _weights.WinPoint;
+            double value = 0;
             foreach (var card in own.Hand)
-                value += card.Type == CardType.Creature ? _values.Creature(card.Definition) : _values.Ability(card.Definition);
+                value += card.Type == CardType.Creature ? _values.Creature(card.Definition) : _values.AbilityInHand(card, own);
 
             foreach (var field in state.Fields)
             {

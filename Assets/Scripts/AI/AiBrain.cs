@@ -39,8 +39,11 @@ namespace Game.AI
             _memory = new AiMemory(player);
             _slots = new DeckSlots(catalog, rules.Deck);
             var values = new CardValues(profile.Weights);
-            var evaluator = new PositionEvaluator(profile.Weights, values, new BattleOutlook(profile, rules, values));
-            _scorer = new ActionScorer(new ForecastBuilder(catalog, rules), evaluator);
+            var score = profile.UsesMatchEquity
+                ? (IMatchScoreValue)new MatchEquityValue(profile.Weights, rules)
+                : new WinPointValue(profile.Weights, rules);
+            var evaluator = new PositionEvaluator(profile.Weights, values, score, new BattleOutlook(profile, rules, values, score));
+            _scorer = new ActionScorer(new ForecastBuilder(catalog, rules), evaluator, profile.ConsidersReplies);
         }
 
         public PlayerId Player { get; }

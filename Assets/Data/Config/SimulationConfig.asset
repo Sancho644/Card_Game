@@ -12,15 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 423e84e670940e341b9fca8ab3871864, type: 3}
   m_Name: SimulationConfig
   m_EditorClassIdentifier: Game.Data::Game.Data.Config.SimulationConfig
-  _games: 1000
+  _games: 5000
   _seed: 1
   _decks: []
+  _randomDecksRun: 1
+  _synergyDecksRun: 1
+  _synergyRandomShare: 0.15
   _player1ProfileId: normal
   _player2ProfileId: normal
   _turnLimit: 200
-  _strengthGames: 500
+  _strengthGames: 1000
   _strongProfileId: normal
   _weakProfileId: easy
   _replayStrengthRun: 0
+  _replaySynergyDecks: 0
   _replayIndex: 0
   _replaySeed: 0

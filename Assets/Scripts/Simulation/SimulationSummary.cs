@@ -27,8 +27,13 @@ namespace Game.Simulation
         public IEnumerable<GameRecord> Hung => Records.Where(record => record.Hung);
         public IEnumerable<GameRecord> Failed => Records.Where(record => record.Error != null);
 
-        public double FirstPlayerWins => Share(Completed, record => record.Winner != null && record.Winner == record.FirstPlayer);
-        public double SecondPlayerWins => Share(Completed, record => record.Winner != null && record.Winner != record.FirstPlayer);
+        /// <summary>Completed matches with a winner; win shares are counted among these.</summary>
+        public IReadOnlyList<GameRecord> DecidedMatches => Completed.Where(record => record.Winner != null).ToList();
+
+        /// <summary>Matches won by the player who went first, among matches with a winner.</summary>
+        public ShareEstimate FirstPlayerWins => Estimate(DecidedMatches, record => record.Winner == record.FirstPlayer);
+
+        /// <summary>Drawn matches, as a share of completed matches.</summary>
         public double MatchDraws => Share(Completed, record => record.Winner == null);
 
         public double AverageTurns => Average(Completed, record => record.Turns);
@@ -56,9 +61,9 @@ namespace Game.Simulation
         /// <summary>Battles won on equal final power, by how the tie was decided.</summary>
         public int EqualPowerBattles(TieBreak how) => Battles.Count(battle => battle.TieBreak == how);
 
-        /// <summary>Wins of a profile, when the profiles differ: share of completed matches.</summary>
-        public double ProfileWins(string profileId) =>
-            Share(Completed, record => record.Winner != null && record.ProfileOf(record.Winner.Value) == profileId);
+        /// <summary>Wins of a profile, when the profiles differ: share of matches with a winner.</summary>
+        public ShareEstimate ProfileWins(string profileId) =>
+            Estimate(DecidedMatches, record => record.ProfileOf(record.Winner.Value) == profileId);
 
         /// <summary>Battle win share of creatures of each element, over battles that were not retreated.</summary>
         public IEnumerable<(Element element, int battles, double wins)> ElementWins() =>
@@ -87,6 +92,8 @@ namespace Game.Simulation
                         stats.TotalUses += uses;
                         if (uses > 0)
                             stats.GamesUsed++;
+                        if (record.Winner != null)
+                            stats.DecidedDeckGames++;
                         if (record.Winner == player)
                             stats.DeckWins++;
                     }
@@ -95,6 +102,9 @@ namespace Game.Simulation
 
             return cards.Values.OrderBy(stats => stats.CardId).ToList();
         }
+
+        private static ShareEstimate Estimate<T>(IReadOnlyCollection<T> items, System.Func<T, bool> predicate) =>
+            new ShareEstimate(items.Count(predicate), items.Count);
 
         private static double Share<T>(IEnumerable<T> items, System.Func<T, bool> predicate)
         {

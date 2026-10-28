@@ -18,6 +18,8 @@ MonoBehaviour:
     _samples: 3
     _noise: 0
     _expectsOpponentResponse: 1
+    _usesMatchEquity: 1
+    _considersReplies: 1
     _usesReactions: 1
     _reactionThreshold: 5
     _prefersFirstTurn: 1
@@ -30,11 +32,13 @@ MonoBehaviour:
       _commonAbility: 6
       _epicAbility: 8
       _legendaryAbility: 12
+      _returnedCardShare: 0.5
       _fieldCard: 4
       _lockedField: 3
       _fieldAffinityPerPower: 0.1
       _choiceAfterBattle: 6
-      _marginScale: 40
+      _marginScale: 25
+      _equalPowerEdge: 5
       _ownReserveShare: 0.5
       _opponentReserveShare: 0.5
       _informationPerCard: 1.5
@@ -43,6 +47,8 @@ MonoBehaviour:
     _samples: 1
     _noise: 15
     _expectsOpponentResponse: 0
+    _usesMatchEquity: 0
+    _considersReplies: 0
     _usesReactions: 0
     _reactionThreshold: 5
     _prefersFirstTurn: 1
@@ -55,11 +61,13 @@ MonoBehaviour:
       _commonAbility: 6
       _epicAbility: 8
       _legendaryAbility: 12
+      _returnedCardShare: 0.5
       _fieldCard: 4
       _lockedField: 3
       _fieldAffinityPerPower: 0.1
       _choiceAfterBattle: 6
       _marginScale: 40
+      _equalPowerEdge: 5
       _ownReserveShare: 0.5
       _opponentReserveShare: 0.5
       _informationPerCard: 1.5

@@ -14,6 +14,15 @@ namespace Game.AI
         /// <summary>Whether the AI expects the opponent to answer with abilities from hand.</summary>
         public bool ExpectsOpponentResponse { get; set; } = true;
 
+        /// <summary>
+        /// Whether the AI values the score as the chance to win the match from wins and creatures left
+        /// (<see cref="MatchEquityValue"/>) instead of flat points per win.
+        /// </summary>
+        public bool UsesMatchEquity { get; set; } = true;
+
+        /// <summary>Whether the AI looks at the opponent's best answer to each action: in a battle or its next main action.</summary>
+        public bool ConsidersReplies { get; set; } = true;
+
         /// <summary>Whether the AI plays abilities on the opponent's turn.</summary>
         public bool UsesReactions { get; set; } = true;
 

@@ -15,8 +15,13 @@ namespace Game.Simulation
         /// <summary>Master seed; every match gets its own seed derived from it.</summary>
         public ulong Seed { get; set; } = 1;
 
-        /// <summary>Decks to pick from for each player; empty means a random valid deck every match.</summary>
+        /// <summary>Decks to pick from for each player; empty means a new deck every match, built by <see cref="DeckMode"/>.</summary>
         public IReadOnlyList<DeckList> Decks { get; set; } = new DeckList[0];
+
+        public SimulationDeckMode DeckMode { get; set; } = SimulationDeckMode.Random;
+
+        /// <summary>Synergy decks: chance that a creature slot takes a random creature instead of the best fit.</summary>
+        public double SynergyRandomShare { get; set; } = 0.15;
 
         public AiProfile Player1Profile { get; set; } = new AiProfile();
         public AiProfile Player2Profile { get; set; } = new AiProfile();

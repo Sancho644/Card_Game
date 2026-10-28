@@ -110,8 +110,14 @@ namespace Game.Simulation
             return host;
         }
 
-        private DeckList PickDeck(SimulationOptions options, IRandom random) =>
-            options.Decks.Count == 0 ? _randomDecks.Build(random) : options.Decks[random.Next(options.Decks.Count)];
+        private DeckList PickDeck(SimulationOptions options, IRandom random)
+        {
+            if (options.Decks.Count > 0)
+                return options.Decks[random.Next(options.Decks.Count)];
+            return options.DeckMode == SimulationDeckMode.Synergy
+                ? new SynergyDeckBuilder(_catalog, _rules.Deck, options.SynergyRandomShare).Build(random)
+                : _randomDecks.Build(random);
+        }
 
         private static ulong NextSeed(IRandom random) =>
             ((ulong)(uint)random.Next(int.MaxValue) << 31) ^ (uint)random.Next(int.MaxValue);

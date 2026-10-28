@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
 using Game.Core.Cards;
+using Game.Core.Decks;
 using Game.Core.Rules;
 using Game.Data.Cards;
 using Game.Data.Config;
@@ -42,12 +44,29 @@ namespace Game.Simulation.Editor
             return missing == null ? new SimulationAssets(config, database, rules, ai) : null;
         }
 
-        public SimulationOptions MainRun() => new SimulationOptions
+        /// <summary>The main runs: one with the fixed decks, or one per enabled deck mode.</summary>
+        public IReadOnlyList<SimulationOptions> MainRuns()
         {
-            Name = $"Основной прогон: ИИ «{ProfileName(Config.Player1ProfileId)}» против ИИ «{ProfileName(Config.Player2ProfileId)}»",
+            if (Decks().Count > 0)
+                return new[] { MainRun(SimulationDeckMode.Random) };
+
+            var runs = new List<SimulationOptions>();
+            if (Config.RandomDecksRun)
+                runs.Add(MainRun(SimulationDeckMode.Random));
+            if (Config.SynergyDecksRun)
+                runs.Add(MainRun(SimulationDeckMode.Synergy));
+            return runs;
+        }
+
+        public SimulationOptions MainRun(SimulationDeckMode mode) => new SimulationOptions
+        {
+            Name = $"Основной прогон: ИИ «{ProfileName(Config.Player1ProfileId)}» против ИИ «{ProfileName(Config.Player2ProfileId)}»" +
+                   (Decks().Count == 0 ? $", колоды {DeckModeName(mode)}" : ""),
             Games = Config.Games,
             Seed = Config.Seed,
-            Decks = Config.Decks.Where(deck => deck != null).Select(deck => deck.ToDeckList()).ToList(),
+            Decks = Decks(),
+            DeckMode = mode,
+            SynergyRandomShare = Config.SynergyRandomShare,
             Player1Profile = Ai.ToProfile(Config.Player1ProfileId),
             Player2Profile = Ai.ToProfile(Config.Player2ProfileId),
             TurnLimit = Config.TurnLimit,
@@ -59,7 +78,7 @@ namespace Game.Simulation.Editor
             Name = $"Проверка силы: ИИ «{ProfileName(Config.StrongProfileId)}» против ИИ «{ProfileName(Config.WeakProfileId)}»",
             Games = Config.StrengthGames,
             Seed = Config.Seed + 1,
-            Decks = Config.Decks.Where(deck => deck != null).Select(deck => deck.ToDeckList()).ToList(),
+            Decks = Decks(),
             Player1Profile = Ai.ToProfile(Config.StrongProfileId),
             Player2Profile = Ai.ToProfile(Config.WeakProfileId),
             AlternateSeats = true,
@@ -67,6 +86,10 @@ namespace Game.Simulation.Editor
         };
 
         public string CardName(string id) => Database.Find(id)?.DisplayName ?? id;
+
+        public static string DeckModeName(SimulationDeckMode mode) => mode == SimulationDeckMode.Synergy ? "с синергией" : "случайные";
+
+        private IReadOnlyList<DeckList> Decks() => Config.Decks.Where(deck => deck != null).Select(deck => deck.ToDeckList()).ToList();
 
         private string ProfileName(string id) => Ai.Profiles.FirstOrDefault(profile => profile.Id == id)?.DisplayName ?? id;
 

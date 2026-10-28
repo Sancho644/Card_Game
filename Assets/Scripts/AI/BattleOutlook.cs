@@ -12,7 +12,7 @@ namespace Game.AI
     /// <summary>
     /// The expected value of the battle in progress for one player: the chance to win from the power margin,
     /// the host's option to open the field and the abilities both players still hold, times what winning and
-    /// losing would bring. Powers and consequences come from the forecast engine.
+    /// losing would bring, the score included. Powers and consequences come from the forecast engine.
     /// </summary>
     internal sealed class BattleOutlook
     {
@@ -21,12 +21,14 @@ namespace Game.AI
         private readonly AiProfile _profile;
         private readonly GameRules _rules;
         private readonly CardValues _values;
+        private readonly IMatchScoreValue _score;
 
-        public BattleOutlook(AiProfile profile, GameRules rules, CardValues values)
+        public BattleOutlook(AiProfile profile, GameRules rules, CardValues values, IMatchScoreValue score)
         {
             _profile = profile;
             _rules = rules;
             _values = values;
+            _score = score;
         }
 
         private AiWeights Weights => _profile.Weights;
@@ -113,21 +115,12 @@ namespace Game.AI
                    || reason == RejectReason.SignatureCreatureNotInBattle;
         }
 
-        /// <summary>What the consequences mean for <paramref name="me"/>, beyond the position as it stands.</summary>
+        /// <summary>The score after the consequences and what else they change for <paramref name="me"/>.</summary>
         private double OutcomeValue(MatchEngine engine, BattleConsequences consequences, PlayerId me)
         {
             var state = engine.State;
             var field = state.Battle.Field;
-            double value = 0;
-            if (consequences.WinScoredBy != null)
-            {
-                var scorer = consequences.WinScoredBy.Value;
-                var gain = Weights.WinPoint;
-                if (state.Player(scorer).Wins + 1 >= _rules.WinsToWin)
-                    gain += Weights.MatchWin;
-                value += Sign(scorer, me) * gain;
-            }
-
+            var value = _score.Value(state, me, consequences);
             foreach (var id in PlayerIds.All)
             {
                 if (consequences.FateOf(id) == CreatureFate.OutOfGame)

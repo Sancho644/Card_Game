@@ -21,8 +21,13 @@ namespace Game.Simulation
         /// <summary>Of those deck-games, how many the deck won.</summary>
         public int DeckWins { get; internal set; }
 
+        /// <summary>Deck-games of matches with a winner; drawn matches are left out of the win share.</summary>
+        public int DecidedDeckGames { get; internal set; }
+
         public double UsedShare => DeckGames == 0 ? 0 : (double)GamesUsed / DeckGames;
         public double UsesPerGame => DeckGames == 0 ? 0 : (double)TotalUses / DeckGames;
-        public double WinShare => DeckGames == 0 ? 0 : (double)DeckWins / DeckGames;
+
+        /// <summary>Share of deck-games won, among matches with a winner.</summary>
+        public ShareEstimate WinShare => new ShareEstimate(DeckWins, DecidedDeckGames);
     }
 }
