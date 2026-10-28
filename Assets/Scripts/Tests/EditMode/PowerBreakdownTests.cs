@@ -56,7 +56,7 @@ namespace Game.Core.Tests
             d.Ready(P1);
             d.Ready(P2);
 
-            Assert.IsTrue(d.Last<BattleResolved>().TieBroken);
+            Assert.AreEqual(TieBreak.Ability, d.Last<BattleResolved>().TieBreak);
 
             var lower = BattleOnP1Field(HumbleHall, Fire180, Water200, player1Deck: Deck(legendaryField: HumbleHall));
             lower.Open(P1);

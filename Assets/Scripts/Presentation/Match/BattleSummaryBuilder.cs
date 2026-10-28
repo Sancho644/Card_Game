@@ -56,8 +56,10 @@ namespace Game.Presentation.Match
                 text.Append(_texts.Get(UiTextKeys.RuleLower)).Append('\n');
             else if (result.Rule == ComparisonRule.NarrowMarginDraw)
                 text.Append(_texts.Get(UiTextKeys.RuleNarrow)).Append('\n');
-            if (result.TieBroken)
+            if (result.TieBreak == TieBreak.Ability)
                 text.Append(_texts.Get(UiTextKeys.TieBroken)).Append('\n');
+            else if (result.TieBreak == TieBreak.EarlierPlacement)
+                text.Append(_texts.Get(UiTextKeys.TieEarlierPlacement)).Append('\n');
 
             text.Append(result.Winner == null
                 ? _texts.Get(UiTextKeys.Draw)

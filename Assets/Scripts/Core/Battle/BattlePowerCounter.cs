@@ -42,7 +42,8 @@ namespace Game.Core.Battle
                 battle.Host,
                 calculation.BreakdownOf(battle.Host),
                 calculation.BreakdownOf(battle.Guest),
-                calculation.Comparison.Rule);
+                calculation.Comparison.Rule,
+                calculation.Comparison.WinnerOnEqualPower(calculation));
         }
 
         private static void ApplyAbilities(BattleState battle, BattleCalculation calculation, BattleStep step)

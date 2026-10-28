@@ -1,4 +1,5 @@
 using System.Linq;
+using Game.Core.Battle;
 using Game.Core.Commands;
 using Game.Core.Events;
 using Game.Core.State;
@@ -77,6 +78,19 @@ namespace Game.Core.Tests
             d.Ready(P2);
 
             d.Play(P1, Boost50);
+        }
+
+        [Test]
+        public void LowerPowerWins_EqualPower_PlacedEarlierWins()
+        {
+            var d = BattleOnP1Field(HumbleHall, Fire180, Fire180, player1Deck: Deck(legendaryField: HumbleHall));
+            d.Open(P1);
+            d.Ready(P1);
+            d.Ready(P2);
+
+            Assert.AreEqual(d.Last<BattleResolved>().HostPower, d.Last<BattleResolved>().GuestPower);
+            Assert.AreEqual(P1, d.Last<BattleResolved>().Winner);
+            Assert.AreEqual(TieBreak.EarlierPlacement, d.Last<BattleResolved>().TieBreak);
         }
 
         [Test]

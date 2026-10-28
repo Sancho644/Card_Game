@@ -133,18 +133,21 @@ namespace Game.Core.Tests
         [Test]
         public void BothSkipInARow_EqualWins_Draw()
         {
-            var d = Begin(P1, SmallRules(), SmallDeck(), SmallDeck());
-            d.Place(P1, Fire180, P1, Forge);
+            // Draws come only from «Узкая грань»: 240 against 240 on the open field.
+            var rules = RulesWithDeck(new[] { Rarity.Legendary }, new[] { Rarity.Common }, new[] { Rarity.Common });
+            var deck = new DeckList(new[] { NarrowField, Fire180, Boost50 });
+            var d = Begin(P1, rules, deck, deck);
+            d.Place(P1, Fire180, P1, NarrowField);
             d.EndTurn(P1);
-            d.Place(P2, Fire180, P1, Forge);
+            d.Place(P2, Fire180, P1, NarrowField);
             d.Open(P1);
             d.Ready(P1);
             d.Ready(P2);
             d.EndTurn(P2);
 
-            d.Place(P1, Fire180, P2, Forge);
+            d.Place(P1, Fire180, P2, NarrowField);
             d.EndTurn(P1);
-            d.Place(P2, Fire180, P2, Forge);
+            d.Place(P2, Fire180, P2, NarrowField);
             d.Ready(P1);
             d.Open(P2);
             d.Ready(P2);

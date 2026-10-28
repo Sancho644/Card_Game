@@ -99,6 +99,21 @@ namespace Game.Core
         /// </summary>
         public BattlePower GetBattlePower() => State.Battle == null ? null : _context.PowerCounter.Power(State.Battle);
 
+        /// <summary>
+        /// The current battle's powers as if the player had also played this ability from hand. Only the effects
+        /// counted in the power count apply; timing and restrictions are not checked. For forecasts; null outside a battle.
+        /// </summary>
+        public BattlePower PreviewPowerWithAbility(PlayerId player, int abilityId) =>
+            State.Battle == null ? null : new BattlePreview(State, _context.PowerCounter).WithAbility(player, abilityId);
+
+        /// <summary>The current battle's powers as if its field were open. For forecasts; null outside a battle.</summary>
+        public BattlePower PreviewPowerWithOpenField() =>
+            State.Battle == null ? null : new BattlePreview(State, _context.PowerCounter).WithOpenField();
+
+        /// <summary>What would happen if the current battle ended now with this winner. For forecasts; null outside a battle.</summary>
+        public BattleConsequences PreviewConsequences(PlayerId? winner) =>
+            State.Battle == null ? null : _context.Resolver.ConsequencesFor(State.Battle, winner);
+
         private static IEnumerable<ICommandHandler> CreateHandlers() => new ICommandHandler[]
         {
             new ChooseTurnOrderHandler(),

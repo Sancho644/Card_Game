@@ -1,3 +1,4 @@
+using Game.Core.Battle;
 using Game.Core.Commands;
 using Game.Core.Events;
 using NUnit.Framework;
@@ -103,17 +104,18 @@ namespace Game.Core.Tests
         }
 
         [Test]
-        public void TieBreaker_WinsOnEqualPower()
+        public void TieBreaker_WinsOnEqualPower_OverPlacementOrder()
         {
-            var d = BattleOnP1Forge(Fire180, Fire180, player1Deck: Deck(epicAbility: TieBreaker));
-            d.Play(P1, TieBreaker);
-            d.Play(P2, Boost50);
+            var d = BattleOnP1Forge(Fire180, Fire180, player2Deck: Deck(epicAbility: TieBreaker));
+            d.Play(P1, Boost50);
+            d.Play(P2, TieBreaker);
             d.Ready(P1);
             d.Ready(P2);
 
             Assert.AreEqual(230, d.Last<BattleResolved>().HostPower);
             Assert.AreEqual(230, d.Last<BattleResolved>().GuestPower);
-            Assert.AreEqual(P1, d.Last<BattleResolved>().Winner);
+            Assert.AreEqual(P2, d.Last<BattleResolved>().Winner, "Player2 was placed later but holds «Перевес».");
+            Assert.AreEqual(TieBreak.Ability, d.Last<BattleResolved>().TieBreak);
         }
 
         [Test]

@@ -23,6 +23,7 @@ namespace Game.Core.Battle
         internal BattleCalculation(BattleState battle)
         {
             Host = battle.Host;
+            EarlierPlaced = battle.Field.EarlierOccupant;
             Field = battle.Field.Definition;
             FieldOpen = battle.Field.IsOpen;
             FieldConditionActive = battle.IsConditionActive;
@@ -42,8 +43,19 @@ namespace Game.Core.Battle
         /// <summary>The field is open and its condition was not cancelled.</summary>
         public bool FieldConditionActive { get; }
 
-        /// <summary>Winner when final powers are equal; null keeps the draw.</summary>
+        /// <summary>The player whose creature was placed on the field first; it also acts first in the battle.</summary>
+        public PlayerId EarlierPlaced { get; }
+
+        /// <summary>«Перевес»: this player wins on equal final power, whoever was placed first.</summary>
         public PlayerId? TieWinner { get; set; }
+
+        // TODO(rules): «Штормовой натиск» gives the first battle turn to the creature placed later; equal power
+        // still goes to the creature placed earlier, as the rules word it. See docs/decisions.md.
+        /// <summary>
+        /// Who wins on equal final power (docs/rules.md §6): the creature placed on the field earlier, unless an
+        /// ability («Перевес») gives the win to its owner. The only place of this rule.
+        /// </summary>
+        public PlayerId EqualPowerWinner => TieWinner ?? EarlierPlaced;
 
         public IBattleComparison Comparison { get; set; } = new HigherPowerWins();
 

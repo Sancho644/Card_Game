@@ -54,5 +54,7 @@ namespace Game.Core.State
         internal void SetReady(PlayerId player, bool ready) => _ready[(int)player] = ready;
 
         internal void AddPlayedAbility(PlayedAbility ability) => _playedAbilities.Add(ability);
+
+        internal void RemovePlayedAbility(PlayedAbility ability) => _playedAbilities.Remove(ability);
     }
 }

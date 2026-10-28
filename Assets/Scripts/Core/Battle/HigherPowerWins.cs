@@ -12,8 +12,10 @@ namespace Game.Core.Battle
             var host = calculation.PowerOf(calculation.Host);
             var guest = calculation.PowerOf(calculation.Guest);
             if (host == guest)
-                return null;
+                return WinnerOnEqualPower(calculation);
             return host > guest ? calculation.Host : calculation.Guest;
         }
+
+        public PlayerId? WinnerOnEqualPower(BattleCalculation calculation) => calculation.EqualPowerWinner;
     }
 }

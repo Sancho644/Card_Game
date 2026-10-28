@@ -62,6 +62,7 @@ namespace Game.Data.Presentation
         public const string RuleLower = "breakdown.rule-lower";
         public const string RuleNarrow = "breakdown.rule-narrow";
         public const string TieBroken = "breakdown.tie-broken";
+        public const string TieEarlierPlacement = "breakdown.tie-earlier";
         public const string Winner = "breakdown.winner";
         public const string Draw = "breakdown.draw";
         public const string Out = "breakdown.out";

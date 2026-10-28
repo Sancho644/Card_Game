@@ -1,0 +1,28 @@
+namespace Game.Simulation
+{
+    /// <summary>One card across a simulation: counted per deck that contained it ("deck-games").</summary>
+    public sealed class CardStats
+    {
+        internal CardStats(string cardId)
+        {
+            CardId = cardId;
+        }
+
+        public string CardId { get; }
+
+        /// <summary>Completed matches in which a deck held this card (a match with it in both decks counts twice).</summary>
+        public int DeckGames { get; internal set; }
+
+        /// <summary>Of those, how many times the deck used the card at least once.</summary>
+        public int GamesUsed { get; internal set; }
+
+        public int TotalUses { get; internal set; }
+
+        /// <summary>Of those deck-games, how many the deck won.</summary>
+        public int DeckWins { get; internal set; }
+
+        public double UsedShare => DeckGames == 0 ? 0 : (double)GamesUsed / DeckGames;
+        public double UsesPerGame => DeckGames == 0 ? 0 : (double)TotalUses / DeckGames;
+        public double WinShare => DeckGames == 0 ? 0 : (double)DeckWins / DeckGames;
+    }
+}

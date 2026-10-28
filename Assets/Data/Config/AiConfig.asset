@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9976d498f4907c34c8f8ba96bbeefa95, type: 3}
+  m_Name: AiConfig
+  m_EditorClassIdentifier: Game.Data::Game.Data.Config.AiConfig
+  _profiles:
+  - _id: normal
+    _displayName: "\u041E\u0431\u044B\u0447\u043D\u044B\u0439"
+    _samples: 3
+    _noise: 0
+    _expectsOpponentResponse: 1
+    _usesReactions: 1
+    _reactionThreshold: 5
+    _prefersFirstTurn: 1
+    _thinkDelayMin: 0.6
+    _thinkDelayMax: 1.2
+    _weights:
+      _matchWin: 1000
+      _winPoint: 100
+      _creaturePerPower: 0.1
+      _commonAbility: 6
+      _epicAbility: 8
+      _legendaryAbility: 12
+      _fieldCard: 4
+      _lockedField: 3
+      _fieldAffinityPerPower: 0.1
+      _choiceAfterBattle: 6
+      _marginScale: 40
+      _ownReserveShare: 0.5
+      _opponentReserveShare: 0.5
+      _informationPerCard: 1.5
+  - _id: easy
+    _displayName: "\u041B\u0451\u0433\u043A\u0438\u0439"
+    _samples: 1
+    _noise: 15
+    _expectsOpponentResponse: 0
+    _usesReactions: 0
+    _reactionThreshold: 5
+    _prefersFirstTurn: 1
+    _thinkDelayMin: 0.6
+    _thinkDelayMax: 1.2
+    _weights:
+      _matchWin: 1000
+      _winPoint: 100
+      _creaturePerPower: 0.1
+      _commonAbility: 6
+      _epicAbility: 8
+      _legendaryAbility: 12
+      _fieldCard: 4
+      _lockedField: 3
+      _fieldAffinityPerPower: 0.1
+      _choiceAfterBattle: 6
+      _marginScale: 40
+      _ownReserveShare: 0.5
+      _opponentReserveShare: 0.5
+      _informationPerCard: 1.5
+  _defaultProfileId: normal

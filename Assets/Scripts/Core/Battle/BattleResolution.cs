@@ -8,14 +8,14 @@ namespace Game.Core.Battle
             PowerBreakdown host,
             PowerBreakdown guest,
             ComparisonRule rule,
-            bool tieBroken,
+            TieBreak tieBreak,
             PlayerId? winner,
             BattleConsequences consequences)
         {
             Host = host;
             Guest = guest;
             Rule = rule;
-            TieBroken = tieBroken;
+            TieBreak = tieBreak;
             Winner = winner;
             Consequences = consequences;
         }
@@ -24,8 +24,8 @@ namespace Game.Core.Battle
         public PowerBreakdown Guest { get; }
         public ComparisonRule Rule { get; }
 
-        /// <summary>Powers were equal and an effect («Перевес») gave the win to one side.</summary>
-        public bool TieBroken { get; }
+        /// <summary>How equal final power was decided, if it was.</summary>
+        public TieBreak TieBreak { get; }
 
         public PlayerId? Winner { get; }
         public BattleConsequences Consequences { get; }

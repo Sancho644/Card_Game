@@ -20,7 +20,12 @@ namespace Game.Core.Battle
         public PlayerId? DecideWinner(BattleCalculation calculation)
         {
             var difference = Math.Abs(calculation.PowerOf(calculation.Host) - calculation.PowerOf(calculation.Guest));
+            if (difference == 0)
+                return WinnerOnEqualPower(calculation);
             return difference < _margin ? null : _inner.DecideWinner(calculation);
         }
+
+        /// <summary>Equal power is within the margin, so a draw by the card text; only «Перевес» still wins it.</summary>
+        public PlayerId? WinnerOnEqualPower(BattleCalculation calculation) => calculation.TieWinner;
     }
 }

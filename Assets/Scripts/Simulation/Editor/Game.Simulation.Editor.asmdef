@@ -1,0 +1,22 @@
+{
+    "name": "Game.Simulation.Editor",
+    "rootNamespace": "Game.Simulation.Editor",
+    "references": [
+        "Game.Core",
+        "Game.Services",
+        "Game.AI",
+        "Game.Data",
+        "Game.Simulation"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

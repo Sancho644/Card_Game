@@ -19,6 +19,9 @@ namespace Game.Presentation.Interaction
         /// <summary>The interface should offer these actions to the player.</summary>
         public event Action<LocalHumanController, PlayerView, IReadOnlyList<GameCommand>> DecisionRequested;
 
+        /// <summary>The interface may offer these optional actions while the opponent is deciding.</summary>
+        public event Action<LocalHumanController, PlayerView, IReadOnlyList<GameCommand>> ReactionOffered;
+
         public event Action<LocalHumanController> DecisionCancelled;
 
         public PlayerId Player { get; }
@@ -29,6 +32,12 @@ namespace Game.Presentation.Interaction
         {
             _submit = submit;
             DecisionRequested?.Invoke(this, view, legalActions);
+        }
+
+        public void OfferReaction(PlayerView view, IReadOnlyList<GameCommand> legalActions, Action<GameCommand> submit)
+        {
+            _submit = submit;
+            ReactionOffered?.Invoke(this, view, legalActions);
         }
 
         public void CancelDecision()

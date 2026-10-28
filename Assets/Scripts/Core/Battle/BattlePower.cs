@@ -8,13 +8,20 @@ namespace Game.Core.Battle
     /// </summary>
     public sealed class BattlePower
     {
-        public BattlePower(int fieldId, PlayerId host, PowerBreakdown hostPower, PowerBreakdown guestPower, ComparisonRule rule)
+        public BattlePower(
+            int fieldId,
+            PlayerId host,
+            PowerBreakdown hostPower,
+            PowerBreakdown guestPower,
+            ComparisonRule rule,
+            PlayerId? equalPowerWinner)
         {
             FieldId = fieldId;
             Host = host;
             HostPower = hostPower;
             GuestPower = guestPower;
             Rule = rule;
+            EqualPowerWinner = equalPowerWinner;
         }
 
         public int FieldId { get; }
@@ -23,6 +30,9 @@ namespace Game.Core.Battle
         public PowerBreakdown HostPower { get; }
         public PowerBreakdown GuestPower { get; }
         public ComparisonRule Rule { get; }
+
+        /// <summary>Who would win if the powers were equal: placed earlier, or «Перевес»; null for a draw by card text.</summary>
+        public PlayerId? EqualPowerWinner { get; }
 
         public PowerBreakdown Of(PlayerId player) => player == Host ? HostPower : GuestPower;
     }
