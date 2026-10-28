@@ -10,9 +10,9 @@ namespace Game.AI
     /// <summary>
     /// The chance to win the match from the score and the creatures each player still has, as if every later
     /// battle were a coin flip in which the winner scores and keeps its creature and the loser's creature is
-    /// out. A player without creatures cannot fight, and the match goes to the leader by wins. A sure win is
-    /// worth +MatchWin, a sure loss −MatchWin. Unlike flat win points, this sees that a creature lost late
-    /// can cost the match and that the last win is worth more than the first.
+    /// out. A player without creatures cannot fight, and the match goes to the leader by wins, then by creatures
+    /// left (docs/rules.md §9). A sure win is worth +MatchWin, a sure loss −MatchWin. Unlike flat win points,
+    /// this sees that a creature lost late can cost the match and that the last win is worth more than the first.
     /// </summary>
     internal sealed class MatchEquityValue : IMatchScoreValue
     {
@@ -51,7 +51,11 @@ namespace Game.AI
             if (opponentWins >= _rules.WinsToWin)
                 return 0;
             if (myCreatures <= 0 || opponentCreatures <= 0)
-                return myWins > opponentWins ? 1 : myWins < opponentWins ? 0 : 0.5;
+            {
+                if (myWins != opponentWins)
+                    return myWins > opponentWins ? 1 : 0;
+                return myCreatures > opponentCreatures ? 1 : myCreatures < opponentCreatures ? 0 : 0.5;
+            }
 
             var key = (myWins, opponentWins, myCreatures, opponentCreatures);
             if (_chances.TryGetValue(key, out var chance))

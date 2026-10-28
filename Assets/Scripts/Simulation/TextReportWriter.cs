@@ -29,11 +29,14 @@ namespace Game.Simulation
             Line(text, "Победы первого игрока", $"{WithInterval(first)} из {first.Trials}");
             Line(text, "Победы второго игрока", Percent(1 - first.Share));
             Line(text, "Ничьи в партиях", Percent(summary.MatchDraws) + " завершённых партий");
+            Line(text, "Решено правилом §9 (больше существ)", $"{summary.MoreCreaturesWins} партий");
             Line(text, "Средняя длина, ходов", Number(summary.AverageTurns));
             Line(text, "Средняя длина, битв", Number(summary.AverageBattles));
             text.AppendLine();
 
             text.AppendLine("Битвы");
+            var hosts = summary.AllHostWins;
+            Line(text, "Победы хозяина, все битвы", $"{WithInterval(hosts)} из {hosts.Trials} битв с победителем");
             Line(text, "Победы хозяина, карта открыта", $"{Percent(summary.HostWins(true))} из {summary.DecidedBattles(true)} битв с победителем");
             Line(text, "Победы гостя, карта открыта", Percent(1 - summary.HostWins(true)));
             Line(text, "Победы хозяина, карта закрыта", $"{Percent(summary.HostWins(false))} из {summary.DecidedBattles(false)} битв с победителем");
@@ -81,6 +84,7 @@ namespace Game.Simulation
             Line(text, $"Победы «{first}»", $"{WithInterval(firstWins)} из {firstWins.Trials}");
             Line(text, $"Победы «{second}»", WithInterval(summary.ProfileWins(second)));
             Line(text, "Ничьи", Percent(summary.MatchDraws) + " завершённых партий");
+            Line(text, "Решено правилом §9 (больше существ)", $"{summary.MoreCreaturesWins} партий");
             Line(text, "Средняя длина, ходов", Number(summary.AverageTurns));
             Problems(text, summary);
             return text.ToString();
@@ -90,6 +94,7 @@ namespace Game.Simulation
         {
             var options = summary.Options;
             text.AppendLine($"== {options.Name} ==");
+            text.AppendLine($"Вариант баланса: {options.BalanceVariant}");
             text.AppendLine($"Партий: {summary.Records.Count}, завершено: {summary.Completed.Count}, " +
                             $"зависло: {summary.Hung.Count()}, ошибок: {summary.Failed.Count()}");
             text.AppendLine($"Seed: {options.Seed}, колоды: {DeckSource(options)}, " +
@@ -118,7 +123,7 @@ namespace Game.Simulation
         }
 
         private static void Line(StringBuilder text, string label, string value) =>
-            text.AppendLine(string.Format(Culture, "  {0,-34} {1}", label + ":", value));
+            text.AppendLine(string.Format(Culture, "  {0,-38} {1}", label + ":", value));
 
         private static string Percent(double share) => share.ToString("P1", Culture);
 

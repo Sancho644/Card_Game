@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Game.Data.Cards;
 using Game.Data.Decks;
 using UnityEngine;
 
@@ -8,6 +9,10 @@ namespace Game.Data.Config
     [CreateAssetMenu(menuName = "Game/Config/Simulation", fileName = "SimulationConfig")]
     public sealed class SimulationConfig : ScriptableObject
     {
+        [Header("Cards")]
+        [SerializeField, Tooltip("Card overrides on top of the main card database; empty: the main cards as they are")]
+        private BalanceVariantDef _balanceVariant;
+
         [Header("Main run")]
         [SerializeField, Min(1)] private int _games = 1000;
         [SerializeField, Tooltip("Master seed; each match's seed is derived from it")] private long _seed = 1;
@@ -30,6 +35,7 @@ namespace Game.Data.Config
         [SerializeField, Min(0)] private int _replayIndex;
         [SerializeField] private long _replaySeed;
 
+        public BalanceVariantDef BalanceVariant => _balanceVariant;
         public int Games => _games;
         public ulong Seed => (ulong)_seed;
         public IReadOnlyList<DeckDef> Decks => _decks;

@@ -18,7 +18,7 @@ namespace Game.Simulation.Editor
             Database = database;
             RulesConfig = rules;
             Ai = ai;
-            Catalog = database.ToCatalog();
+            Catalog = config.BalanceVariant != null ? config.BalanceVariant.ToCatalog(database) : database.ToCatalog();
             Rules = rules.ToRules();
         }
 
@@ -29,7 +29,7 @@ namespace Game.Simulation.Editor
         public CardCatalog Catalog { get; }
         public GameRules Rules { get; }
 
-        /// <summary>Null if an asset is missing; <paramref name="missing"/> names it.</summary>
+        /// <summary>Null if an asset is missing or the balance variant is invalid; <paramref name="missing"/> says which.</summary>
         public static SimulationAssets Load(out string missing)
         {
             var config = Find<SimulationConfig>();
@@ -41,7 +41,17 @@ namespace Game.Simulation.Editor
                 : rules == null ? nameof(GameRulesConfig)
                 : ai == null ? nameof(AiConfig)
                 : null;
-            return missing == null ? new SimulationAssets(config, database, rules, ai) : null;
+            if (missing != null)
+                return null;
+
+            var problem = config.BalanceVariant?.Validate(database).FirstOrDefault();
+            if (problem != null)
+            {
+                missing = $"valid balance variant ({problem})";
+                return null;
+            }
+
+            return new SimulationAssets(config, database, rules, ai);
         }
 
         /// <summary>The main runs: one with the fixed decks, or one per enabled deck mode.</summary>
@@ -64,6 +74,7 @@ namespace Game.Simulation.Editor
                    (Decks().Count == 0 ? $", колоды {DeckModeName(mode)}" : ""),
             Games = Config.Games,
             Seed = Config.Seed,
+            BalanceVariant = VariantName,
             Decks = Decks(),
             DeckMode = mode,
             SynergyRandomShare = Config.SynergyRandomShare,
@@ -78,12 +89,15 @@ namespace Game.Simulation.Editor
             Name = $"Проверка силы: ИИ «{ProfileName(Config.StrongProfileId)}» против ИИ «{ProfileName(Config.WeakProfileId)}»",
             Games = Config.StrengthGames,
             Seed = Config.Seed + 1,
+            BalanceVariant = VariantName,
             Decks = Decks(),
             Player1Profile = Ai.ToProfile(Config.StrongProfileId),
             Player2Profile = Ai.ToProfile(Config.WeakProfileId),
             AlternateSeats = true,
             TurnLimit = Config.TurnLimit,
         };
+
+        private string VariantName => Config.BalanceVariant != null ? Config.BalanceVariant.DisplayName : "База";
 
         public string CardName(string id) => Database.Find(id)?.DisplayName ?? id;
 

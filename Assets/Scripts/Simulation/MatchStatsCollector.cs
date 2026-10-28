@@ -65,6 +65,7 @@ namespace Game.Simulation
                     case MatchEnded ended:
                         _record.Ended = true;
                         _record.Winner = ended.Winner;
+                        _record.EndReason = ended.Reason;
                         break;
                 }
             }

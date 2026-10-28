@@ -12,6 +12,9 @@ namespace Game.Simulation
 
         public int Games { get; set; } = 1000;
 
+        /// <summary>Name of the card balance variant the runner's catalog was built with, for the report.</summary>
+        public string BalanceVariant { get; set; } = "База";
+
         /// <summary>Master seed; every match gets its own seed derived from it.</summary>
         public ulong Seed { get; set; } = 1;
 

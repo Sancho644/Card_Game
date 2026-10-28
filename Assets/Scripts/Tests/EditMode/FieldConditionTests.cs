@@ -163,6 +163,33 @@ namespace Game.Core.Tests
         }
 
         [Test]
+        public void SacrificeOnlyGuest_WinningHostStays()
+        {
+            var d = BattleOnP1Field(GuestSacrificeField, Fire180, Water200, player1Deck: Deck(legendaryField: GuestSacrificeField));
+            d.Open(P1);
+            d.Ready(P1);
+            d.Ready(P2);
+
+            Assert.AreEqual(P1, d.Last<BattleResolved>().Winner);
+            Assert.IsFalse(d.IsOut(P1, Fire180));
+            Assert.IsTrue(d.IsOut(P2, Water200));
+        }
+
+        [Test]
+        public void SacrificeOnlyGuest_WinningGuestGoesOutToo()
+        {
+            var d = BattleOnP1Field(GuestSacrificeField, Water200, Earth250, player1Deck: Deck(legendaryField: GuestSacrificeField));
+            d.Open(P1);
+            d.Ready(P1);
+            d.Ready(P2);
+
+            Assert.AreEqual(P2, d.Last<BattleResolved>().Winner);
+            Assert.IsTrue(d.IsOut(P2, Earth250));
+            Assert.IsTrue(d.IsOut(P1, Water200));
+            Assert.AreEqual(1, d.Wins(P2));
+        }
+
+        [Test]
         public void Trophy_WinnerChoosesAbilityFromDiscard()
         {
             var d = BattleOnP1Field(TrophyField, Fire180, Water200, player1Deck: Deck(epicField: TrophyField));

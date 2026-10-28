@@ -36,6 +36,9 @@ namespace Game.Simulation
         /// <summary>Drawn matches, as a share of completed matches.</summary>
         public double MatchDraws => Share(Completed, record => record.Winner == null);
 
+        /// <summary>Completed matches decided by the creatures left on equal wins (docs/rules.md §9).</summary>
+        public int MoreCreaturesWins => Completed.Count(record => record.EndReason == MatchEndReason.MoreCreatures);
+
         public double AverageTurns => Average(Completed, record => record.Turns);
         public double AverageBattles => Average(Completed, record => record.Battles.Count);
 
@@ -48,6 +51,10 @@ namespace Game.Simulation
         public double OpeningsPerMatch => Average(Completed, record => record.FieldOpenings);
         public double SkipsPerTurn => Ratio(Completed.Sum(record => record.Skips), Completed.Sum(record => record.Turns));
         public double ChallengesPerTurn => Ratio(Completed.Sum(record => record.Challenges), Completed.Sum(record => record.Turns));
+
+        /// <summary>Share of decided battles (with a winner) the host won, on any field.</summary>
+        public ShareEstimate AllHostWins =>
+            Estimate(Battles.Where(battle => battle.Winner != null).ToList(), battle => battle.Winner == battle.Host);
 
         /// <summary>Share of decided battles (with a winner) the host won, on an open or a closed field.</summary>
         public double HostWins(bool open) => Share(Decided(open), battle => battle.Winner == battle.Host);

@@ -162,6 +162,43 @@ namespace Game.Core.Tests
             Assert.AreEqual(0, d.Wins(P2));
             Assert.IsTrue(d.State.Result.IsDraw);
             Assert.IsNull(d.Last<MatchEnded>().Winner);
+            Assert.AreEqual(MatchEndReason.Draw, d.Last<MatchEnded>().Reason, "Equal wins and one creature each.");
+        }
+
+        [Test]
+        public void BothSkipInARow_EqualWins_MoreCreaturesWins()
+        {
+            // Player1 wins on its open «Жертва» field and loses its creature too; Player2 wins the second battle.
+            // 1:1 in wins, but Player1 has no creatures left and Player2 still has one (docs/rules.md §9).
+            var rules = RulesWithDeck(new[] { Rarity.Legendary }, new[] { Rarity.Common, Rarity.Epic }, new[] { Rarity.Common });
+            var d = Begin(P1, rules,
+                new DeckList(new[] { SacrificeField, Fire180, Water200, Boost50 }),
+                new DeckList(new[] { Temple, Fire180, Water200, Boost50 }));
+            d.Place(P1, Fire180, P1, SacrificeField);
+            d.EndTurn(P1);
+            d.Place(P2, Fire180, P1, SacrificeField);
+            d.Open(P1);
+            d.Ready(P1);
+            d.Ready(P2);
+            d.EndTurn(P2);
+
+            d.Place(P1, Water200, P2, Temple);
+            d.EndTurn(P1);
+            d.Place(P2, Water200, P2, Temple);
+            d.Ready(P1);
+            d.Play(P2, Boost50);
+            d.Ready(P1);
+            d.Ready(P2);
+            d.EndTurn(P2);
+
+            d.EndTurn(P1);
+            d.EndTurn(P2);
+
+            Assert.AreEqual(1, d.Wins(P1));
+            Assert.AreEqual(1, d.Wins(P2));
+            Assert.AreEqual(P2, d.State.Result.Winner);
+            Assert.AreEqual(P2, d.Last<MatchEnded>().Winner);
+            Assert.AreEqual(MatchEndReason.MoreCreatures, d.Last<MatchEnded>().Reason);
         }
 
         [Test]

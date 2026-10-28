@@ -27,6 +27,7 @@ namespace Game.Simulation
         public PlayerId? FirstPlayer { get; internal set; }
         public bool Ended { get; internal set; }
         public PlayerId? Winner { get; internal set; }
+        public MatchEndReason EndReason { get; internal set; }
         public int Turns { get; internal set; }
         public int Skips { get; internal set; }
         public int Challenges { get; internal set; }

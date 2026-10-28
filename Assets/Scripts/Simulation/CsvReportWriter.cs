@@ -11,7 +11,7 @@ namespace Game.Simulation
     public sealed class CsvReportWriter
     {
         private const string Header =
-            "index,seed,status,profile_p1,profile_p2,deck_p1,deck_p2,first,winner,turns,battles,battle_draws,equal_power,retreats,field_openings,skips,challenges,error";
+            "index,seed,status,profile_p1,profile_p2,deck_p1,deck_p2,first,winner,end_reason,turns,battles,battle_draws,equal_power,retreats,field_openings,skips,challenges,error";
 
         public string Write(IReadOnlyList<GameRecord> records)
         {
@@ -29,6 +29,7 @@ namespace Game.Simulation
                     Quote(string.Join(" ", record.DeckOf(PlayerId.Player2).CardIds)),
                     record.FirstPlayer?.ToString() ?? "",
                     record.Winner?.ToString() ?? (record.Completed ? "draw" : ""),
+                    record.Ended ? record.EndReason.ToString() : "",
                     record.Turns.ToString(CultureInfo.InvariantCulture),
                     record.Battles.Count.ToString(CultureInfo.InvariantCulture),
                     record.Battles.Count(battle => battle.IsDraw).ToString(CultureInfo.InvariantCulture),

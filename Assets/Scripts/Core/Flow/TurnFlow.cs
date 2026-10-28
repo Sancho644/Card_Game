@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using Game.Core.Cards;
 using Game.Core.Commands;
 using Game.Core.Events;
 using Game.Core.State;
@@ -76,23 +78,44 @@ namespace Game.Core.Flow
             _events.Emit(new TurnEnded(player));
 
             if (_state.ConsecutiveSkips >= SkipsToEndMatch)
-                EndMatch(LeaderByWins());
+                EndByScore();
             else
                 StartTurn(player.Opponent());
         }
 
-        public void EndMatch(PlayerId? winner)
+        public void EndMatch(PlayerId? winner, MatchEndReason reason)
         {
             _state.Phase = MatchPhase.Ended;
             _state.Battle = null;
-            _state.Result = new MatchResult(winner);
-            _events.Emit(new MatchEnded(winner));
+            _state.Result = new MatchResult(winner, reason);
+            _events.Emit(new MatchEnded(winner, reason));
         }
 
-        private PlayerId? LeaderByWins()
+        /// <summary>
+        /// The match ended without the wins needed (docs/rules.md §9): more wins decide; on equal wins, more
+        /// creatures not out of the game (in hand and on the table); otherwise a draw. The only place of this rule.
+        /// </summary>
+        private void EndByScore()
         {
-            var first = _state.Player(PlayerId.Player1).Wins;
-            var second = _state.Player(PlayerId.Player2).Wins;
+            var winner = Leader(player => _state.Player(player).Wins);
+            if (winner != null)
+            {
+                EndMatch(winner, MatchEndReason.MoreWins);
+                return;
+            }
+
+            winner = Leader(CreaturesInPlay);
+            EndMatch(winner, winner == null ? MatchEndReason.Draw : MatchEndReason.MoreCreatures);
+        }
+
+        private int CreaturesInPlay(PlayerId player) =>
+            _state.Player(player).Hand.Count(card => card.Type == CardType.Creature) +
+            _state.Fields.Count(field => field.OccupantOf(player) != null);
+
+        private static PlayerId? Leader(Func<PlayerId, int> score)
+        {
+            var first = score(PlayerId.Player1);
+            var second = score(PlayerId.Player2);
             if (first == second)
                 return null;
             return first > second ? PlayerId.Player1 : PlayerId.Player2;

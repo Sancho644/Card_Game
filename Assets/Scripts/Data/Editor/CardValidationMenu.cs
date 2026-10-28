@@ -23,6 +23,15 @@ namespace Game.Data.Editor
                     problems++;
                 }
 
+                foreach (var variant in LoadAll<BalanceVariantDef>())
+                {
+                    foreach (var problem in variant.Validate(database))
+                    {
+                        Debug.LogError($"[{variant.name}] {problem}", variant);
+                        problems++;
+                    }
+                }
+
                 foreach (var balance in LoadAll<BalanceConfig>())
                 {
                     foreach (var warning in new CardBalanceValidator(balance).Check(database.Cards))

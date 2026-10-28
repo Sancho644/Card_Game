@@ -35,7 +35,7 @@ namespace Game.Core.Forecast
                 MainActionDone = _view.MainActionDone,
                 BattleHappenedThisTurn = _view.BattleHappenedThisTurn,
                 ConsecutiveSkips = _view.ConsecutiveSkips,
-                Result = _view.Result == null ? null : new MatchResult(_view.Result.Winner),
+                Result = _view.Result == null ? null : new MatchResult(_view.Result.Winner, _view.Result.Reason),
             };
             state.RestorePlacementCounter(_view.Fields.SelectMany(field => PlayerIds.All.Select(field.PlacementOrder)).DefaultIfEmpty().Max());
 

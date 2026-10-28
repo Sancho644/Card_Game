@@ -25,6 +25,7 @@ namespace Game.Core.Tests
         public const string MercyField = "test.field.mercy";
         public const string UnbreakableField = "test.field.unbreakable";
         public const string SacrificeField = "test.field.sacrifice";
+        public const string GuestSacrificeField = "test.field.guest-sacrifice";
         public const string TrophyField = "test.field.trophy";
         public const string HostHomeField = "test.field.host-home";
         public const string Quarry = "test.field.quarry";
@@ -88,6 +89,8 @@ namespace Game.Core.Tests
                 new[] { new FieldStaysCondition() }),
             new FieldCard(SacrificeField, Rarity.Legendary, Modifiers((Element.Fire, 100)),
                 new[] { new WinnerOutOfGameCondition() }),
+            new FieldCard(GuestSacrificeField, Rarity.Legendary, Modifiers((Element.Fire, 100)),
+                new[] { new WinnerOutOfGameCondition(onlyGuest: true) }),
             new FieldCard(MercyField, Rarity.Common, Modifiers((Element.Light, 40)),
                 new[] { new LoserReturnsToHandCondition() }),
             new FieldCard(HostHomeField, Rarity.Common, Modifiers((Element.Fire, 40), (Element.Water, -30)),

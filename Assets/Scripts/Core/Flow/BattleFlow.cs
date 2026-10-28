@@ -149,7 +149,7 @@ namespace Game.Core.Flow
                 _events.Emit(new WinScored(winner, player.Wins));
                 if (player.Wins >= _rules.WinsToWin)
                 {
-                    _turns.EndMatch(winner);
+                    _turns.EndMatch(winner, MatchEndReason.WinsReached);
                     return;
                 }
             }
