@@ -25,14 +25,17 @@ namespace Game.Core
         private readonly LegalActionFinder _legalActions;
 
         public MatchEngine(MatchSetup setup, CardCatalog catalog, GameRules rules, IRandom random)
+            : this(CreateState(setup, catalog, rules), rules, random)
         {
-            if (setup == null) throw new ArgumentNullException(nameof(setup));
-            if (catalog == null) throw new ArgumentNullException(nameof(catalog));
+        }
+
+        /// <summary>An engine over a state built elsewhere: a forecast rebuilt from a player view.</summary>
+        internal MatchEngine(MatchState state, GameRules rules, IRandom random)
+        {
             if (rules == null) throw new ArgumentNullException(nameof(rules));
             if (random == null) throw new ArgumentNullException(nameof(random));
 
-            ValidateDecks(setup, catalog, rules);
-            _context = new MatchContext(CreateState(setup, catalog), rules, random);
+            _context = new MatchContext(state, rules, random);
             _handlers = CreateHandlers().ToDictionary(handler => handler.CommandType);
             _legalActions = new LegalActionFinder(_context.State, Validate);
         }
@@ -120,8 +123,13 @@ namespace Game.Core
         }
 
         /// <summary>Field cards go on the table face down, creatures and abilities to the hand.</summary>
-        private static MatchState CreateState(MatchSetup setup, CardCatalog catalog)
+        private static MatchState CreateState(MatchSetup setup, CardCatalog catalog, GameRules rules)
         {
+            if (setup == null) throw new ArgumentNullException(nameof(setup));
+            if (catalog == null) throw new ArgumentNullException(nameof(catalog));
+            if (rules == null) throw new ArgumentNullException(nameof(rules));
+
+            ValidateDecks(setup, catalog, rules);
             var nextInstanceId = 1;
             var players = new PlayerState[PlayerIds.All.Count];
             var fields = new List<FieldSlot>();

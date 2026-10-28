@@ -35,6 +35,9 @@ namespace Game.Core.State
 
         public CardInstance OccupantOf(PlayerId player) => _occupants[(int)player];
 
+        /// <summary>When the player's creature was placed here, in match-wide order; valid while it stands here.</summary>
+        public int PlacementOrder(PlayerId player) => _placementOrder[(int)player];
+
         internal void Occupy(PlayerId player, CardInstance creature, int placementOrder)
         {
             if (_occupants[(int)player] != null)

@@ -10,6 +10,7 @@ namespace Game.Core.State
     public sealed class PlayerView
     {
         private readonly int[] _wins;
+        private readonly int[] _legendariesPlayed;
         private readonly IReadOnlyList<CardRef>[] _discards;
         private readonly IReadOnlyList<CardRef>[] _outOfGame;
 
@@ -19,6 +20,9 @@ namespace Game.Core.State
             Phase = state.Phase;
             AwaitingPlayer = AwaitingPlayerOf(state);
             ActivePlayer = state.ActivePlayer;
+            MainActionDone = state.MainActionDone;
+            BattleHappenedThisTurn = state.BattleHappenedThisTurn;
+            ConsecutiveSkips = state.ConsecutiveSkips;
             CoinTossWinner = state.CoinTossWinner;
             Result = state.Result;
             Hand = state.Player(viewer).Hand.Select(CardRef.From).ToList();
@@ -26,9 +30,11 @@ namespace Game.Core.State
             Fields = state.Fields.Select(field => new FieldView(field, viewer)).ToList();
             Battle = state.Battle == null ? null : new BattleView(state.Battle);
             ChoosingPlayer = state.PendingChoice?.Player;
+            ChoicePurpose = state.PendingChoice?.Purpose;
             ChoiceOptions = state.PendingChoice == null ? new CardRef[0] : Refs(state.PendingChoice.Options);
 
             _wins = PlayerIds.All.Select(id => state.Player(id).Wins).ToArray();
+            _legendariesPlayed = PlayerIds.All.Select(id => state.Player(id).LegendariesPlayedThisTurn).ToArray();
             _discards = PlayerIds.All.Select(id => Refs(state.Player(id).Discard)).ToArray();
             _outOfGame = PlayerIds.All.Select(id => Refs(state.Player(id).OutOfGame)).ToArray();
         }
@@ -42,6 +48,15 @@ namespace Game.Core.State
         /// </summary>
         public PlayerId? AwaitingPlayer { get; }
         public PlayerId ActivePlayer { get; }
+
+        /// <summary>The active player has done the main action of this turn.</summary>
+        public bool MainActionDone { get; }
+
+        public bool BattleHappenedThisTurn { get; }
+
+        /// <summary>Main actions skipped in a row, across both players.</summary>
+        public int ConsecutiveSkips { get; }
+
         public PlayerId? CoinTossWinner { get; }
         public MatchResult Result { get; }
         public IReadOnlyList<CardRef> Hand { get; }
@@ -52,9 +67,12 @@ namespace Game.Core.State
         /// <summary>The player who must choose a card, or null. Options come from public piles.</summary>
         public PlayerId? ChoosingPlayer { get; }
 
+        public ChoicePurpose? ChoicePurpose { get; }
+
         public IReadOnlyList<CardRef> ChoiceOptions { get; }
 
         public int Wins(PlayerId player) => _wins[(int)player];
+        public int LegendariesPlayedThisTurn(PlayerId player) => _legendariesPlayed[(int)player];
         public IReadOnlyList<CardRef> Discard(PlayerId player) => _discards[(int)player];
         public IReadOnlyList<CardRef> OutOfGame(PlayerId player) => _outOfGame[(int)player];
         public FieldView Field(int fieldId) => Fields.FirstOrDefault(field => field.Id == fieldId);

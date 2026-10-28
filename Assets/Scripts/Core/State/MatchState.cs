@@ -40,5 +40,8 @@ namespace Game.Core.State
             _fields.Find(field => field.OccupantOf(owner)?.Id == creatureId);
 
         internal int NextPlacementOrder() => ++_placementCounter;
+
+        /// <summary>Continues the placement order of a match rebuilt from a view.</summary>
+        internal void RestorePlacementCounter(int value) => _placementCounter = value;
     }
 }

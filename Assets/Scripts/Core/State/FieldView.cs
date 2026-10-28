@@ -5,6 +5,7 @@ namespace Game.Core.State
     public sealed class FieldView
     {
         private readonly CardRef[] _occupants;
+        private readonly int[] _placementOrder;
 
         internal FieldView(FieldSlot field, PlayerId viewer)
         {
@@ -16,6 +17,7 @@ namespace Game.Core.State
             // A closed field removed after a battle stays hidden from the opponent (docs/rules.md §6).
             CardId = field.IsOpen || field.Owner == viewer ? field.Definition.Id : null;
             _occupants = PlayerIds.All.Select(id => CardRef.From(field.OccupantOf(id))).ToArray();
+            _placementOrder = PlayerIds.All.Select(id => field.OccupantOf(id) == null ? 0 : field.PlacementOrder(id)).ToArray();
         }
 
         public int Id { get; }
@@ -30,5 +32,8 @@ namespace Game.Core.State
 
         /// <summary>Creatures stand face up, so both players see them.</summary>
         public CardRef Occupant(PlayerId player) => _occupants[(int)player];
+
+        /// <summary>When the player's creature was placed here (match-wide order, 0 if none). Public: both players saw it.</summary>
+        public int PlacementOrder(PlayerId player) => _placementOrder[(int)player];
     }
 }

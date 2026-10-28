@@ -7,6 +7,7 @@ namespace Game.Core.Cards
     public sealed class CardCatalog
     {
         private readonly Dictionary<string, CardDefinition> _cards = new Dictionary<string, CardDefinition>();
+        private readonly List<CardDefinition> _ordered = new List<CardDefinition>();
 
         public CardCatalog(IEnumerable<CardDefinition> cards)
         {
@@ -18,8 +19,12 @@ namespace Game.Core.Cards
                 if (_cards.ContainsKey(card.Id))
                     throw new ArgumentException($"Duplicate card id '{card.Id}'.", nameof(cards));
                 _cards.Add(card.Id, card);
+                _ordered.Add(card);
             }
         }
+
+        /// <summary>Every card, in the order given to the constructor.</summary>
+        public IReadOnlyList<CardDefinition> All => _ordered;
 
         public bool TryGet(string id, out CardDefinition card) => _cards.TryGetValue(id, out card);
 
