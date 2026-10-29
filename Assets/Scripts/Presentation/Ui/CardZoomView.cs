@@ -10,8 +10,8 @@ namespace Game.Presentation.Ui
 {
     /// <summary>
     /// A card shown large over the table, laid out like the card itself: it flies from where the card lies
-    /// to the centre of the screen over a darkened table, and back when the player taps anywhere. A card the
-    /// viewer may not see shows its back. Runs on real time, so it stays quick while animations are sped up.
+    /// to the centre of the screen over a darkened table, and back when the player taps anywhere. Runs on real
+    /// time, so it stays quick while animations are sped up.
     /// </summary>
     public sealed class CardZoomView : MonoBehaviour
     {
@@ -30,7 +30,6 @@ namespace Game.Presentation.Ui
         [SerializeField] private TMP_Text _stats;
         [SerializeField] private TMP_Text _body;
         [SerializeField] private TMP_Text _rarity;
-        [SerializeField] private Image _back;
         [SerializeField] private Button _close;
 
         private CardSkin _skin;
@@ -49,24 +48,13 @@ namespace Game.Presentation.Ui
             _dimAlpha = _dim.color.a;
         }
 
-        /// <summary>Shows the face, or the back when <paramref name="face"/> is null.</summary>
         /// <param name="from">Where the card is on the screen, in pixels; the view grows out of it and returns there.</param>
         /// <param name="closed">Called once the view has flown back.</param>
         public void Show(CardFace face, Rect from, Action closed)
         {
             _from = from;
             _closed = closed;
-            _back.gameObject.SetActive(face == null);
-            if (face == null)
-            {
-                _back.sprite = _skin.BackArt;
-                _back.color = _skin.Back;
-            }
-            else
-            {
-                ShowFace(face);
-            }
-
+            ShowFace(face);
             UiButtons.Bind(_close, Hide);
             _close.interactable = true;
             gameObject.SetActive(true);

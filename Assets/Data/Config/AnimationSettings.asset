@@ -18,6 +18,7 @@ MonoBehaviour:
   _moveDuration: 0.35
   _handFocusHeight: 0.42
   _handFocusSeconds: 0.12
+  _handSpread: 0.35
   _zoomHeight: 0.82
   _zoomOpenSeconds: 0.22
   _zoomCloseSeconds: 0.18

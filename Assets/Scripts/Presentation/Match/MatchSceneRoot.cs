@@ -105,7 +105,7 @@ namespace Game.Presentation.Match
                 registry, new FloatingTextSpawner(_cardRoot, _camera), new PowerDiff(lookup), _visual, _animation);
 
             _interaction = new TableInteraction(
-                _pointer, new TableRaycaster(_camera), registry, selector, new DropTargetPicker(), _zoom, new HandFocus(_camera, _animation, _layout.CardSize), faces, queue, speed, _visual, _settings);
+                _pointer, new TableRaycaster(_camera), registry, selector, _zoom, new HandFocus(_camera, _animation, () => registry.All, _layout.CardSize), faces, queue, speed, _visual);
             _decisions = new HumanDecisionUi(
                 humans, selector, _interaction, _actionBar, _turnOrder, _options, _prompt, names, lookup, texts);
 

@@ -9,10 +9,6 @@ namespace Game.Data.Presentation
         [Header("Input")]
         [SerializeField, Min(0.1f)] private float _longPressSeconds = 0.5f;
         [SerializeField, Min(1)] private float _dragThresholdPixels = 14f;
-        [Tooltip("Extra room around a drop target, in fractions of the screen height.")]
-        [SerializeField, Range(0f, 0.2f)] private float _dropPadding = 0.03f;
-        [Tooltip("How far from a target the card may be released and still land on it, in fractions of the screen height.")]
-        [SerializeField, Range(0f, 0.5f)] private float _dropRadius = 0.12f;
 
         [Header("Camera")]
         [Tooltip("Angle between the view and the table, degrees: 90 looks straight down. Can be tuned in Play mode.")]
@@ -23,6 +19,8 @@ namespace Game.Data.Presentation
         [SerializeField, Range(10f, 90f)] private float _cameraFieldOfView = 36f;
 
         [Header("Hand")]
+        [Tooltip("Size of a resting hand card; a card being looked at grows to its own size.")]
+        [SerializeField, Range(0.4f, 1.5f)] private float _handCardScale = 0.9f;
         [SerializeField, Min(0.1f)] private float _handSpacing = 1.15f;
         [SerializeField] private float _handFanDegrees = 5f;
         [Tooltip("Free space between the hand and the edges of the safe area, in fractions of the screen width.")]
@@ -43,8 +41,7 @@ namespace Game.Data.Presentation
 
         public float LongPressSeconds => _longPressSeconds;
         public float DragThresholdPixels => _dragThresholdPixels;
-        public float DropPadding => _dropPadding;
-        public float DropRadius => _dropRadius;
+        public float HandCardScale => _handCardScale;
         public float HandSpacing => _handSpacing;
         public float HandFanDegrees => _handFanDegrees;
         public float CameraPitch => _cameraPitch;

@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.TablePresentationSettings
   _longPressSeconds: 0.5
   _dragThresholdPixels: 14
-  _dropPadding: 0.03
-  _dropRadius: 0.12
   _cameraPitch: 82
   _cameraHeight: 18
   _cameraFieldOfView: 36
+  _handCardScale: 0.9
   _handSpacing: 1.25
   _handFanDegrees: 4
   _handScreenMargin: 0.03

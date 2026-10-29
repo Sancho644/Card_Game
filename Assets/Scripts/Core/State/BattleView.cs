@@ -15,6 +15,7 @@ namespace Game.Core.State
             CurrentActor = battle.CurrentActor;
             _ready = PlayerIds.All.Select(battle.IsReady).ToArray();
             PlayedAbilities = battle.PlayedAbilities.Select(played => new PlayedAbilityView(played)).ToList();
+            IsConditionCancelled = battle.IsConditionCancelled;
         }
 
         public int FieldId { get; }
@@ -24,6 +25,9 @@ namespace Game.Core.State
 
         /// <summary>Abilities played in this battle, in play order, cancelled ones included. Played face up.</summary>
         public IReadOnlyList<PlayedAbilityView> PlayedAbilities { get; }
+
+        /// <summary>An ability in play («Разрыв условия») cancels the field's condition for this battle.</summary>
+        public bool IsConditionCancelled { get; }
 
         public bool IsReady(PlayerId player) => _ready[(int)player];
     }

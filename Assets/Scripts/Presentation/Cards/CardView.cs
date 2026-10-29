@@ -38,6 +38,7 @@ namespace Game.Presentation.Cards
         [SerializeField] private TMP_Text _rarity;
         [SerializeField] private TMP_Text _status;
         [SerializeField] private GameObject _conditionBadge;
+        [SerializeField] private GameObject _conditionCancelled;
         [SerializeField] private GameObject _powerBadge;
         [SerializeField] private Renderer _powerBackground;
         [SerializeField] private TMP_Text _powerText;
@@ -65,6 +66,9 @@ namespace Game.Presentation.Cards
         /// <summary>The visible part is lifted away from the card's place, e.g. a hand card being looked at.</summary>
         public bool IsFocused { get; private set; }
 
+        /// <summary>The visible part is away from the card's place: lifted, or nudged aside for a lifted neighbour.</summary>
+        public bool IsDisplaced { get; private set; }
+
         public Collider Collider => _collider;
 
         /// <summary>Everything visible on the card; emphasis animations move this, not the card itself.</summary>
@@ -87,8 +91,7 @@ namespace Game.Presentation.Cards
             SetSprite(_back, skin.BackArt, skin.Back);
             SetColor(_powerBackground, skin.PowerBadge);
             ApplyFace();
-            if (_conditionBadge != null)
-                _conditionBadge.SetActive(face.HasCondition);
+            SetCondition(ConditionMark.None);
             SetStatus(null);
             SetHighlight(null);
             SetBattle(null);
@@ -102,6 +105,16 @@ namespace Game.Presentation.Cards
                 return;
             _status.text = status ?? "";
             _status.gameObject.SetActive(!string.IsNullOrEmpty(status));
+        }
+
+        /// <summary>Shows whether the field's condition acts in the current battle; only fields with a condition show it.</summary>
+        public void SetCondition(ConditionMark mark)
+        {
+            var shown = mark != ConditionMark.None && _face != null && _face.HasCondition;
+            if (_conditionBadge != null)
+                _conditionBadge.SetActive(shown);
+            if (_conditionCancelled != null)
+                _conditionCancelled.SetActive(shown && mark == ConditionMark.Cancelled);
         }
 
         /// <summary>Darkens the face, e.g. the owner's own closed field. 1 is the normal face.</summary>
@@ -149,7 +162,7 @@ namespace Game.Presentation.Cards
         public void SetInHand(bool inHand)
         {
             IsInHand = inHand;
-            if (!inHand && IsFocused)
+            if (!inHand && IsDisplaced)
                 ResetVisual();
         }
 
@@ -166,38 +179,30 @@ namespace Game.Presentation.Cards
         /// </summary>
         public Tween FocusVisual(Vector3 position, Quaternion rotation, float scale, float duration)
         {
-            if (_visual == null)
-                return null;
-
-            _focus?.Kill();
             IsFocused = true;
-            var localPosition = transform.InverseTransformPoint(position);
-            var localRotation = Quaternion.Inverse(transform.rotation) * rotation;
-            var localScale = Vector3.one * (scale / Mathf.Max(0.001f, transform.lossyScale.x));
-            _focus = DOTween.Sequence()
-                .Join(_visual.DOLocalMove(localPosition, duration).SetEase(Ease.OutCubic))
-                .Join(_visual.DOLocalRotateQuaternion(localRotation, duration).SetEase(Ease.OutCubic))
-                .Join(_visual.DOScale(localScale, duration).SetEase(Ease.OutCubic))
-                .SetUpdate(true)
-                .SetTarget(this);
-            return _focus;
+            return MoveVisual(
+                transform.InverseTransformPoint(position),
+                Quaternion.Inverse(transform.rotation) * rotation,
+                scale / Mathf.Max(0.001f, transform.lossyScale.x),
+                duration);
+        }
+
+        /// <summary>Shifts the visible part aside by a world offset, keeping its size, e.g. away from a lifted neighbour.</summary>
+        public Tween NudgeVisual(Vector3 offset, float duration)
+        {
+            IsFocused = false;
+            return MoveVisual(transform.InverseTransformVector(offset), Quaternion.identity, 1f, duration);
         }
 
         /// <summary>Brings the visible part back to the card's place.</summary>
         public Tween ReleaseVisual(float duration)
         {
-            if (_visual == null || !IsFocused)
+            if (!IsDisplaced)
                 return null;
-
-            _focus?.Kill();
+            var tween = MoveVisual(Vector3.zero, Quaternion.identity, 1f, duration);
             IsFocused = false;
-            _focus = DOTween.Sequence()
-                .Join(_visual.DOLocalMove(Vector3.zero, duration).SetEase(Ease.OutCubic))
-                .Join(_visual.DOLocalRotateQuaternion(Quaternion.identity, duration).SetEase(Ease.OutCubic))
-                .Join(_visual.DOScale(Vector3.one, duration).SetEase(Ease.OutCubic))
-                .SetUpdate(true)
-                .SetTarget(this);
-            return _focus;
+            IsDisplaced = false;
+            return tween;
         }
 
         /// <summary>Puts the visible part back at once.</summary>
@@ -205,6 +210,7 @@ namespace Game.Presentation.Cards
         {
             _focus?.Kill();
             IsFocused = false;
+            IsDisplaced = false;
             if (_visual == null)
                 return;
             _visual.localPosition = Vector3.zero;
@@ -234,6 +240,22 @@ namespace Game.Presentation.Cards
                 .Join(transform.DOScale(pose.Scale, duration).SetEase(Ease.OutCubic))
                 .SetTarget(this);
             return _move;
+        }
+
+        private Tween MoveVisual(Vector3 localPosition, Quaternion localRotation, float localScale, float duration)
+        {
+            if (_visual == null)
+                return null;
+
+            _focus?.Kill();
+            IsDisplaced = true;
+            _focus = DOTween.Sequence()
+                .Join(_visual.DOLocalMove(localPosition, duration).SetEase(Ease.OutCubic))
+                .Join(_visual.DOLocalRotateQuaternion(localRotation, duration).SetEase(Ease.OutCubic))
+                .Join(_visual.DOScale(Vector3.one * localScale, duration).SetEase(Ease.OutCubic))
+                .SetUpdate(true)
+                .SetTarget(this);
+            return _focus;
         }
 
         private void ApplyFace()

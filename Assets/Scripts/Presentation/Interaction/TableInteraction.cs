@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Game.Data.Presentation;
 using Game.Presentation.Animation;
@@ -15,9 +14,10 @@ namespace Game.Presentation.Interaction
     /// <list type="bullet">
     /// <item>A hand card lifts to be read while the mouse is over it, or after a tap until a tap elsewhere;
     /// a tap on a playable hand card also chooses it.</item>
-    /// <item>A tap on a card the player can choose now (lit) chooses it; a tap on any other card on the
-    /// table shows it large; long press or right click shows any card large.</item>
-    /// <item>A dragged hand card lands on the nearest target on screen, which is lit while dragging.</item>
+    /// <item>A tap on a card the player can choose now (lit) chooses it; a tap on any other face-up card on
+    /// the table shows it large; long press or right click shows any face-up card large. Backs are not shown.</item>
+    /// <item>While a chosen card waits for its target, only a tap or a release right on a lit target uses it;
+    /// anywhere else the choice is dropped and nothing is sent.</item>
     /// <item>Looking at cards never changes the match, so it works on the opponent's turn and while
     /// animations play; a tap on the empty table then speeds the animations up.</item>
     /// <item>While a card is shown large, the table takes no input; a tap anywhere sends it back.</item>
@@ -31,14 +31,12 @@ namespace Game.Presentation.Interaction
         private readonly TableRaycaster _raycaster;
         private readonly CardViewRegistry _registry;
         private readonly ActionSelector _selector;
-        private readonly DropTargetPicker _picker;
         private readonly CardZoomView _zoom;
         private readonly HandFocus _focus;
         private readonly CardFaceBuilder _faces;
         private readonly AnimationQueue _queue;
         private readonly AnimationSpeed _speed;
         private readonly VisualSettings _visual;
-        private readonly TablePresentationSettings _settings;
         private CardView _dragged;
         private int? _dropTarget;
         private bool _enabled;
@@ -49,27 +47,23 @@ namespace Game.Presentation.Interaction
             TableRaycaster raycaster,
             CardViewRegistry registry,
             ActionSelector selector,
-            DropTargetPicker picker,
             CardZoomView zoom,
             HandFocus focus,
             CardFaceBuilder faces,
             AnimationQueue queue,
             AnimationSpeed speed,
-            VisualSettings visual,
-            TablePresentationSettings settings)
+            VisualSettings visual)
         {
             _input = input;
             _raycaster = raycaster;
             _registry = registry;
             _selector = selector;
-            _picker = picker;
             _zoom = zoom;
             _focus = focus;
             _faces = faces;
             _queue = queue;
             _speed = speed;
             _visual = visual;
-            _settings = settings;
 
             _input.Tapped += OnTap;
             _input.LongPressed += OnLongPress;
@@ -172,9 +166,14 @@ namespace Game.Presentation.Interaction
                 return;
 
             var card = _raycaster.CardAt(position);
+            if (CanAct && _selector.Source != null && TapWhileChosen(position, card))
+                return;
+
             if (card == null)
             {
-                TapEmptyTable(position);
+                _focus.Unpin();
+                if (_queue.IsBusy)
+                    _speed.FastForward();
                 return;
             }
 
@@ -188,36 +187,31 @@ namespace Game.Presentation.Interaction
 
             _focus.Unpin();
             if (IsChoosable(card))
-            {
                 _selector.TapCard(card.InstanceId);
-                return;
-            }
-
-            // A tap near a target while a card is chosen, e.g. on the opponent's creature that stands on the target field.
-            var target = CanAct && _selector.Source != null ? TargetNear(position) : null;
-            if (target != null)
-                _selector.TapCard(target.Value);
             else
                 ShowLarge(card);
         }
 
-        private void TapEmptyTable(Vector2 position)
+        /// <summary>
+        /// A card is chosen and waits for its target: a tap on a lit target uses it, a tap on another hand card
+        /// chooses that one instead, any other tap drops the choice. True when the tap is handled.
+        /// </summary>
+        private bool TapWhileChosen(Vector2 position, CardView card)
         {
-            _focus.Unpin();
-            if (_queue.IsBusy)
+            var target = TargetAt(position);
+            if (target != null)
             {
-                _speed.FastForward();
-                return;
+                _focus.Unpin();
+                _selector.TapCard(target.Value);
+                return true;
             }
 
-            if (!_enabled)
-                return;
+            if (card != null && card.IsInHand)
+                return false;
 
-            var target = _selector.Source != null ? TargetNear(position) : null;
-            if (target != null)
-                _selector.TapCard(target.Value);
-            else if (_selector.IsSelecting && _selector.Source != null)
-                _selector.Cancel();
+            _focus.Unpin();
+            _selector.Cancel();
+            return true;
         }
 
         private void OnLongPress(Vector2 position)
@@ -230,13 +224,18 @@ namespace Game.Presentation.Interaction
                 ShowLarge(card);
         }
 
-        /// <summary>The card flies to the centre of the screen; its place stays empty until it flies back.</summary>
+        /// <summary>
+        /// The card flies to the centre of the screen; its place stays empty until it flies back. A back has
+        /// nothing to show: the opponent's hand and closed fields stay where they are.
+        /// </summary>
         private void ShowLarge(CardView card)
         {
+            if (!card.IsKnown)
+                return;
             _focus.Hover(null);
             var from = _raycaster.ScreenRectOf(card);
             card.SetVisible(false);
-            _zoom.Show(card.IsKnown ? _faces.Build(card.CardId) : null, from, () =>
+            _zoom.Show(_faces.Build(card.CardId), from, () =>
             {
                 if (card != null)
                     card.SetVisible(true);
@@ -268,7 +267,7 @@ namespace Game.Presentation.Interaction
                 return;
 
             _dragged.transform.position = _raycaster.PointAtHeight(position, DragHeight);
-            var target = TargetNear(position);
+            var target = TargetAt(position);
             if (target == _dropTarget)
                 return;
             _dropTarget = target;
@@ -286,7 +285,7 @@ namespace Game.Presentation.Interaction
             if (dragged != null)
                 dragged.Collider.enabled = true;
 
-            var target = TargetNear(position);
+            var target = TargetAt(position);
             if (target != null)
                 _selector.TapCard(target.Value);
             else
@@ -294,23 +293,17 @@ namespace Game.Presentation.Interaction
             ResyncRequested?.Invoke();
         }
 
-        /// <summary>The selectable target a release at this point lands on: the one under it or the nearest within the radius.</summary>
-        private int? TargetNear(Vector2 position)
+        /// <summary>The lit target right under the point, if any; a creature standing on a target field does not hide it.</summary>
+        private int? TargetAt(Vector2 position)
         {
-            var under = _raycaster.CardAt(position, _dragged);
-            if (under != null && _selector.Targets.Contains(under.InstanceId))
-                return under.InstanceId;
-
-            var candidates = new List<DropCandidate>();
-            foreach (var id in _selector.Targets)
+            var targets = _selector.Targets;
+            foreach (var card in _raycaster.CardsAt(position, _dragged))
             {
-                var card = _registry.Find(id);
-                if (card != null)
-                    candidates.Add(new DropCandidate(id, _raycaster.ScreenRectOf(card)));
+                if (targets.Contains(card.InstanceId))
+                    return card.InstanceId;
             }
 
-            var height = Screen.height;
-            return _picker.Pick(position, candidates, _settings.DropPadding * height, _settings.DropRadius * height);
+            return null;
         }
 
         private void OnQueueIdle() => _speed.EndFastForward();

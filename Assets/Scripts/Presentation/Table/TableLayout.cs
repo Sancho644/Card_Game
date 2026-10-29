@@ -8,8 +8,8 @@ namespace Game.Presentation.Table
     /// <summary>
     /// Card places on the table, in world space. Fields of both players in the centre, the viewer's row
     /// nearer to the camera; creatures stand at the edge of the field facing their owner, so the field's
-    /// numbers and condition stay visible. The viewer's hand faces the camera and squeezes to fit the safe
-    /// area; the opponent's hand of backs lies at the far edge, partly off screen.
+    /// numbers and condition stay visible. The viewer's hand faces the camera and squeezes so the whole fan
+    /// fits the safe area; the opponent's hand of backs lies at the far edge, partly off screen.
     /// </summary>
     public sealed class TableLayout : MonoBehaviour
     {
@@ -25,8 +25,6 @@ namespace Game.Presentation.Table
         [SerializeField] private float _opponentHandDistance = 6.4f;
         [SerializeField] private float _handLift = 1.2f;
         [SerializeField] private float _minHandSpacing = 0.35f;
-        [Tooltip("Part of a resting hand card kept on screen, from its top edge; the rest may hang below. A card being looked at rises in full.")]
-        [SerializeField, Range(0.3f, 1f)] private float _handVisibleShare = 0.65f;
 
         [Header("Piles")]
         [SerializeField] private float _discardX = 5.6f;
@@ -82,10 +80,10 @@ namespace Game.Presentation.Table
             var position = new Vector3(x, lift, -_handDistance);
 
             // The whole fan keeps the same arc however many cards there are, so the outer ones never sink off screen.
-            var bend = count > 1 ? Mathf.Min(1f, MaxFanSteps / (count - 1)) : 1f;
+            var bend = Bend(count);
             var tilt = FacingCamera;
             var fan = Quaternion.AngleAxis((centre - index) * _settings.HandFanDegrees * bend, tilt * Vector3.back);
-            return new CardPose(position + Vector3.down * Mathf.Abs(index - centre) * FanDroop * bend, fan * tilt);
+            return new CardPose(position + Vector3.down * Mathf.Abs(index - centre) * FanDroop * bend, fan * tilt, _settings.HandCardScale);
         }
 
         public CardPose Pile(TableSide side, PileKind pile, int index, bool faceUp)
@@ -103,7 +101,7 @@ namespace Game.Presentation.Table
             new CardPose(_battleFocus, FacingCamera);
 
         /// <summary>
-        /// Points the camera must keep on screen: the visible part of the viewer's hand, the far edge of the
+        /// Points the camera must keep on screen: the lower edge of the viewer's whole fan, the far edge of the
         /// opponent's creatures and the piles. The hands' width is not included, because the hands squeeze to
         /// the screen instead; the opponent's hand may hang off the top.
         /// </summary>
@@ -111,8 +109,7 @@ namespace Game.Presentation.Table
         {
             var halfHeight = _cardSize.y / 2f;
             var halfWidth = _cardSize.x / 2f;
-            var nearEdge = FacingCamera * new Vector3(0f, halfHeight - 2f * halfHeight * _handVisibleShare, 0f);
-            yield return new Vector3(0f, _handLift, -_handDistance) + nearEdge;
+            yield return HandLowerEdge();
             var farField = Field(TableSide.Top, 0, 1, true);
             var farCreature = Creature(farField, TableSide.Top);
             yield return farCreature.Position + new Vector3(0f, 0f, halfHeight * farCreature.Scale);
@@ -123,17 +120,35 @@ namespace Game.Presentation.Table
             }
         }
 
-        /// <summary>The widest step that keeps the whole hand inside the safe area, never above the configured one.</summary>
+        /// <summary>
+        /// The widest step that keeps the whole hand inside the safe area, never above the configured one. The
+        /// outer cards of the viewer's fan are turned, so they take a little more room than a straight card.
+        /// </summary>
         private float HandSpacing(TableSide side, int count)
         {
             var spacing = _settings.HandSpacing;
             if (count < 2 || _camera == null)
                 return spacing;
 
-            var centre = side == TableSide.Bottom ? new Vector3(0f, _handLift, -_handDistance) : new Vector3(0f, 0f, _opponentHandDistance);
-            var room = VisibleHalfWidth(centre) - _cardSize.x / 2f;
+            if (side == TableSide.Top)
+            {
+                var top = new Vector3(0f, 0f, _opponentHandDistance);
+                return Mathf.Clamp(2f * (VisibleHalfWidth(top) - _cardSize.x / 2f) / (count - 1), _minHandSpacing, spacing);
+            }
+
+            var scale = _settings.HandCardScale;
+            var turn = (count - 1) / 2f * _settings.HandFanDegrees * Bend(count) * Mathf.Deg2Rad;
+            var halfCard = (_cardSize.x / 2f * Mathf.Cos(turn) + _cardSize.y / 2f * Mathf.Sin(turn)) * scale;
+            var room = VisibleHalfWidth(HandLowerEdge()) - halfCard;
             return Mathf.Clamp(2f * room / (count - 1), _minHandSpacing, spacing);
         }
+
+        /// <summary>The middle of the lower edge of the viewer's fan, with the outer cards' corners hanging a little lower.</summary>
+        private Vector3 HandLowerEdge() =>
+            new Vector3(0f, _handLift, -_handDistance) + FacingCamera * new Vector3(0f, -_cardSize.y / 2f * _settings.HandCardScale * 1.15f, 0f);
+
+        /// <summary>How much of the full fan angle a hand of this size uses.</summary>
+        private static float Bend(int count) => count > 1 ? Mathf.Min(1f, MaxFanSteps / (count - 1)) : 1f;
 
         /// <summary>Half of the table width visible at the point's depth, inside the safe area and margins.</summary>
         private float VisibleHalfWidth(Vector3 point)

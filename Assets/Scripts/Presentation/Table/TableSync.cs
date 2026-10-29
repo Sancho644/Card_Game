@@ -113,13 +113,23 @@ namespace Game.Presentation.Table
             return sequence;
         }
 
+        /// <summary>Lights the field of the current battle and shows whether its condition acts.</summary>
         private void MarkBattle(PlayerView view)
         {
             foreach (var card in _registry.All)
+            {
                 card.SetBattle(null);
-            var field = view.Battle == null ? null : _registry.Find(view.Battle.FieldId);
-            if (field != null)
-                field.SetBattle(_visual.Battle);
+                card.SetCondition(ConditionMark.None);
+            }
+
+            var battle = view.Battle;
+            var field = battle == null ? null : _registry.Find(battle.FieldId);
+            if (field == null)
+                return;
+
+            field.SetBattle(_visual.Battle);
+            if (view.Field(battle.FieldId).IsOpen)
+                field.SetCondition(battle.IsConditionCancelled ? ConditionMark.Cancelled : ConditionMark.Active);
         }
 
         private string StatusOf(FieldView field)

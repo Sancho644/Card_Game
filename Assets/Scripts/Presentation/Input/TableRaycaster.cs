@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Game.Presentation.Cards;
 using UnityEngine;
 
@@ -13,22 +15,21 @@ namespace Game.Presentation.Input
             _camera = camera;
         }
 
+        /// <summary>The nearest card under the point: the one the player sees there.</summary>
         public CardView CardAt(Vector2 screenPosition, CardView ignore = null)
         {
-            var hits = Physics.RaycastAll(_camera.ScreenPointToRay(screenPosition), 100f);
-            CardView nearest = null;
-            var nearestDistance = float.MaxValue;
-            foreach (var hit in hits)
-            {
-                var card = hit.collider.GetComponentInParent<CardView>();
-                if (card == null || card == ignore || hit.distance >= nearestDistance)
-                    continue;
-                nearest = card;
-                nearestDistance = hit.distance;
-            }
-
-            return nearest;
+            foreach (var card in CardsAt(screenPosition, ignore))
+                return card;
+            return null;
         }
+
+        /// <summary>Every card under the point, nearest first, e.g. a field under the creature that stands on its edge.</summary>
+        public IEnumerable<CardView> CardsAt(Vector2 screenPosition, CardView ignore = null) =>
+            Physics.RaycastAll(_camera.ScreenPointToRay(screenPosition), 100f)
+                .OrderBy(hit => hit.distance)
+                .Select(hit => hit.collider.GetComponentInParent<CardView>())
+                .Where(card => card != null && card != ignore)
+                .Distinct();
 
         /// <summary>The screen area a card covers: its collider's bounds projected to the screen, in pixels.</summary>
         public Rect ScreenRectOf(CardView card)
