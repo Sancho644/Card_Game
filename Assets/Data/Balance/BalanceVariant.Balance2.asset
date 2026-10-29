@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e221f7c2bc0236d44866203279141b70, type: 3}
+  m_Name: BalanceVariant.Balance2
+  m_EditorClassIdentifier: Game.Data::Game.Data.Cards.BalanceVariantDef
+  _id: balance2
+  _displayName: "\u0411\u0430\u043B\u0430\u043D\u0441 2"
+  _basedOn: {fileID: 0}
+  _overrides:
+  - {fileID: 11400000, guid: 2abdb33f9d431b74c9bfb20992c10be6, type: 2}
+  - {fileID: 11400000, guid: 874aac86606dd4e41965c4a7bdc300f3, type: 2}
+  - {fileID: 11400000, guid: 59c5449e44f94ee4891d889159cecd6b, type: 2}
+  - {fileID: 11400000, guid: 638bdf9b257382e41a6cf66c495c8670, type: 2}

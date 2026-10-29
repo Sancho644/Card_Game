@@ -53,5 +53,5 @@ MonoBehaviour:
       Min: 0
       Max: 0
   _signatureAbilityPower:
-    Min: 60
+    Min: 50
     Max: 100

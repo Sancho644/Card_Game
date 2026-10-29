@@ -10,6 +10,7 @@ using Game.Core.State;
 using Game.Data.Cards;
 using Game.Data.Config;
 using Game.Data.Decks;
+using Game.Data.Effects;
 using NUnit.Framework;
 using UnityEditor;
 
@@ -68,14 +69,45 @@ namespace Game.Data.Tests
             Assert.IsInstanceOf<NoCommonOrEpicAbilitiesCondition>(forge.Conditions.Single());
         }
 
-        [Test]
-        public void CreaturePower_IsFixedPerRarity()
+        [TestCase("creature.radiant-stag", 165)]
+        [TestCase("creature.lagoon-serpent", 160)]
+        [TestCase("creature.spark-fox", 150)]
+        [TestCase("creature.shadow-imp", 150)]
+        [TestCase("creature.stone-beetle", 135)]
+        [TestCase("creature.storm-swift", 140)]
+        [TestCase("creature.goldwing-guardian", 195)]
+        [TestCase("creature.deep-siren", 190)]
+        [TestCase("creature.faceless-demon", 190)]
+        [TestCase("creature.mossy-giant", 215)]
+        [TestCase("creature.ash-phoenix", 205)]
+        [TestCase("creature.whirlwind-griffin", 205)]
+        [TestCase("creature.dawn-seraph", 240)]
+        [TestCase("creature.prince-of-abyss", 265)]
+        [TestCase("creature.guardian-of-first-mountain", 260)]
+        [TestCase("creature.mistress-of-tides", 255)]
+        [TestCase("creature.lord-of-crimson-forge", 245)]
+        [TestCase("creature.hurricane-king", 235)]
+        public void CreaturePower_MatchesApprovedTable(string creatureId, int power)
         {
-            foreach (var creature in _database.Cards.OfType<CreatureDef>())
-            {
-                var expected = creature.Rarity == Rarity.Common ? 150 : creature.Rarity == Rarity.Epic ? 200 : 250;
-                Assert.AreEqual(expected, creature.Power, creature.Id);
-            }
+            Assert.AreEqual(power, ((CreatureDef)_database.Find(creatureId)).Power, "docs/decisions.md, power table.");
+        }
+
+        [TestCase("ability.storm-onslaught", 50)]
+        [TestCase("ability.last-word", 60)]
+        [TestCase("ability.desperation", 50)]
+        public void AbilityBonus_MatchesApprovedNumbers(string abilityId, int bonus)
+        {
+            var ability = (AbilityDef)_database.Find(abilityId);
+
+            Assert.AreEqual(bonus, ability.Effects.OfType<PowerBonusData>().Sum(effect => effect.Amount));
+        }
+
+        [Test]
+        public void SacrificialAltar_OnlyWinningGuestGoesOut()
+        {
+            var altar = (FieldDef)_database.Find("field.sacrificial-altar");
+
+            Assert.IsTrue(altar.Conditions.OfType<WinnerOutOfGameData>().Single().OnlyGuest);
         }
 
         [TestCase("ability.forge-flame", "creature.lord-of-crimson-forge")]
@@ -148,7 +180,7 @@ namespace Game.Data.Tests
             Ok(engine, new Ready(PlayerId.Player1));
             var result = engine.Execute(new Ready(PlayerId.Player2)).Events.OfType<BattleResolved>().Single();
             Assert.AreEqual(150 + 60, result.HostPower);
-            Assert.AreEqual(200 - 30, result.GuestPower);
+            Assert.AreEqual(190 - 30, result.GuestPower);
             Assert.AreEqual(PlayerId.Player1, result.Winner);
         }
 

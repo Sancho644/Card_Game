@@ -73,12 +73,22 @@ namespace Game.Simulation
             Estimate(DecidedMatches, record => record.ProfileOf(record.Winner.Value) == profileId);
 
         /// <summary>Battle win share of creatures of each element, over battles that were not retreated.</summary>
-        public IEnumerable<(Element element, int battles, double wins)> ElementWins() =>
-            Battles.Where(battle => !battle.Retreated)
-                .SelectMany(battle => PlayerIds.All.Select(side => (battle.ElementOf(side), battle.Winner == side)))
-                .GroupBy(entry => entry.Item1)
+        public IEnumerable<(Element element, ShareEstimate wins)> ElementWins() =>
+            Sides()
+                .GroupBy(side => side.battle.ElementOf(side.player))
                 .OrderBy(group => group.Key)
-                .Select(group => (group.Key, group.Count(), (double)group.Count(entry => entry.Item2) / group.Count()));
+                .Select(group => (group.Key, new ShareEstimate(group.Count(side => side.won), group.Count())));
+
+        /// <summary>Battle win share of each creature, over battles that were not retreated.</summary>
+        public IEnumerable<(string creatureId, Element element, ShareEstimate wins)> CreatureWins() =>
+            Sides()
+                .GroupBy(side => (side.battle.CreatureOf(side.player), side.battle.ElementOf(side.player)))
+                .Select(group => (group.Key.Item1, group.Key.Item2, new ShareEstimate(group.Count(side => side.won), group.Count())));
+
+        /// <summary>Both sides of every battle that was not retreated; a draw counts as not won.</summary>
+        private IEnumerable<(BattleRecord battle, PlayerId player, bool won)> Sides() =>
+            Battles.Where(battle => !battle.Retreated)
+                .SelectMany(battle => PlayerIds.All.Select(side => (battle, side, battle.Winner == side)));
 
         private IEnumerable<BattleRecord> Decided(bool open) =>
             Battles.Where(battle => battle.Winner != null && battle.FieldOpen == open);

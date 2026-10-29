@@ -52,9 +52,18 @@ namespace Game.Simulation
             Line(text, "Вызовы", Percent(summary.ChallengesPerTurn) + " ходов");
             text.AppendLine();
 
-            text.AppendLine("Стихии существ (доля побед в битвах)");
-            foreach (var (element, battles, wins) in summary.ElementWins())
-                Line(text, element.ToString(), $"{Percent(wins)} в {battles} битвах");
+            text.AppendLine("Стихии существ (доля побед в битвах, без отступлений; ничья — не победа) [95% интервал]");
+            foreach (var (element, wins) in summary.ElementWins())
+                Line(text, element.ToString(), $"{WithInterval(wins)} в {wins.Trials} битвах {Mark(wins)}");
+            text.AppendLine();
+
+            text.AppendLine("Существа (доля побед в битвах, без отступлений; ничья — не победа) [95% интервал]");
+            text.AppendLine("  * — интервал не включает 50%");
+            foreach (var (creatureId, element, wins) in summary.CreatureWins().OrderByDescending(creature => creature.wins.Share))
+            {
+                text.AppendLine(string.Format(Culture, "  {0,-28} {1,-6} {2} в {3,5} битвах {4}",
+                    _cardName(creatureId), element, WithInterval(wins), wins.Trials, Mark(wins)));
+            }
             text.AppendLine();
 
             text.AppendLine("Карты: в колодах (партий) · использована (доля партий) · использований за партию · " +
@@ -65,7 +74,7 @@ namespace Game.Simulation
                 var wins = card.WinShare;
                 text.AppendLine(string.Format(Culture, "  {0,-28} {1,5} · {2,6} · {3,5} · {4} {5}",
                     _cardName(card.CardId), card.DeckGames, Percent(card.UsedShare), Number(card.UsesPerGame),
-                    WithInterval(wins), wins.ExcludesHalf ? "*" : ""));
+                    WithInterval(wins), Mark(wins)));
             }
 
             Problems(text, summary);
@@ -129,6 +138,8 @@ namespace Game.Simulation
 
         private static string WithInterval(ShareEstimate estimate) =>
             string.Format(Culture, "{0,7} [{1:0.0}–{2:0.0}]", Percent(estimate.Share), estimate.Low * 100, estimate.High * 100);
+
+        private static string Mark(ShareEstimate estimate) => estimate.ExcludesHalf ? "*" : "";
 
         private static string Number(double value) => value.ToString("0.0", Culture);
     }
