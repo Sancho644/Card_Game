@@ -15,6 +15,9 @@ namespace Game.Data.Presentation
         public const string MenuChooseDeck = "menu.choose-deck";
         public const string MenuChooseSecondDeck = "menu.choose-second-deck";
         public const string MenuChooseDifficulty = "menu.choose-difficulty";
+        public const string MenuFastAnimations = "menu.fast-animations";
+        public const string On = "toggle.on";
+        public const string Off = "toggle.off";
         public const string SearchTitle = "search.title";
         public const string SearchHint = "search.hint";
         public const string ToMenu = "button.to-menu";

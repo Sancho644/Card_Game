@@ -15,20 +15,20 @@ namespace Game.Presentation.Table
     {
         private readonly TableLayout _layout;
         private readonly CardViewRegistry _registry;
-        private readonly TablePresentationSettings _settings;
+        private readonly AnimationSettings _animation;
         private readonly VisualSettings _visual;
         private readonly UiTexts _texts;
 
         public TableSync(
             TableLayout layout,
             CardViewRegistry registry,
-            TablePresentationSettings settings,
+            AnimationSettings animation,
             VisualSettings visual,
             UiTexts texts)
         {
             _layout = layout;
             _registry = registry;
-            _settings = settings;
+            _animation = animation;
             _visual = visual;
             _texts = texts;
         }
@@ -38,7 +38,7 @@ namespace Game.Presentation.Table
         /// <param name="instant">Place cards without animation, e.g. behind the hand-off screen.</param>
         public Tween Sync(PlayerView view, PlayerView revealedOpponent, bool instant)
         {
-            var duration = instant ? 0f : _settings.MoveDuration;
+            var duration = instant ? 0f : _animation.MoveDuration;
             var sequence = DOTween.Sequence();
             var visible = new HashSet<int>();
 

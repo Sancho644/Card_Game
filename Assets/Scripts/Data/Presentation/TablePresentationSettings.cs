@@ -2,17 +2,10 @@ using UnityEngine;
 
 namespace Game.Data.Presentation
 {
-    /// <summary>Timings and layout numbers of the table scene.</summary>
+    /// <summary>Input and layout numbers of the table scene; animation timings are in <see cref="AnimationSettings"/>.</summary>
     [CreateAssetMenu(menuName = "Game/Config/Table Presentation", fileName = "TablePresentation")]
     public sealed class TablePresentationSettings : ScriptableObject
     {
-        [Header("Animation, seconds")]
-        [SerializeField, Min(0)] private float _moveDuration = 0.35f;
-        [SerializeField, Min(0)] private float _abilityShowSeconds = 0.8f;
-        [SerializeField, Min(1)] private float _fastForwardScale = 4f;
-        [SerializeField, Min(0)] private float _bannerSeconds = 1.6f;
-        [SerializeField, Min(0)] private float _powerPopupSeconds = 1.1f;
-
         [Header("Input")]
         [SerializeField, Min(0.1f)] private float _longPressSeconds = 0.5f;
         [SerializeField, Min(1)] private float _dragThresholdPixels = 14f;
@@ -41,11 +34,6 @@ namespace Game.Data.Presentation
         [Header("Event log")]
         [SerializeField, Min(5)] private int _logLines = 60;
 
-        public float MoveDuration => _moveDuration;
-        public float AbilityShowSeconds => _abilityShowSeconds;
-        public float FastForwardScale => _fastForwardScale;
-        public float BannerSeconds => _bannerSeconds;
-        public float PowerPopupSeconds => _powerPopupSeconds;
         public float LongPressSeconds => _longPressSeconds;
         public float DragThresholdPixels => _dragThresholdPixels;
         public float DropPadding => _dropPadding;

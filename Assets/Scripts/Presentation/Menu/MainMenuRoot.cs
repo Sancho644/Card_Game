@@ -57,10 +57,18 @@ namespace Game.Presentation.Menu
                 Texts.Get(UiTextKeys.MenuHotSeat),
                 Texts.Format(UiTextKeys.MenuDeck, _app.Decks[_app.DeckIndex].DisplayName),
                 Texts.Format(UiTextKeys.MenuDifficulty, DifficultyName(_app.Difficulty)),
+                Texts.Format(UiTextKeys.MenuFastAnimations, Texts.Get(_app.PlayerSettings.FastAnimations ? UiTextKeys.On : UiTextKeys.Off)),
                 PlayVersusAi,
                 ChooseSecondDeck,
                 ChooseDeck,
-                ChooseDifficulty);
+                ChooseDifficulty,
+                ToggleFastAnimations);
+
+        private void ToggleFastAnimations()
+        {
+            _app.PlayerSettings.FastAnimations = !_app.PlayerSettings.FastAnimations;
+            ShowMenu();
+        }
 
         private void ChooseDeck()
         {

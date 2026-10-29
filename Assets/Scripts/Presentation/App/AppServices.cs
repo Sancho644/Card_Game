@@ -7,7 +7,9 @@ using Game.Data.Cards;
 using Game.Data.Config;
 using Game.Data.Decks;
 using Game.Data.Presentation;
+using Game.Presentation.Audio;
 using Game.Services.Matchmaking;
+using Game.Services.Settings;
 
 namespace Game.Presentation.App
 {
@@ -25,7 +27,9 @@ namespace Game.Presentation.App
             AiConfig ai,
             IMatchmakingService matchmaking,
             ISceneNavigator scenes,
-            IRandom random)
+            IRandom random,
+            IPlayerSettingsService playerSettings,
+            ISoundPlayer sound)
         {
             Database = database ?? throw new ArgumentNullException(nameof(database));
             Catalog = database.ToCatalog();
@@ -36,6 +40,8 @@ namespace Game.Presentation.App
             Matchmaking = matchmaking ?? throw new ArgumentNullException(nameof(matchmaking));
             Scenes = scenes ?? throw new ArgumentNullException(nameof(scenes));
             Random = random ?? throw new ArgumentNullException(nameof(random));
+            PlayerSettings = playerSettings ?? throw new ArgumentNullException(nameof(playerSettings));
+            Sound = sound ?? throw new ArgumentNullException(nameof(sound));
             Difficulty = ai.DefaultProfileId;
         }
 
@@ -50,6 +56,11 @@ namespace Game.Presentation.App
 
         /// <summary>Seeds for local matches.</summary>
         public IRandom Random { get; }
+
+        /// <summary>The player's settings on this device, e.g. fast animations.</summary>
+        public IPlayerSettingsService PlayerSettings { get; }
+
+        public ISoundPlayer Sound { get; }
 
         /// <summary>The player's deck chosen in the menu, kept between visits.</summary>
         public int DeckIndex { get; set; }

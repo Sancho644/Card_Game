@@ -11,14 +11,14 @@ namespace Game.Presentation.Match
         private readonly BannerView _banner;
         private readonly PlayerNames _names;
         private readonly UiTexts _texts;
-        private readonly TablePresentationSettings _settings;
+        private readonly AnimationSettings _animation;
 
-        public SkipPresenter(BannerView banner, PlayerNames names, UiTexts texts, TablePresentationSettings settings)
+        public SkipPresenter(BannerView banner, PlayerNames names, UiTexts texts, AnimationSettings animation)
         {
             _banner = banner;
             _names = names;
             _texts = texts;
-            _settings = settings;
+            _animation = animation;
         }
 
         public void Present(GameEvent gameEvent, PresentationContext context)
@@ -28,7 +28,7 @@ namespace Game.Presentation.Match
 
             var text = _texts.Format(UiTextKeys.SkipBanner, _texts.Get(UiTextKeys.SkipReasonPrefix + skipped.Reason));
             context.Enqueue(() => _banner.Show(_names.Of(skipped.Player), text));
-            context.Enqueue(new DelayStep(_settings.BannerSeconds));
+            context.Enqueue(new DelayStep(_animation.BannerSeconds));
             context.Enqueue(_banner.Hide);
         }
     }

@@ -11,13 +11,13 @@ namespace Game.Presentation.Match
     {
         private readonly TableLayout _layout;
         private readonly CardViewRegistry _registry;
-        private readonly TablePresentationSettings _settings;
+        private readonly AnimationSettings _animation;
 
-        public AbilityPlayedPresenter(TableLayout layout, CardViewRegistry registry, TablePresentationSettings settings)
+        public AbilityPlayedPresenter(TableLayout layout, CardViewRegistry registry, AnimationSettings animation)
         {
             _layout = layout;
             _registry = registry;
-            _settings = settings;
+            _animation = animation;
         }
 
         public void Present(GameEvent gameEvent, PresentationContext context)
@@ -29,9 +29,9 @@ namespace Game.Presentation.Match
             context.Enqueue(new TweenStep(() =>
             {
                 var card = _registry.GetOrCreate(played.Ability.InstanceId, played.Ability.CardId, _layout.Spawn(side));
-                return card.MoveTo(_layout.BattleFocus(), _settings.MoveDuration);
+                return card.MoveTo(_layout.BattleFocus(), _animation.MoveDuration);
             }));
-            context.Enqueue(new DelayStep(_settings.AbilityShowSeconds));
+            context.Enqueue(new DelayStep(_animation.AbilityShowSeconds));
         }
     }
 }

@@ -7,7 +7,9 @@ using Game.Data.Cards;
 using Game.Data.Config;
 using Game.Data.Decks;
 using Game.Data.Presentation;
+using Game.Presentation.Audio;
 using Game.Services.Matchmaking;
+using Game.Services.Settings;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -25,6 +27,7 @@ namespace Game.Presentation.App
         [SerializeField] private AiConfig _ai;
         [SerializeField] private MatchmakingConfig _matchmaking;
         [SerializeField] private UiTexts _texts;
+        [SerializeField] private SoundSettings _sounds;
         [SerializeField] private List<DeckDef> _decks = new List<DeckDef>();
 
         [Header("Scenes")]
@@ -44,6 +47,8 @@ namespace Game.Presentation.App
             var opponents = new AiOpponentFactory(catalog, rules, _ai.ToProfile, scheduler);
             var matchmaking = new LocalMatchmakingService(
                 catalog, rules, opponents, scheduler, random, _matchmaking.SearchSecondsMin, _matchmaking.SearchSecondsMax);
+            var sound = gameObject.AddComponent<AudioSourceSoundPlayer>();
+            sound.Configure(_sounds);
 
             _context = new AppServices(
                 _database,
@@ -53,7 +58,9 @@ namespace Game.Presentation.App
                 _ai,
                 matchmaking,
                 new SceneNavigator(_mainMenuScene, _matchScene),
-                random);
+                random,
+                new LocalPlayerSettingsService(new PlayerPrefsSettingsStore()),
+                sound);
 
             SceneManager.sceneLoaded += OnSceneLoaded;
         }

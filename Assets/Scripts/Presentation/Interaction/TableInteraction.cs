@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using Game.Data.Presentation;
 using Game.Presentation.Animation;
 using Game.Presentation.Cards;
@@ -28,6 +27,7 @@ namespace Game.Presentation.Interaction
         private readonly CardZoomView _zoom;
         private readonly CardFaceBuilder _faces;
         private readonly AnimationQueue _queue;
+        private readonly AnimationSpeed _speed;
         private readonly VisualSettings _visual;
         private readonly TablePresentationSettings _settings;
         private CardView _dragged;
@@ -44,6 +44,7 @@ namespace Game.Presentation.Interaction
             CardZoomView zoom,
             CardFaceBuilder faces,
             AnimationQueue queue,
+            AnimationSpeed speed,
             VisualSettings visual,
             TablePresentationSettings settings)
         {
@@ -55,6 +56,7 @@ namespace Game.Presentation.Interaction
             _zoom = zoom;
             _faces = faces;
             _queue = queue;
+            _speed = speed;
             _visual = visual;
             _settings = settings;
 
@@ -130,7 +132,7 @@ namespace Game.Presentation.Interaction
         {
             if (_queue.IsBusy)
             {
-                DOTween.timeScale = _settings.FastForwardScale;
+                _speed.FastForward();
                 return;
             }
 
@@ -230,6 +232,6 @@ namespace Game.Presentation.Interaction
             return _picker.Pick(position, candidates, _settings.DropPadding * height, _settings.DropRadius * height);
         }
 
-        private void OnQueueIdle() => DOTween.timeScale = 1f;
+        private void OnQueueIdle() => _speed.EndFastForward();
     }
 }

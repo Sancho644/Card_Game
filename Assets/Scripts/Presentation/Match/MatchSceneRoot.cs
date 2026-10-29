@@ -23,6 +23,7 @@ namespace Game.Presentation.Match
         [Header("Data")]
         [SerializeField] private VisualSettings _visual;
         [SerializeField] private TablePresentationSettings _settings;
+        [SerializeField] private AnimationSettings _animation;
         [SerializeField, Tooltip("Loaded when this scene is opened directly in the editor")] private string _bootstrapScene = "Bootstrap";
 
         [Header("Table")]
@@ -53,6 +54,7 @@ namespace Game.Presentation.Match
         private TableInteraction _interaction;
         private HumanDecisionUi _decisions;
         private AnimationQueue _queue;
+        private AnimationSpeed _speed;
 
         public void Enter(AppServices app) => _app = app;
 
@@ -88,7 +90,8 @@ namespace Game.Presentation.Match
             var faces = new CardFaceBuilder(_app.Database, _visual, texts);
             var registry = new CardViewRegistry(_cardPrefab, _cardRoot, faces, _visual);
             var queue = _queue = new AnimationQueue();
-            var sync = new TableSync(_layout, registry, _settings, _visual, texts);
+            var speed = _speed = new AnimationSpeed(_animation, _app.PlayerSettings);
+            var sync = new TableSync(_layout, registry, _animation, _visual, texts);
             var names = new PlayerNames(texts);
             names.Use(_launch.Mode);
             var lookup = new CardNameLookup(faces);
@@ -97,21 +100,21 @@ namespace Game.Presentation.Match
             var humans = _launch.LocalPlayers.Select(player => new LocalHumanController(player)).ToList();
             var status = new StatusPresenter(_topBar, _battlePanel, _ruleBadge, names, lookup, texts);
             var power = new BattlePowerPresenter(
-                registry, new FloatingTextSpawner(_cardRoot, _camera), new PowerDiff(lookup), _visual, _settings);
+                registry, new FloatingTextSpawner(_cardRoot, _camera), new PowerDiff(lookup), _visual, _animation);
 
             _interaction = new TableInteraction(
-                _pointer, new TableRaycaster(_camera), registry, selector, new DropTargetPicker(), _zoom, faces, queue, _visual, _settings);
+                _pointer, new TableRaycaster(_camera), registry, selector, new DropTargetPicker(), _zoom, faces, queue, speed, _visual, _settings);
             _decisions = new HumanDecisionUi(
                 humans, selector, _interaction, _actionBar, _turnOrder, _options, _prompt, names, lookup, texts);
 
             var presenters = new IEventPresenter[]
             {
                 new LogPresenter(new EventLogFormatter(texts, names, lookup, faces), _log),
-                new AbilityPlayedPresenter(_layout, registry, _settings),
+                new AbilityPlayedPresenter(_layout, registry, _animation),
                 new TableMovePresenter(),
                 new BattleResolvedPresenter(new BattleSummaryBuilder(texts, names, lookup), _breakdown, texts),
                 new ScoutedPresenter(_breakdown, faces, texts),
-                new SkipPresenter(_banner, names, texts, _settings),
+                new SkipPresenter(_banner, names, texts, _animation),
             };
 
             _presenter = new MatchPresenter(
@@ -151,6 +154,7 @@ namespace Game.Presentation.Match
             _interaction?.Dispose();
             _presenter?.Dispose();
             _launch?.Opponent?.Dispose();
+            _speed?.Dispose();
         }
     }
 }

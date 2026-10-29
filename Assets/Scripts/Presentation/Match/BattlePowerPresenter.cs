@@ -19,7 +19,7 @@ namespace Game.Presentation.Match
         private readonly FloatingTextSpawner _floatingText;
         private readonly PowerDiff _diff;
         private readonly VisualSettings _visual;
-        private readonly TablePresentationSettings _settings;
+        private readonly AnimationSettings _animation;
         private readonly HashSet<int> _badged = new HashSet<int>();
         private BattlePower _shown;
 
@@ -28,13 +28,13 @@ namespace Game.Presentation.Match
             FloatingTextSpawner floatingText,
             PowerDiff diff,
             VisualSettings visual,
-            TablePresentationSettings settings)
+            AnimationSettings animation)
         {
             _registry = registry;
             _floatingText = floatingText;
             _diff = diff;
             _visual = visual;
-            _settings = settings;
+            _animation = animation;
         }
 
         /// <summary>Queues the update of the power badges to the battle as it stands after the batch.</summary>
@@ -83,7 +83,7 @@ namespace Game.Presentation.Match
                 var before = previous.Of(player);
                 if (before.FinalPower != now.FinalPower)
                 {
-                    var flash = view.FlashPower(now.FinalPower > before.FinalPower ? _visual.PowerUp : _visual.PowerDown, _settings.PowerPopupSeconds);
+                    var flash = view.FlashPower(now.FinalPower > before.FinalPower ? _visual.PowerUp : _visual.PowerDown, _animation.PowerPopupSeconds);
                     if (flash != null)
                         sequence.Join(flash);
                 }
@@ -94,7 +94,7 @@ namespace Game.Presentation.Match
                     var change = changes[i];
                     var text = (change.Amount > 0 ? "+" : "−") + System.Math.Abs(change.Amount) + " " + change.Source;
                     var color = change.Amount > 0 ? _visual.PowerUp : _visual.PowerDown;
-                    sequence.Join(_floatingText.Show(text, color, view.PowerAnchor, i * 0.45f, _settings.PowerPopupSeconds));
+                    sequence.Join(_floatingText.Show(text, color, view.PowerAnchor, i * 0.45f, _animation.PowerPopupSeconds));
                 }
             }
 

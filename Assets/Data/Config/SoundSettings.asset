@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99b801a342f807744abbc030caf42d36, type: 3}
+  m_Name: SoundSettings
+  m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.SoundSettings
+  _masterVolume: 1
+  _sounds:
+  - Cue: 0
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 1
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 2
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 3
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 4
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 5
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 6
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 7
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 8
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 9
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 10
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 11
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 12
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 13
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 14
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 15
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 16
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 17
+    Clip: {fileID: 0}
+    Volume: 1
+  - Cue: 18
+    Clip: {fileID: 0}
+    Volume: 1

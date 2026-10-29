@@ -5800,6 +5800,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Match.TableBootstrap
   _visual: {fileID: 11400000, guid: 4b431b96e06cb79428ba9dc5aeb25e2c, type: 2}
   _settings: {fileID: 11400000, guid: f6605da4e29eab94c8f33eb8ee550f6c, type: 2}
+  _animation: {fileID: 0}
   _bootstrapScene: Bootstrap
   _camera: {fileID: 967686874}
   _layout: {fileID: 1391235504}
