@@ -96,9 +96,9 @@ namespace Game.Presentation.Table
         public CardPose Spawn(TableSide side) =>
             new CardPose(new Vector3(0f, _handLift, side == TableSide.Bottom ? -_handDistance - 2.5f : _opponentHandDistance + 2.5f), FaceDown);
 
-        /// <summary>Above the table in front of the camera: where a played ability is shown.</summary>
-        public CardPose BattleFocus() =>
-            new CardPose(_battleFocus, FacingCamera);
+        /// <summary>Above the table in front of the camera: where a played ability is shown, at the given size.</summary>
+        public CardPose BattleFocus(float scale) =>
+            new CardPose(_battleFocus, FacingCamera, scale);
 
         /// <summary>
         /// Points the camera must keep on screen: the lower edge of the viewer's whole fan, the far edge of the

@@ -130,14 +130,29 @@ namespace Game.Presentation.Cards
 
         public void SetBattle(Color? color) => SetGlow(_battleGlow, color);
 
-        /// <summary>Shows the creature's current power in a badge; null hides it.</summary>
+        /// <summary>Shows the creature's current power in a badge, in place of its base power; null hides it.</summary>
         public void SetPower(int? power)
         {
             if (_powerBadge == null)
                 return;
             _powerBadge.SetActive(power.HasValue);
+            if (_basePower != null)
+                _basePower.SetActive(!power.HasValue && _face != null && _face.Power.HasValue);
             if (power.HasValue && _powerText != null)
                 _powerText.text = power.Value.ToString();
+        }
+
+        /// <summary>Shows the power badge counting from one value to another.</summary>
+        public Tween CountPower(int from, int to, float duration)
+        {
+            SetPower(from);
+            if (_powerText == null || from == to || duration <= 0f)
+            {
+                SetPower(to);
+                return null;
+            }
+
+            return DOVirtual.Int(from, to, duration, value => SetPower(value)).SetEase(Ease.OutCubic).SetTarget(this);
         }
 
         /// <summary>Tints the power badge for a moment: green when the power grew, red when it fell.</summary>
@@ -218,6 +233,30 @@ namespace Game.Presentation.Cards
             _visual.localScale = Vector3.one;
         }
 
+        /// <summary>
+        /// Turns the card over on the spot: it rises, rolls over its horizontal axis and lands where it lay.
+        /// Its face must already be bound; the back shows until the card stands on its edge.
+        /// </summary>
+        public Tween Flip(float duration, float lift)
+        {
+            _move?.Kill();
+            var y = transform.position.y;
+            _move = DOTween.Sequence()
+                .Join(transform.DORotate(new Vector3(180f, 0f, 0f), duration, RotateMode.WorldAxisAdd).SetEase(Ease.InOutCubic))
+                .Join(transform.DOMoveY(y + lift, duration / 2f).SetEase(Ease.OutQuad).SetLoops(2, LoopType.Yoyo))
+                .SetTarget(this);
+            return _move;
+        }
+
+        /// <summary>Swells the visible part for a moment and back, to draw the eye.</summary>
+        public Tween Pulse(float strength, float duration)
+        {
+            if (_visual == null || IsDisplaced)
+                return null;
+            _visual.localScale = Vector3.one;
+            return _visual.DOPunchScale(Vector3.one * strength, duration, 4, 0.5f).SetTarget(this);
+        }
+
         public void Place(CardPose pose)
         {
             _move?.Kill();
@@ -289,7 +328,7 @@ namespace Game.Presentation.Cards
             }
 
             if (_basePower != null)
-                _basePower.SetActive(_face.Power.HasValue);
+                _basePower.SetActive(_face.Power.HasValue && (_powerBadge == null || !_powerBadge.activeSelf));
             if (_face.Power.HasValue)
             {
                 SetColor(_basePowerBackground, Dim(_skin.PowerBadge));

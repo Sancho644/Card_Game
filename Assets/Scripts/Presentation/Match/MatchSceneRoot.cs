@@ -102,7 +102,7 @@ namespace Game.Presentation.Match
             var humans = _launch.LocalPlayers.Select(player => new LocalHumanController(player)).ToList();
             var status = new StatusPresenter(_topBar, _battlePanel, _ruleBadge, names, lookup, texts);
             var power = new BattlePowerPresenter(
-                registry, new FloatingTextSpawner(_cardRoot, _camera), new PowerDiff(lookup), _visual, _animation);
+                registry, new FloatingTextSpawner(_cardRoot, _camera), new PowerDiff(lookup), _visual, _animation, _app.Sound);
 
             _interaction = new TableInteraction(
                 _pointer, new TableRaycaster(_camera), registry, selector, _zoom, new HandFocus(_camera, _animation, () => registry.All, _layout.CardSize), faces, queue, speed, _visual, _app.Sound);
@@ -112,9 +112,12 @@ namespace Game.Presentation.Match
             var presenters = new IEventPresenter[]
             {
                 new LogPresenter(new EventLogFormatter(texts, names, lookup, faces), _log),
-                new AbilityPlayedPresenter(_layout, registry, _animation),
                 new DealPresenter(_animation),
+                new FieldOpenedPresenter(registry, _animation, _app.Sound),
+                new AbilityPlayedPresenter(_layout, registry, _animation, _app.Sound),
+                new CardSoundPresenter(_app.Sound),
                 new TableMovePresenter(),
+                new BattleStartedPresenter(registry, _banner, lookup, texts, _animation, _app.Sound),
                 new BattleResolvedPresenter(new BattleSummaryBuilder(texts, names, lookup), _breakdown, texts),
                 new ScoutedPresenter(_breakdown, faces, texts),
                 new SkipPresenter(_banner, names, texts, _animation),

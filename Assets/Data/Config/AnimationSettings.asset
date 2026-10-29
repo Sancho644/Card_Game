@@ -24,6 +24,12 @@ MonoBehaviour:
   _zoomHeight: 0.82
   _zoomOpenSeconds: 0.22
   _zoomCloseSeconds: 0.18
+  _flipSeconds: 0.45
+  _flipLift: 1.2
+  _battleStartSeconds: 1
+  _battlePulse: 0.15
+  _abilityShowScale: 1.6
   _abilityShowSeconds: 0.8
+  _powerCountSeconds: 0.6
   _powerPopupSeconds: 1.1
   _bannerSeconds: 1.6

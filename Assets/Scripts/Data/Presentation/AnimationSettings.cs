@@ -35,8 +35,20 @@ namespace Game.Data.Presentation
         [SerializeField, Min(0)] private float _zoomOpenSeconds = 0.22f;
         [SerializeField, Min(0)] private float _zoomCloseSeconds = 0.18f;
 
-        [Header("Battle, seconds")]
+        [Header("Battle")]
+        [Tooltip("A field card turning over when it is opened, seconds.")]
+        [SerializeField, Min(0)] private float _flipSeconds = 0.45f;
+        [Tooltip("How high a field card rises while it turns over, in world units.")]
+        [SerializeField, Min(0)] private float _flipLift = 1.2f;
+        [Tooltip("How long the «Битва!» banner stays when a battle starts, seconds.")]
+        [SerializeField, Min(0)] private float _battleStartSeconds = 1.0f;
+        [Tooltip("How much the cards of a starting battle swell for a moment.")]
+        [SerializeField, Range(0f, 0.5f)] private float _battlePulse = 0.15f;
+        [Tooltip("A played ability is shown in the middle of the table this much larger.")]
+        [SerializeField, Range(1f, 3f)] private float _abilityShowScale = 1.6f;
         [SerializeField, Min(0)] private float _abilityShowSeconds = 0.8f;
+        [Tooltip("The power on a creature counts to its new value over this time, seconds.")]
+        [SerializeField, Min(0)] private float _powerCountSeconds = 0.6f;
         [SerializeField, Min(0)] private float _powerPopupSeconds = 1.1f;
 
         [Header("Messages, seconds")]
@@ -54,7 +66,13 @@ namespace Game.Data.Presentation
         public float ZoomHeight => _zoomHeight;
         public float ZoomOpenSeconds => _zoomOpenSeconds;
         public float ZoomCloseSeconds => _zoomCloseSeconds;
+        public float FlipSeconds => _flipSeconds;
+        public float FlipLift => _flipLift;
+        public float BattleStartSeconds => _battleStartSeconds;
+        public float BattlePulse => _battlePulse;
+        public float AbilityShowScale => _abilityShowScale;
         public float AbilityShowSeconds => _abilityShowSeconds;
+        public float PowerCountSeconds => _powerCountSeconds;
         public float PowerPopupSeconds => _powerPopupSeconds;
         public float BannerSeconds => _bannerSeconds;
     }

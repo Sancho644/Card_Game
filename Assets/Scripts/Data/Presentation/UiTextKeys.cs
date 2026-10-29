@@ -64,6 +64,8 @@ namespace Game.Data.Presentation
         public const string PromptTarget = "prompt.target";
 
         public const string BattleTitle = "battle.title";
+        public const string BattleStart = "battle.start";
+        public const string BattleVersus = "battle.versus";
         public const string BattleHost = "battle.host";
         public const string BattleGuest = "battle.guest";
         public const string BattleReady = "battle.ready";

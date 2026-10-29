@@ -237,3 +237,7 @@ MonoBehaviour:
     Text: "\u0432\u044B\u043A\u043B"
   - Key: card.ability
     Text: "\u0421\u043F\u043E\u0441\u043E\u0431\u043D\u043E\u0441\u0442\u044C"
+  - Key: battle.start
+    Text: "\u0411\u0438\u0442\u0432\u0430!"
+  - Key: battle.versus
+    Text: "{0} \u043F\u0440\u043E\u0442\u0438\u0432 {1}"

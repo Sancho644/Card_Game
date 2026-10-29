@@ -4,13 +4,15 @@ using Game.Core.Battle;
 using Game.Core.State;
 using Game.Data.Presentation;
 using Game.Presentation.Animation;
+using Game.Presentation.Audio;
 using Game.Presentation.Cards;
 
 namespace Game.Presentation.Match
 {
     /// <summary>
     /// Shows each battling creature's current power on its card and, after every change (the field opened,
-    /// an ability played or cancelled), what changed it: «+50 Кузница» in green, «−30 Тень» in red.
+    /// an ability played or cancelled), counts it to the new value and shows what changed it: «+50 Кузница»
+    /// in green, «−30 Тень» in red.
     /// The numbers come from the engine's own count, so they always match the final result.
     /// </summary>
     public sealed class BattlePowerPresenter
@@ -20,6 +22,7 @@ namespace Game.Presentation.Match
         private readonly PowerDiff _diff;
         private readonly VisualSettings _visual;
         private readonly AnimationSettings _animation;
+        private readonly ISoundPlayer _sound;
         private readonly HashSet<int> _badged = new HashSet<int>();
         private BattlePower _shown;
 
@@ -28,13 +31,15 @@ namespace Game.Presentation.Match
             FloatingTextSpawner floatingText,
             PowerDiff diff,
             VisualSettings visual,
-            AnimationSettings animation)
+            AnimationSettings animation,
+            ISoundPlayer sound)
         {
             _registry = registry;
             _floatingText = floatingText;
             _diff = diff;
             _visual = visual;
             _animation = animation;
+            _sound = sound;
         }
 
         /// <summary>Queues the update of the power badges to the battle as it stands after the batch.</summary>
@@ -76,16 +81,27 @@ namespace Game.Presentation.Match
 
                 current.Add(creature.InstanceId);
                 var now = power.Of(player);
-                view.SetPower(now.FinalPower);
                 if (previous == null)
+                {
+                    view.SetPower(now.FinalPower);
                     continue;
+                }
 
                 var before = previous.Of(player);
                 if (before.FinalPower != now.FinalPower)
                 {
-                    var flash = view.FlashPower(now.FinalPower > before.FinalPower ? _visual.PowerUp : _visual.PowerDown, _animation.PowerPopupSeconds);
+                    var grew = now.FinalPower > before.FinalPower;
+                    _sound.Play(grew ? SoundCue.PowerUp : SoundCue.PowerDown);
+                    var count = view.CountPower(before.FinalPower, now.FinalPower, _animation.PowerCountSeconds);
+                    if (count != null)
+                        sequence.Join(count);
+                    var flash = view.FlashPower(grew ? _visual.PowerUp : _visual.PowerDown, _animation.PowerPopupSeconds);
                     if (flash != null)
                         sequence.Join(flash);
+                }
+                else
+                {
+                    view.SetPower(now.FinalPower);
                 }
 
                 var changes = _diff.Changes(before, now, power.FieldId);
