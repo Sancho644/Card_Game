@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
+using Game.Data.Presentation;
 using UnityEngine;
 
 namespace Game.Presentation.Table
 {
     /// <summary>
-    /// Keeps the table on screen. The camera stays where it is and only tilts and zooms: the smallest
-    /// vertical field of view (not below the base one) and the tilt that put every framing point inside the
-    /// safe area, below the top bar. On wide screens (up to 21:9) the base view stays and the sides get more
-    /// room. Reports when the screen or the safe area changes, so the cards can be laid out again.
+    /// Places the camera from the table settings: tilt, height and angle of view. The camera slides along
+    /// the table so the framing points sit in the middle of the safe area below the top bar; if they still do
+    /// not fit, the angle of view grows until they do. On wide screens (up to 21:9) the sides simply get more
+    /// room. Follows changes of the screen,
+    /// the safe area and the settings themselves (they can be tuned in the inspector in Play mode) and
+    /// reports them, so the cards can be laid out again.
     /// </summary>
     [RequireComponent(typeof(Camera))]
     public sealed class CameraFramer : MonoBehaviour
@@ -16,102 +19,128 @@ namespace Game.Presentation.Table
         private const float MaxVerticalFov = 90f;
         private const int SearchSteps = 24;
 
-        [SerializeField] private float _baseVerticalFov = 42f;
         [SerializeField, Range(0f, 0.1f)] private float _screenMargin = 0.01f;
 
         private Camera _camera;
+        private TablePresentationSettings _settings;
         private Func<IEnumerable<Vector3>> _points;
         private float _topBarShare;
         private Vector2Int _screen;
         private Rect _safeArea;
+        private Vector3 _applied;
 
         public event Action Changed;
 
-        public void Configure(Func<IEnumerable<Vector3>> points, float topBarShare)
+        public void Configure(TablePresentationSettings settings, Func<IEnumerable<Vector3>> points)
         {
+            _settings = settings;
             _points = points;
-            _topBarShare = topBarShare;
+            _topBarShare = settings.TopBarShare;
             Refit();
         }
 
-        /// <summary>Fits the camera to the current screen at once, e.g. after rendering to a texture of another size.</summary>
+        /// <summary>Fits the camera to the current screen and settings at once.</summary>
         public void Refit()
         {
             if (_camera == null)
                 _camera = GetComponent<Camera>();
             _screen = new Vector2Int(Screen.width, Screen.height);
             _safeArea = Screen.safeArea;
-            if (_points != null)
-                Fit(new List<Vector3>(_points()));
+            if (_settings == null)
+                return;
+
+            _applied = Snapshot();
+            var points = _points != null ? new List<Vector3>(_points()) : new List<Vector3>();
+            FitAngleOfView(points);
         }
 
         private void Awake() => _camera = GetComponent<Camera>();
 
         private void LateUpdate()
         {
-            if (_screen.x == Screen.width && _screen.y == Screen.height && _safeArea == Screen.safeArea)
+            if (_settings == null)
+                return;
+            if (_screen.x == Screen.width && _screen.y == Screen.height && _safeArea == Screen.safeArea && _applied == Snapshot())
                 return;
 
             Refit();
             Changed?.Invoke();
         }
 
-        private void Fit(IReadOnlyList<Vector3> points)
+        private Vector3 Snapshot() =>
+            new Vector3(_settings.CameraPitch, _settings.CameraHeight, _settings.CameraFieldOfView);
+
+        /// <summary>Above the table at the set height and tilt, slid along the table to <paramref name="z"/>.</summary>
+        private void Place(float z) =>
+            transform.SetPositionAndRotation(new Vector3(0f, _settings.CameraHeight, z), Quaternion.Euler(_settings.CameraPitch, 0f, 0f));
+
+        private void FitAngleOfView(IReadOnlyList<Vector3> points)
         {
             var area = AllowedViewport();
-            if (TryFit(_baseVerticalFov, points, area))
+            var start = _settings.CameraFieldOfView;
+            if (Fits(start, points, area))
                 return;
 
-            var low = _baseVerticalFov;
+            var low = start;
             var high = MaxVerticalFov;
             for (var i = 0; i < SearchSteps; i++)
             {
                 var middle = (low + high) / 2f;
-                if (TryFit(middle, points, area))
+                if (Fits(middle, points, area))
                     high = middle;
                 else
                     low = middle;
             }
 
-            TryFit(high, points, area);
+            Fits(high, points, area);
         }
 
-        /// <summary>
-        /// Sets the field of view and the tilt that centres the points vertically in the area; true if they all fit.
-        /// The camera only pitches, so a point's height on screen depends on its height and depth alone.
-        /// </summary>
-        private bool TryFit(float fov, IReadOnlyList<Vector3> points, Rect area)
+        /// <summary>Sets the angle of view, centres the points vertically; true if every point is then inside the area.</summary>
+        private bool Fits(float fov, IReadOnlyList<Vector3> points, Rect area)
         {
-            var nearest = float.MinValue;
-            var farthest = float.MaxValue;
-            var origin = transform.position;
-            foreach (var point in points)
-            {
-                // Angle below the horizon at which the camera sees the point.
-                var below = Mathf.Atan2(origin.y - point.y, point.z - origin.z) * Mathf.Rad2Deg;
-                nearest = Mathf.Max(nearest, below);
-                farthest = Mathf.Min(farthest, below);
-            }
-
-            var halfTan = Mathf.Tan(fov * 0.5f * Mathf.Deg2Rad);
-            var bottomOffset = Mathf.Atan((0.5f - area.yMin) * 2f * halfTan) * Mathf.Rad2Deg;
-            var topOffset = Mathf.Atan((0.5f - area.yMax) * 2f * halfTan) * Mathf.Rad2Deg;
-            var minPitch = nearest - bottomOffset;
-            var maxPitch = farthest - topOffset;
-
             _camera.fieldOfView = fov;
-            transform.rotation = Quaternion.Euler((minPitch + maxPitch) / 2f, 0f, 0f);
-            if (minPitch > maxPitch)
-                return false;
-
+            Centre(points, area);
             foreach (var point in points)
             {
                 var viewport = _camera.WorldToViewportPoint(point);
-                if (viewport.z <= 0f || viewport.x < area.xMin || viewport.x > area.xMax)
+                if (viewport.z <= 0f || !area.Contains(viewport))
                     return false;
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Slides the camera along the table until the highest and lowest points are equally far from the
+        /// area's edges. Stepping back moves every point up the screen, so a bisection finds the place.
+        /// </summary>
+        private void Centre(IReadOnlyList<Vector3> points, Rect area)
+        {
+            var near = -2f * _settings.CameraHeight - 20f;
+            var far = 20f;
+            var middle = 0f;
+            for (var i = 0; i < SearchSteps; i++)
+            {
+                middle = (near + far) / 2f;
+                Place(middle);
+                if (points.Count == 0)
+                    return;
+
+                var low = float.MaxValue;
+                var high = float.MinValue;
+                foreach (var point in points)
+                {
+                    var y = _camera.WorldToViewportPoint(point).y;
+                    low = Mathf.Min(low, y);
+                    high = Mathf.Max(high, y);
+                }
+
+                // Points too high: come forward; too low: step back.
+                if ((low + high) / 2f > area.center.y)
+                    near = middle;
+                else
+                    far = middle;
+            }
         }
 
         private Rect AllowedViewport()

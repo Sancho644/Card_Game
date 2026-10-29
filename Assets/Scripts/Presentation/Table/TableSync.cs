@@ -42,12 +42,13 @@ namespace Game.Presentation.Table
             var sequence = DOTween.Sequence();
             var visible = new HashSet<int>();
 
-            void Move(CardRef card, TableSide owner, CardPose pose, string status = null, float brightness = 1f)
+            void Move(CardRef card, TableSide owner, CardPose pose, string status = null, float brightness = 1f, bool inHand = false)
             {
                 visible.Add(card.InstanceId);
                 var cardView = _registry.GetOrCreate(card.InstanceId, card.CardId, _layout.Spawn(owner));
                 cardView.SetStatus(status);
                 cardView.SetDimming(brightness);
+                cardView.SetInHand(inHand);
                 var tween = cardView.MoveTo(pose, duration);
                 if (tween != null)
                     sequence.Join(tween);
@@ -87,7 +88,7 @@ namespace Game.Presentation.Table
             }
 
             for (var i = 0; i < view.Hand.Count; i++)
-                Move(view.Hand[i], TableSide.Bottom, _layout.Hand(TableSide.Bottom, i, view.Hand.Count, true));
+                Move(view.Hand[i], TableSide.Bottom, _layout.Hand(TableSide.Bottom, i, view.Hand.Count, true), inHand: true);
 
             if (revealedOpponent != null)
             {

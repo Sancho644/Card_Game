@@ -77,7 +77,7 @@ namespace Game.Presentation.Match
             var texts = _app.Texts;
             _layout.Configure(_settings, _camera);
             var framer = _camera.GetComponent<CameraFramer>();
-            framer.Configure(_layout.FramingPoints, _settings.TopBarShare);
+            framer.Configure(_settings, _layout.FramingPoints);
             _pointer.Configure(_settings.LongPressSeconds, _settings.DragThresholdPixels);
             _actionBar.Init(texts.Get(UiTextKeys.EndTurn), texts.Get(UiTextKeys.Ready), texts.Get(UiTextKeys.OpenField), texts.Get(UiTextKeys.Cancel));
             _log.Init(_settings.LogLines);
@@ -85,11 +85,11 @@ namespace Game.Presentation.Match
             foreach (var dialog in new[] { _breakdown, _turnOrder, _handoff, _matchEnd })
                 dialog.Hide();
             _options.Hide();
-            _zoom.Hide();
+            _zoom.HideInstantly();
 
             var faces = new CardFaceBuilder(_app.Database, _visual, texts);
             var skin = new CardSkin(_visual);
-            _zoom.Init(skin);
+            _zoom.Init(skin, _animation);
             var registry = new CardViewRegistry(_cardPrefab, _cardRoot, faces, skin);
             var queue = _queue = new AnimationQueue();
             var speed = _speed = new AnimationSpeed(_animation, _app.PlayerSettings);
@@ -105,7 +105,7 @@ namespace Game.Presentation.Match
                 registry, new FloatingTextSpawner(_cardRoot, _camera), new PowerDiff(lookup), _visual, _animation);
 
             _interaction = new TableInteraction(
-                _pointer, new TableRaycaster(_camera), registry, selector, new DropTargetPicker(), _zoom, faces, queue, speed, _visual, _settings);
+                _pointer, new TableRaycaster(_camera), registry, selector, new DropTargetPicker(), _zoom, new HandFocus(_camera, _animation, _layout.CardSize), faces, queue, speed, _visual, _settings);
             _decisions = new HumanDecisionUi(
                 humans, selector, _interaction, _actionBar, _turnOrder, _options, _prompt, names, lookup, texts);
 
@@ -137,6 +137,7 @@ namespace Game.Presentation.Match
                 () => _app.Scenes.ToMainMenu());
 
             _interaction.ResyncRequested += () => _presenter.Resync();
+            _presenter.HandoffStarted += _interaction.StopLooking;
             framer.Changed += () => _presenter.Resync();
             _topBar.ShowBothHandsChanged += show =>
             {

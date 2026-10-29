@@ -75,6 +75,9 @@ namespace Game.Presentation.Match
             _newMatch = newMatch;
         }
 
+        /// <summary>The table is about to be handed to the other hot-seat player: nothing private may stay on screen.</summary>
+        public event Action HandoffStarted;
+
         public void Start(MatchSetup setup, ulong seed)
         {
             _session.EventsProduced += OnEvents;
@@ -197,6 +200,7 @@ namespace Game.Presentation.Match
         private IAnimationStep HandoffStep(PlayerId next) =>
             new WaitForPlayerStep(done =>
             {
+                HandoffStarted?.Invoke();
                 _status.Hide();
                 _handoff.Show(
                     _texts.Format(UiTextKeys.HandoffTitle, _names.Of(next)),

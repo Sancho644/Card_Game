@@ -8,8 +8,9 @@ namespace Game.Presentation.Input
 {
     /// <summary>
     /// Turns mouse and touch into the same gestures: tap, long press, drag. The right mouse button is a
-    /// shortcut for long press. Nothing reacts to hovering, so every gesture works with a finger.
-    /// Presses that start on the interface are left to the interface.
+    /// shortcut for long press. The mouse also reports hovering, but only as a convenience: whatever it
+    /// shows is reachable by a tap too, so every gesture works with a finger. Presses that start on the
+    /// interface are left to the interface.
     /// </summary>
     public sealed class PointerInput : MonoBehaviour
     {
@@ -22,12 +23,17 @@ namespace Game.Presentation.Input
         private bool _longPressFired;
         private Vector2 _pressPosition;
         private float _pressTime;
+        private Vector2? _hover;
+        private Vector2? _hoverRaw;
 
         public event Action<Vector2> Tapped;
         public event Action<Vector2> LongPressed;
         public event Action<Vector2> DragStarted;
         public event Action<Vector2> Dragged;
         public event Action<Vector2> DragEnded;
+
+        /// <summary>The mouse moved over the table with no button down; null when it left the table or went over the interface.</summary>
+        public event Action<Vector2?> Hovered;
 
         public void Configure(float longPressSeconds, float dragThresholdPixels)
         {
@@ -50,6 +56,10 @@ namespace Game.Presentation.Input
             }
 
             var press = pointer.press;
+            if (mouse == null || pointer != mouse)
+                TrackHover(null);
+            else if (!press.isPressed)
+                TrackHover(position);
             if (press.wasPressedThisFrame)
             {
                 _pressed = !IsOverInterface(position);
@@ -74,6 +84,19 @@ namespace Game.Presentation.Input
                 _pressed = false;
                 _dragging = false;
             }
+        }
+
+        /// <summary>Reports the hovered point when it changes; the interface check runs only after a move.</summary>
+        private void TrackHover(Vector2? position)
+        {
+            if (position == _hoverRaw)
+                return;
+            _hoverRaw = position;
+            var hover = position.HasValue && IsOverInterface(position.Value) ? null : position;
+            if (hover == _hover)
+                return;
+            _hover = hover;
+            Hovered?.Invoke(hover);
         }
 
         private void TrackHold(Vector2 position)

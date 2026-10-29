@@ -20,6 +20,15 @@ namespace Game.Data.Presentation
         [Header("Cards, seconds")]
         [SerializeField, Min(0)] private float _moveDuration = 0.35f;
 
+        [Header("Looking at cards")]
+        [Tooltip("A hand card under the mouse or tapped rises and grows to this share of the screen height.")]
+        [SerializeField, Range(0.1f, 0.9f)] private float _handFocusHeight = 0.42f;
+        [SerializeField, Min(0)] private float _handFocusSeconds = 0.12f;
+        [Tooltip("A card looked at closely flies to the centre and grows to this share of the screen height.")]
+        [SerializeField, Range(0.3f, 1f)] private float _zoomHeight = 0.82f;
+        [SerializeField, Min(0)] private float _zoomOpenSeconds = 0.22f;
+        [SerializeField, Min(0)] private float _zoomCloseSeconds = 0.18f;
+
         [Header("Battle, seconds")]
         [SerializeField, Min(0)] private float _abilityShowSeconds = 0.8f;
         [SerializeField, Min(0)] private float _powerPopupSeconds = 1.1f;
@@ -31,6 +40,11 @@ namespace Game.Data.Presentation
         public float FastSpeed => _fastSpeed;
         public float TapFastForward => _tapFastForward;
         public float MoveDuration => _moveDuration;
+        public float HandFocusHeight => _handFocusHeight;
+        public float HandFocusSeconds => _handFocusSeconds;
+        public float ZoomHeight => _zoomHeight;
+        public float ZoomOpenSeconds => _zoomOpenSeconds;
+        public float ZoomCloseSeconds => _zoomCloseSeconds;
         public float AbilityShowSeconds => _abilityShowSeconds;
         public float PowerPopupSeconds => _powerPopupSeconds;
         public float BannerSeconds => _bannerSeconds;

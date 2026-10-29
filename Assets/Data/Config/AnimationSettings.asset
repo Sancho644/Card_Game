@@ -16,6 +16,11 @@ MonoBehaviour:
   _fastSpeed: 2
   _tapFastForward: 4
   _moveDuration: 0.35
+  _handFocusHeight: 0.42
+  _handFocusSeconds: 0.12
+  _zoomHeight: 0.82
+  _zoomOpenSeconds: 0.22
+  _zoomCloseSeconds: 0.18
   _abilityShowSeconds: 0.8
   _powerPopupSeconds: 1.1
   _bannerSeconds: 1.6

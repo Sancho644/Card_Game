@@ -8,7 +8,8 @@ namespace Game.Presentation.Table
     /// <summary>
     /// Card places on the table, in world space. Fields of both players in the centre, the viewer's row
     /// nearer to the camera; creatures stand at the edge of the field facing their owner, so the field's
-    /// numbers and condition stay visible. The hands squeeze to fit the camera's safe area.
+    /// numbers and condition stay visible. The viewer's hand faces the camera and squeezes to fit the safe
+    /// area; the opponent's hand of backs lies at the far edge, partly off screen.
     /// </summary>
     public sealed class TableLayout : MonoBehaviour
     {
@@ -21,8 +22,11 @@ namespace Game.Presentation.Table
 
         [Header("Hands")]
         [SerializeField] private float _handDistance = 5.8f;
+        [SerializeField] private float _opponentHandDistance = 6.4f;
         [SerializeField] private float _handLift = 1.2f;
         [SerializeField] private float _minHandSpacing = 0.35f;
+        [Tooltip("Part of a resting hand card kept on screen, from its top edge; the rest may hang below. A card being looked at rises in full.")]
+        [SerializeField, Range(0.3f, 1f)] private float _handVisibleShare = 0.65f;
 
         [Header("Piles")]
         [SerializeField] private float _discardX = 5.6f;
@@ -44,6 +48,9 @@ namespace Game.Presentation.Table
 
         private TablePresentationSettings _settings;
         private Camera _camera;
+
+        /// <summary>Size of a card at scale 1, in world units.</summary>
+        public Vector2 CardSize => _cardSize;
 
         public void Configure(TablePresentationSettings settings, Camera camera)
         {
@@ -70,13 +77,13 @@ namespace Game.Presentation.Table
             var x = RowX(index, count, HandSpacing(side, count));
             var centre = (count - 1) / 2f;
             var lift = _handLift + index * _layerLift;
-            var position = new Vector3(x, lift, Sign(side) * _handDistance);
             if (side == TableSide.Top)
-                return new CardPose(position, Face(faceUp));
+                return new CardPose(new Vector3(x, index * _layerLift, _opponentHandDistance), Face(faceUp));
+            var position = new Vector3(x, lift, -_handDistance);
 
             // The whole fan keeps the same arc however many cards there are, so the outer ones never sink off screen.
             var bend = count > 1 ? Mathf.Min(1f, MaxFanSteps / (count - 1)) : 1f;
-            var tilt = Quaternion.Euler(90f - _settings.HandTiltDegrees, 0f, 0f);
+            var tilt = FacingCamera;
             var fan = Quaternion.AngleAxis((centre - index) * _settings.HandFanDegrees * bend, tilt * Vector3.back);
             return new CardPose(position + Vector3.down * Mathf.Abs(index - centre) * FanDroop * bend, fan * tilt);
         }
@@ -89,25 +96,26 @@ namespace Game.Presentation.Table
 
         /// <summary>Where a card appears from when it shows up on this side without a view yet.</summary>
         public CardPose Spawn(TableSide side) =>
-            new CardPose(new Vector3(0f, _handLift, Sign(side) * (_handDistance + 2.5f)), FaceDown);
+            new CardPose(new Vector3(0f, _handLift, side == TableSide.Bottom ? -_handDistance - 2.5f : _opponentHandDistance + 2.5f), FaceDown);
 
         /// <summary>Above the table in front of the camera: where a played ability is shown.</summary>
         public CardPose BattleFocus() =>
-            new CardPose(_battleFocus, Quaternion.Euler(90f - _settings.HandTiltDegrees, 0f, 0f));
+            new CardPose(_battleFocus, FacingCamera);
 
         /// <summary>
-        /// Points the camera must keep on screen: the outer edges of both hands and of the piles. The
-        /// hands' width is not included, because the hands squeeze to the screen instead.
+        /// Points the camera must keep on screen: the visible part of the viewer's hand, the far edge of the
+        /// opponent's creatures and the piles. The hands' width is not included, because the hands squeeze to
+        /// the screen instead; the opponent's hand may hang off the top.
         /// </summary>
         public IEnumerable<Vector3> FramingPoints()
         {
             var halfHeight = _cardSize.y / 2f;
             var halfWidth = _cardSize.x / 2f;
-            var tilt = Quaternion.Euler(90f - _settings.HandTiltDegrees, 0f, 0f);
-            // The fan turns the outer cards, so their lower corners hang a little below the straight edge.
-            var nearEdge = tilt * new Vector3(0f, -halfHeight * 1.15f, 0f);
+            var nearEdge = FacingCamera * new Vector3(0f, halfHeight - 2f * halfHeight * _handVisibleShare, 0f);
             yield return new Vector3(0f, _handLift, -_handDistance) + nearEdge;
-            yield return new Vector3(0f, _handLift, _handDistance + halfHeight);
+            var farField = Field(TableSide.Top, 0, 1, true);
+            var farCreature = Creature(farField, TableSide.Top);
+            yield return farCreature.Position + new Vector3(0f, 0f, halfHeight * farCreature.Scale);
             foreach (var x in new[] { _outOfGameX + halfWidth, _removedFieldsX - halfWidth })
             {
                 yield return new Vector3(x, 0f, -_pileDistance - halfHeight);
@@ -122,7 +130,7 @@ namespace Game.Presentation.Table
             if (count < 2 || _camera == null)
                 return spacing;
 
-            var centre = new Vector3(0f, _handLift, Sign(side) * _handDistance);
+            var centre = side == TableSide.Bottom ? new Vector3(0f, _handLift, -_handDistance) : new Vector3(0f, 0f, _opponentHandDistance);
             var room = VisibleHalfWidth(centre) - _cardSize.x / 2f;
             return Mathf.Clamp(2f * room / (count - 1), _minHandSpacing, spacing);
         }
@@ -138,6 +146,9 @@ namespace Game.Presentation.Table
             var rightEdge = _camera.ViewportToWorldPoint(new Vector3(right, viewport.y, viewport.z));
             return Mathf.Min(point.x - leftEdge.x, rightEdge.x - point.x);
         }
+
+        /// <summary>A card turned to face the camera, so it reads without perspective.</summary>
+        private Quaternion FacingCamera => Quaternion.Euler(_settings.CameraPitch, 0f, 0f);
 
         private static Quaternion Face(bool faceUp) => faceUp ? FaceUp : FaceDown;
 

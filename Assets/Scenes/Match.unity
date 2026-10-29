@@ -940,6 +940,7 @@ RectTransform:
   - {fileID: 1427013671}
   - {fileID: 898354517}
   - {fileID: 718752393}
+  - {fileID: 1185707221}
   m_Father: {fileID: 1066895384}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -4914,7 +4915,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06024a72ba9f4b04a8dd9e8c60be2cca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Table.CameraFramer
-  _baseVerticalFov: 42
   _screenMargin: 0.015
 --- !u!4 &967686876
 Transform:
@@ -5448,6 +5448,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d504fc01caa9cdc4e8ed79feffbf4b92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Ui.CardZoomView
+  _dim: {fileID: 1066895383}
+  _card: {fileID: 272238230}
   _frame: {fileID: 272238232}
   _rarityBadge: {fileID: 1520318542}
   _art: {fileID: 811374823}
@@ -5461,6 +5463,7 @@ MonoBehaviour:
   _stats: {fileID: 1427013673}
   _body: {fileID: 898354519}
   _rarity: {fileID: 718752391}
+  _back: {fileID: 1185707219}
   _close: {fileID: 1066895382}
 --- !u!114 &1066895382
 MonoBehaviour:
@@ -5481,7 +5484,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 1
+  m_Transition: 0
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -6379,6 +6382,81 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &1185707218
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1185707221}
+  - component: {fileID: 1185707220}
+  - component: {fileID: 1185707219}
+  m_Layer: 0
+  m_Name: Back
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1185707219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185707218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1185707220
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185707218}
+  m_CullTransparentMesh: 1
+--- !u!224 &1185707221
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185707218}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 272238230}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1223535778
 GameObject:
   m_ObjectHideFlags: 0
@@ -7186,15 +7264,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Table.TableLayout
   _cardSize: {x: 1.4, y: 2}
-  _fieldSpacing: 2.2
-  _fieldRowDistance: 2.6
-  _handDistance: 6.8
+  _fieldSpacing: 2.3
+  _fieldRowDistance: 1.55
+  _handDistance: 6.6
+  _opponentHandDistance: 7.6
   _handLift: 1
   _minHandSpacing: 0.35
-  _discardX: 5.6
-  _outOfGameX: 7.4
-  _removedFieldsX: -5.8
-  _pileDistance: 2.4
+  _handVisibleShare: 0.6
+  _discardX: 5.4
+  _outOfGameX: 7
+  _removedFieldsX: -5.4
+  _pileDistance: 2.2
   _stackStep: 0.03
   _battleFocus: {x: 0, y: 2.2, z: -1.2}
   _layerLift: 0.02

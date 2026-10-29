@@ -46,6 +46,7 @@ namespace Game.Presentation.Cards
         private MaterialPropertyBlock _block;
         private Tween _move;
         private Tween _powerFlash;
+        private Tween _focus;
         private CardFace _face;
         private CardSkin _skin;
         private float _dimming = 1f;
@@ -57,6 +58,12 @@ namespace Game.Presentation.Cards
         public string CardId { get; private set; }
 
         public bool IsKnown => CardId != null;
+
+        /// <summary>The card lies in the viewer's own hand.</summary>
+        public bool IsInHand { get; private set; }
+
+        /// <summary>The visible part is lifted away from the card's place, e.g. a hand card being looked at.</summary>
+        public bool IsFocused { get; private set; }
 
         public Collider Collider => _collider;
 
@@ -74,6 +81,8 @@ namespace Game.Presentation.Cards
 
             _face = face;
             _skin = skin;
+            ResetVisual();
+            SetVisible(true);
             _dimming = 1f;
             SetSprite(_back, skin.BackArt, skin.Back);
             SetColor(_powerBackground, skin.PowerBadge);
@@ -134,6 +143,73 @@ namespace Game.Presentation.Cards
                 .AppendCallback(() => SetColor(_powerBackground, _skin.PowerBadge))
                 .SetTarget(this);
             return _powerFlash;
+        }
+
+        /// <summary>Marks the card as lying in the viewer's hand; a card leaving the hand drops its focus.</summary>
+        public void SetInHand(bool inHand)
+        {
+            IsInHand = inHand;
+            if (!inHand && IsFocused)
+                ResetVisual();
+        }
+
+        /// <summary>Hides or shows everything visible, e.g. while the card is shown large over the table.</summary>
+        public void SetVisible(bool visible)
+        {
+            if (_visual != null)
+                _visual.gameObject.SetActive(visible);
+        }
+
+        /// <summary>
+        /// Moves the visible part to the given world pose and size, leaving the card's place as it is.
+        /// Runs on real time, so looking at cards stays quick while animations are sped up.
+        /// </summary>
+        public Tween FocusVisual(Vector3 position, Quaternion rotation, float scale, float duration)
+        {
+            if (_visual == null)
+                return null;
+
+            _focus?.Kill();
+            IsFocused = true;
+            var localPosition = transform.InverseTransformPoint(position);
+            var localRotation = Quaternion.Inverse(transform.rotation) * rotation;
+            var localScale = Vector3.one * (scale / Mathf.Max(0.001f, transform.lossyScale.x));
+            _focus = DOTween.Sequence()
+                .Join(_visual.DOLocalMove(localPosition, duration).SetEase(Ease.OutCubic))
+                .Join(_visual.DOLocalRotateQuaternion(localRotation, duration).SetEase(Ease.OutCubic))
+                .Join(_visual.DOScale(localScale, duration).SetEase(Ease.OutCubic))
+                .SetUpdate(true)
+                .SetTarget(this);
+            return _focus;
+        }
+
+        /// <summary>Brings the visible part back to the card's place.</summary>
+        public Tween ReleaseVisual(float duration)
+        {
+            if (_visual == null || !IsFocused)
+                return null;
+
+            _focus?.Kill();
+            IsFocused = false;
+            _focus = DOTween.Sequence()
+                .Join(_visual.DOLocalMove(Vector3.zero, duration).SetEase(Ease.OutCubic))
+                .Join(_visual.DOLocalRotateQuaternion(Quaternion.identity, duration).SetEase(Ease.OutCubic))
+                .Join(_visual.DOScale(Vector3.one, duration).SetEase(Ease.OutCubic))
+                .SetUpdate(true)
+                .SetTarget(this);
+            return _focus;
+        }
+
+        /// <summary>Puts the visible part back at once.</summary>
+        public void ResetVisual()
+        {
+            _focus?.Kill();
+            IsFocused = false;
+            if (_visual == null)
+                return;
+            _visual.localPosition = Vector3.zero;
+            _visual.localRotation = Quaternion.identity;
+            _visual.localScale = Vector3.one;
         }
 
         public void Place(CardPose pose)
@@ -278,6 +354,7 @@ namespace Game.Presentation.Cards
         {
             _move?.Kill();
             _powerFlash?.Kill();
+            _focus?.Kill();
         }
     }
 }

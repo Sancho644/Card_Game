@@ -14,10 +14,17 @@ namespace Game.Data.Presentation
         [Tooltip("How far from a target the card may be released and still land on it, in fractions of the screen height.")]
         [SerializeField, Range(0f, 0.5f)] private float _dropRadius = 0.12f;
 
+        [Header("Camera")]
+        [Tooltip("Angle between the view and the table, degrees: 90 looks straight down. Can be tuned in Play mode.")]
+        [SerializeField, Range(30f, 90f)] private float _cameraPitch = 68f;
+        [Tooltip("Height of the camera above the table, in world units.")]
+        [SerializeField, Min(1f)] private float _cameraHeight = 15f;
+        [Tooltip("Vertical angle of view, degrees. Grows on its own only when the table does not fit, e.g. in a narrow safe area.")]
+        [SerializeField, Range(10f, 90f)] private float _cameraFieldOfView = 36f;
+
         [Header("Hand")]
         [SerializeField, Min(0.1f)] private float _handSpacing = 1.15f;
         [SerializeField] private float _handFanDegrees = 5f;
-        [SerializeField] private float _handTiltDegrees = 40f;
         [Tooltip("Free space between the hand and the edges of the safe area, in fractions of the screen width.")]
         [SerializeField, Range(0f, 0.2f)] private float _handScreenMargin = 0.03f;
 
@@ -40,7 +47,9 @@ namespace Game.Data.Presentation
         public float DropRadius => _dropRadius;
         public float HandSpacing => _handSpacing;
         public float HandFanDegrees => _handFanDegrees;
-        public float HandTiltDegrees => _handTiltDegrees;
+        public float CameraPitch => _cameraPitch;
+        public float CameraHeight => _cameraHeight;
+        public float CameraFieldOfView => _cameraFieldOfView;
         public float HandScreenMargin => _handScreenMargin;
         public float FieldScale => _fieldScale;
         public float CreatureOnFieldScale => _creatureOnFieldScale;

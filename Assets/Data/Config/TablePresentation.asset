@@ -12,21 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2569de254a4895458d251b56e1640f0, type: 3}
   m_Name: TablePresentation
   m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.TablePresentationSettings
-  _moveDuration: 0.35
-  _abilityShowSeconds: 0.8
-  _fastForwardScale: 4
-  _bannerSeconds: 1.6
-  _powerPopupSeconds: 1.1
   _longPressSeconds: 0.5
   _dragThresholdPixels: 14
   _dropPadding: 0.03
   _dropRadius: 0.12
-  _handSpacing: 1.45
-  _handFanDegrees: 3
-  _handTiltDegrees: 40
+  _cameraPitch: 82
+  _cameraHeight: 18
+  _cameraFieldOfView: 36
+  _handSpacing: 1.25
+  _handFanDegrees: 4
   _handScreenMargin: 0.03
-  _fieldScale: 1.15
-  _creatureOnFieldScale: 0.75
-  _creatureOverlap: 0.12
+  _fieldScale: 1.4
+  _creatureOnFieldScale: 1.2
+  _creatureOverlap: 0.55
   _topBarShare: 0.14
   _logLines: 60
