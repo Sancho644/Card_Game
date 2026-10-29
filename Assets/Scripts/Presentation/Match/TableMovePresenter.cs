@@ -9,8 +9,6 @@ namespace Game.Presentation.Match
     {
         private static readonly HashSet<Type> MovingEvents = new HashSet<Type>
         {
-            typeof(FieldsDealt),
-            typeof(HandDealt),
             typeof(CreaturePlaced),
             typeof(CreatureMoved),
             typeof(FieldOpened),

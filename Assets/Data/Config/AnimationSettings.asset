@@ -16,6 +16,8 @@ MonoBehaviour:
   _fastSpeed: 2
   _tapFastForward: 4
   _moveDuration: 0.35
+  _dealInterval: 0.09
+  _dragScale: 1.2
   _handFocusHeight: 0.42
   _handFocusSeconds: 0.12
   _handSpread: 0.35

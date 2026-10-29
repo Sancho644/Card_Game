@@ -68,6 +68,17 @@ namespace Game.Presentation.Interaction
             Apply();
         }
 
+        /// <summary>A card picked up to drag: it grows a little and turns to face the player; the hand settles.</summary>
+        public void Grab(CardView card)
+        {
+            Clear();
+            var facing = Quaternion.LookRotation(_camera.transform.forward, _camera.transform.up);
+            card.FocusVisual(card.transform.position, facing, _animation.DragScale * card.transform.lossyScale.x, _animation.HandFocusSeconds);
+        }
+
+        /// <summary>A dragged card was let go: it shrinks back on its way to wherever it goes.</summary>
+        public void Drop(CardView card) => card.ReleaseVisual(_animation.HandFocusSeconds);
+
         /// <summary>Puts every hand card back at once, e.g. before a drag.</summary>
         public void Clear()
         {

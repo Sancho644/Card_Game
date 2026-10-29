@@ -19,6 +19,10 @@ namespace Game.Data.Presentation
 
         [Header("Cards, seconds")]
         [SerializeField, Min(0)] private float _moveDuration = 0.35f;
+        [Tooltip("Pause between cards flying in one by one when they are dealt.")]
+        [SerializeField, Min(0)] private float _dealInterval = 0.09f;
+        [Tooltip("A dragged card grows by this much and turns to face the player.")]
+        [SerializeField, Range(1f, 2f)] private float _dragScale = 1.2f;
 
         [Header("Looking at cards")]
         [Tooltip("A hand card under the mouse or tapped rises and grows to this share of the screen height.")]
@@ -42,6 +46,8 @@ namespace Game.Data.Presentation
         public float FastSpeed => _fastSpeed;
         public float TapFastForward => _tapFastForward;
         public float MoveDuration => _moveDuration;
+        public float DealInterval => _dealInterval;
+        public float DragScale => _dragScale;
         public float HandFocusHeight => _handFocusHeight;
         public float HandFocusSeconds => _handFocusSeconds;
         public float HandSpread => _handSpread;

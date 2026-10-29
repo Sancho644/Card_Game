@@ -93,7 +93,7 @@ namespace Game.Presentation.Match
             var registry = new CardViewRegistry(_cardPrefab, _cardRoot, faces, skin);
             var queue = _queue = new AnimationQueue();
             var speed = _speed = new AnimationSpeed(_animation, _app.PlayerSettings);
-            var sync = new TableSync(_layout, registry, _animation, _visual, texts);
+            var sync = new TableSync(_layout, registry, _animation, _visual, texts, _app.Sound);
             var names = new PlayerNames(texts);
             names.Use(_launch.Mode);
             var lookup = new CardNameLookup(faces);
@@ -105,7 +105,7 @@ namespace Game.Presentation.Match
                 registry, new FloatingTextSpawner(_cardRoot, _camera), new PowerDiff(lookup), _visual, _animation);
 
             _interaction = new TableInteraction(
-                _pointer, new TableRaycaster(_camera), registry, selector, _zoom, new HandFocus(_camera, _animation, () => registry.All, _layout.CardSize), faces, queue, speed, _visual);
+                _pointer, new TableRaycaster(_camera), registry, selector, _zoom, new HandFocus(_camera, _animation, () => registry.All, _layout.CardSize), faces, queue, speed, _visual, _app.Sound);
             _decisions = new HumanDecisionUi(
                 humans, selector, _interaction, _actionBar, _turnOrder, _options, _prompt, names, lookup, texts);
 
@@ -113,6 +113,7 @@ namespace Game.Presentation.Match
             {
                 new LogPresenter(new EventLogFormatter(texts, names, lookup, faces), _log),
                 new AbilityPlayedPresenter(_layout, registry, _animation),
+                new DealPresenter(_animation),
                 new TableMovePresenter(),
                 new BattleResolvedPresenter(new BattleSummaryBuilder(texts, names, lookup), _breakdown, texts),
                 new ScoutedPresenter(_breakdown, faces, texts),

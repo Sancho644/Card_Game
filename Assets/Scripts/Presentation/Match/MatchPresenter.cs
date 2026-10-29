@@ -88,7 +88,7 @@ namespace Game.Presentation.Match
         public void Resync()
         {
             if (!_disposed)
-                _queue.Enqueue(CreateSync());
+                _queue.Enqueue(CreateSync(0f));
         }
 
         /// <summary>
@@ -234,8 +234,9 @@ namespace Game.Presentation.Match
             _matchEnd.Show(title, score, _texts.Get(UiTextKeys.ToMenu), _newMatch);
         }
 
-        private IAnimationStep CreateSync() =>
-            new TweenStep(() => _sync.Sync(ViewerView(), RevealedOpponent(), instant: false));
+        /// <param name="dealInterval">Pause between new cards flying in; 0 moves everything at once.</param>
+        private IAnimationStep CreateSync(float dealInterval) =>
+            new TweenStep(() => _sync.Sync(ViewerView(), RevealedOpponent(), instant: false, dealInterval));
 
         private PlayerView ViewerView() => _session.GetView(_hotSeat.Viewer);
 

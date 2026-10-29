@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Game.Data.Presentation;
 using Game.Presentation.Animation;
+using Game.Presentation.Audio;
 using Game.Presentation.Cards;
 using Game.Presentation.Input;
 using Game.Presentation.Ui;
@@ -37,6 +38,7 @@ namespace Game.Presentation.Interaction
         private readonly AnimationQueue _queue;
         private readonly AnimationSpeed _speed;
         private readonly VisualSettings _visual;
+        private readonly ISoundPlayer _sound;
         private CardView _dragged;
         private int? _dropTarget;
         private bool _enabled;
@@ -52,7 +54,8 @@ namespace Game.Presentation.Interaction
             CardFaceBuilder faces,
             AnimationQueue queue,
             AnimationSpeed speed,
-            VisualSettings visual)
+            VisualSettings visual,
+            ISoundPlayer sound)
         {
             _input = input;
             _raycaster = raycaster;
@@ -64,6 +67,7 @@ namespace Game.Presentation.Interaction
             _queue = queue;
             _speed = speed;
             _visual = visual;
+            _sound = sound;
 
             _input.Tapped += OnTap;
             _input.LongPressed += OnLongPress;
@@ -181,7 +185,12 @@ namespace Game.Presentation.Interaction
             {
                 _focus.Pin(card);
                 if (IsChoosable(card))
+                {
                     _selector.TapCard(card.InstanceId);
+                    if (_selector.Source == card.InstanceId)
+                        _sound.Play(SoundCue.CardPick);
+                }
+
                 return;
             }
 
@@ -256,7 +265,8 @@ namespace Game.Presentation.Interaction
             if (_selector.Source != card.InstanceId)
                 return;
 
-            _focus.Clear();
+            _focus.Grab(card);
+            _sound.Play(SoundCue.CardPick);
             _dragged = card;
             _dragged.Collider.enabled = false;
         }
@@ -283,13 +293,21 @@ namespace Game.Presentation.Interaction
             _dragged = null;
             _dropTarget = null;
             if (dragged != null)
+            {
                 dragged.Collider.enabled = true;
+                _focus.Drop(dragged);
+            }
 
             var target = TargetAt(position);
             if (target != null)
+            {
                 _selector.TapCard(target.Value);
+            }
             else
+            {
                 _selector.Cancel();
+                _sound.Play(SoundCue.CardDrop);
+            }
             ResyncRequested?.Invoke();
         }
 

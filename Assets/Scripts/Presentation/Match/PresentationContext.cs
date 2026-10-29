@@ -10,7 +10,7 @@ namespace Game.Presentation.Match
     public sealed class PresentationContext
     {
         private readonly AnimationQueue _queue;
-        private readonly Func<IAnimationStep> _createSync;
+        private readonly Func<float, IAnimationStep> _createSync;
         private bool _lastWasSync;
 
         public PresentationContext(
@@ -18,7 +18,7 @@ namespace Game.Presentation.Match
             PlayerView previousView,
             PlayerView view,
             AnimationQueue queue,
-            Func<IAnimationStep> createSync)
+            Func<float, IAnimationStep> createSync)
         {
             Batch = batch;
             PreviousView = previousView;
@@ -51,7 +51,16 @@ namespace Game.Presentation.Match
         {
             if (_lastWasSync)
                 return;
-            _queue.Enqueue(_createSync());
+            _queue.Enqueue(_createSync(0f));
+            _lastWasSync = true;
+        }
+
+        /// <summary>Moves the cards to their places, the ones new on the table flying in one by one.</summary>
+        public void EnqueueDeal(float interval)
+        {
+            if (_lastWasSync)
+                return;
+            _queue.Enqueue(_createSync(interval));
             _lastWasSync = true;
         }
     }
