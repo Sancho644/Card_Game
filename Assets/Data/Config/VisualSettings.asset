@@ -15,32 +15,46 @@ MonoBehaviour:
   _elements:
   - Element: 0
     Color: {r: 0.95, g: 0.85, b: 0.45, a: 1}
+    Icon: {fileID: 21300000, guid: a96208a008d45f84299f98527f6ae69d, type: 3}
   - Element: 1
     Color: {r: 0.45, g: 0.3, b: 0.6, a: 1}
+    Icon: {fileID: 21300000, guid: 5ee4112bb5b0fd04d883ea0c74ecbc7d, type: 3}
   - Element: 2
     Color: {r: 0.55, g: 0.42, b: 0.25, a: 1}
+    Icon: {fileID: 21300000, guid: 1338a5c5fee59c844a6ff25d017548b8, type: 3}
   - Element: 3
     Color: {r: 0.25, g: 0.55, b: 0.9, a: 1}
+    Icon: {fileID: 21300000, guid: 7cfc8930fcff30f40ab0ce93755683b6, type: 3}
   - Element: 4
     Color: {r: 0.9, g: 0.35, b: 0.2, a: 1}
+    Icon: {fileID: 21300000, guid: f057ba4579868d342b592560c6b7c9f4, type: 3}
   - Element: 5
     Color: {r: 0.45, g: 0.8, b: 0.6, a: 1}
+    Icon: {fileID: 21300000, guid: ddde44eef7e9c034fbd6150672f40794, type: 3}
   _abilityFrame: {r: 0.7, g: 0.72, b: 0.78, a: 1}
   _neutralFrame: {r: 0.6, g: 0.6, b: 0.6, a: 1}
   _cardBody: {r: 0.12, g: 0.12, b: 0.15, a: 1}
   _cardBack: {r: 0.2, g: 0.18, b: 0.35, a: 1}
+  _cardBackArt: {fileID: 21300000, guid: 30f1c72559d29f54fb181fd733fd2e3a, type: 3}
   _cardText: {r: 1, g: 1, b: 1, a: 1}
+  _stripIconColor: {r: 0.1, g: 0.1, b: 0.12, a: 1}
+  _artPlaceholderBrightness: 0.35
   _rarities:
   - Rarity: 0
-    Color: {r: 0.75, g: 0.75, b: 0.75, a: 1}
-    Icon: {fileID: 0}
+    Color: {r: 0.8, g: 0.82, b: 0.86, a: 1}
+    Icon: {fileID: 21300000, guid: d17effb0cf7fb0c44974321cc3038e66, type: 3}
   - Rarity: 1
-    Color: {r: 0.65, g: 0.35, b: 0.9, a: 1}
-    Icon: {fileID: 0}
+    Color: {r: 0.66, g: 0.36, b: 0.95, a: 1}
+    Icon: {fileID: 21300000, guid: d17effb0cf7fb0c44974321cc3038e66, type: 3}
   - Rarity: 2
-    Color: {r: 1, g: 0.65, b: 0.1, a: 1}
-    Icon: {fileID: 0}
+    Color: {r: 1, g: 0.78, b: 0.22, a: 1}
+    Icon: {fileID: 21300000, guid: d17effb0cf7fb0c44974321cc3038e66, type: 3}
   _selectable: {r: 0.3, g: 0.9, b: 0.4, a: 1}
   _selected: {r: 1, g: 0.9, b: 0.2, a: 1}
   _target: {r: 0.25, g: 0.85, b: 1, a: 1}
   _battle: {r: 1, g: 0.45, b: 0.15, a: 1}
+  _dropTarget: {r: 1, g: 1, b: 1, a: 1}
+  _closedFieldBrightness: 0.5
+  _powerBadge: {r: 0.1, g: 0.1, b: 0.12, a: 1}
+  _powerUp: {r: 0.25, g: 0.8, b: 0.3, a: 1}
+  _powerDown: {r: 0.9, g: 0.25, b: 0.2, a: 1}

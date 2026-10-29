@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Game.Data.Presentation;
 using UnityEngine;
 
 namespace Game.Presentation.Cards
@@ -14,16 +13,16 @@ namespace Game.Presentation.Cards
         private readonly CardView _prefab;
         private readonly Transform _root;
         private readonly CardFaceBuilder _faces;
-        private readonly VisualSettings _visual;
+        private readonly CardSkin _skin;
         private readonly Dictionary<int, CardView> _known = new Dictionary<int, CardView>();
         private readonly List<CardView> _anonymous = new List<CardView>();
 
-        public CardViewRegistry(CardView prefab, Transform root, CardFaceBuilder faces, VisualSettings visual)
+        public CardViewRegistry(CardView prefab, Transform root, CardFaceBuilder faces, CardSkin skin)
         {
             _prefab = prefab;
             _root = root;
             _faces = faces;
-            _visual = visual;
+            _skin = skin;
         }
 
         public IEnumerable<CardView> All => _known.Values.Concat(_anonymous);
@@ -86,6 +85,6 @@ namespace Game.Presentation.Cards
         private CardView Spawn(CardPose pose) => Object.Instantiate(_prefab, pose.Position, pose.Rotation, _root);
 
         private void Bind(CardView view, int instanceId, string cardId) =>
-            view.Bind(instanceId, cardId, _faces.Build(cardId), _visual.CardBody, _visual.CardBack, _visual.CardText, _visual.PowerBadge);
+            view.Bind(instanceId, cardId, _faces.Build(cardId), _skin);
     }
 }

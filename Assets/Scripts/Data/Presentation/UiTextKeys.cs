@@ -24,6 +24,7 @@ namespace Game.Data.Presentation
         public const string ElementPrefix = "element.";
         public const string RarityPrefix = "rarity.";
         public const string CardPower = "card.power";
+        public const string CardAbility = "card.ability";
         public const string HiddenCard = "card.hidden";
         public const string FieldClosed = "card.closed";
         public const string FieldLocked = "card.locked";

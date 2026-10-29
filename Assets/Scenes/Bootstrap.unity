@@ -236,7 +236,7 @@ MonoBehaviour:
   _ai: {fileID: 11400000, guid: b538ce2cbf0a7924396dad2195a87afd, type: 2}
   _matchmaking: {fileID: 11400000, guid: 5dbbf49fcc1d3f44ca19c295e2e0199c, type: 2}
   _texts: {fileID: 11400000, guid: 79ee04999c7ff1647a9c960a1647c5d2, type: 2}
-  _sounds: {fileID: 0}
+  _sounds: {fileID: 11400000, guid: c457245186854f146a5bc7065a3929a8, type: 2}
   _decks:
   - {fileID: 11400000, guid: 84815df58fb9015428cdb81d3b0b5f17, type: 2}
   - {fileID: 11400000, guid: f3940cb9f6b53e545b4f581870738e45, type: 2}

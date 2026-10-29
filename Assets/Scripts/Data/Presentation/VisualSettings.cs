@@ -23,7 +23,15 @@ namespace Game.Data.Presentation
         [SerializeField] private Color _neutralFrame = new Color(0.60f, 0.60f, 0.60f);
         [SerializeField] private Color _cardBody = new Color(0.12f, 0.12f, 0.15f);
         [SerializeField] private Color _cardBack = new Color(0.20f, 0.18f, 0.35f);
+        [Tooltip("One back for every card, tinted with the back color")]
+        [SerializeField] private Sprite _cardBackArt;
         [SerializeField] private Color _cardText = Color.white;
+        [Tooltip("Text and icons on light element strips; on dark ones the card text color is used")]
+        [SerializeField] private Color _stripIconColor = new Color(0.10f, 0.10f, 0.12f);
+
+        [Header("Art placeholder")]
+        [Tooltip("How dark the element color is behind the element icon while a card has no art")]
+        [SerializeField, Range(0.1f, 1f)] private float _artPlaceholderBrightness = 0.35f;
 
         [Header("Rarities")]
         [SerializeField] private List<RarityStyle> _rarities = new List<RarityStyle>
@@ -51,6 +59,9 @@ namespace Game.Data.Presentation
         public Color CardBody => _cardBody;
         public Color CardBack => _cardBack;
         public Color CardText => _cardText;
+        public Sprite CardBackArt => _cardBackArt;
+        public Color StripIconColor => _stripIconColor;
+        public float ArtPlaceholderBrightness => _artPlaceholderBrightness;
         public Color Selectable => _selectable;
         public Color Selected => _selected;
         public Color Target => _target;
@@ -70,6 +81,12 @@ namespace Game.Data.Presentation
         {
             var index = _elements.FindIndex(entry => entry.Element == element);
             return index < 0 ? _neutralFrame : _elements[index].Color;
+        }
+
+        public Sprite IconOf(Element element)
+        {
+            var index = _elements.FindIndex(entry => entry.Element == element);
+            return index < 0 ? null : _elements[index].Icon;
         }
 
         public RarityStyle StyleOf(Rarity rarity) => _rarities.Find(entry => entry.Rarity == rarity);

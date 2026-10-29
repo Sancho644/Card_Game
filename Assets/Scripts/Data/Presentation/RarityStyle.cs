@@ -9,6 +9,8 @@ namespace Game.Data.Presentation
     {
         public Rarity Rarity;
         public Color Color;
+
+        [Tooltip("The rarity gem in the corner of the card, tinted with the color")]
         public Sprite Icon;
 
         public RarityStyle(Rarity rarity, Color color)

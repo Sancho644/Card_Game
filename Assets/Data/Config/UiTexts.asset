@@ -235,3 +235,5 @@ MonoBehaviour:
     Text: "\u0432\u043A\u043B"
   - Key: toggle.off
     Text: "\u0432\u044B\u043A\u043B"
+  - Key: card.ability
+    Text: "\u0421\u043F\u043E\u0441\u043E\u0431\u043D\u043E\u0441\u0442\u044C"

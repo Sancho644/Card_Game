@@ -88,7 +88,9 @@ namespace Game.Presentation.Match
             _zoom.Hide();
 
             var faces = new CardFaceBuilder(_app.Database, _visual, texts);
-            var registry = new CardViewRegistry(_cardPrefab, _cardRoot, faces, _visual);
+            var skin = new CardSkin(_visual);
+            _zoom.Init(skin);
+            var registry = new CardViewRegistry(_cardPrefab, _cardRoot, faces, skin);
             var queue = _queue = new AnimationQueue();
             var speed = _speed = new AnimationSpeed(_animation, _app.PlayerSettings);
             var sync = new TableSync(_layout, registry, _animation, _visual, texts);
