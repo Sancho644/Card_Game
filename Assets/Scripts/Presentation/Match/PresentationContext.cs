@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Game.Core.Events;
 using Game.Core.State;
 using Game.Presentation.Animation;
@@ -49,7 +50,8 @@ namespace Game.Presentation.Match
         /// <summary>Moves the cards to their places; repeated requests in a row become one.</summary>
         public void EnqueueSync()
         {
-            if (_lastWasSync)
+            // Preserve the pre-outcome poses even when a preceding ability requests a sync.
+            if (_lastWasSync || Batch.Skip(Index + 1).Any(e => e is BattleResolved || e is BattleRetreated))
                 return;
             _queue.Enqueue(_createSync(0f));
             _lastWasSync = true;

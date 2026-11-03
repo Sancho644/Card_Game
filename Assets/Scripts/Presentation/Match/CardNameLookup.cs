@@ -18,6 +18,8 @@ namespace Game.Presentation.Match
             _faces = faces;
         }
 
+        public string CardName(string id) => _faces.NameOf(id);
+
         public void Remember(CardRef card)
         {
             if (card?.CardId != null)

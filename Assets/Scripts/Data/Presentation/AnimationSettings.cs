@@ -54,6 +54,16 @@ namespace Game.Data.Presentation
         [Header("Messages, seconds")]
         [SerializeField, Min(0)] private float _bannerSeconds = 1.6f;
 
+        [Header("Battle outcome")]
+        [SerializeField, Min(0)] private float _outcomeSeconds = 0.65f;
+        [SerializeField, Min(0)] private float _outcomeBannerSeconds = 2.4f;
+        [SerializeField, Min(0)] private float _turnBannerSeconds = 1f;
+        [SerializeField, Range(0f, 1f)] private float _outBrightness = 0.25f;
+
+        public float OutcomeSeconds => _outcomeSeconds;
+        public float OutcomeBannerSeconds => _outcomeBannerSeconds;
+        public float TurnBannerSeconds => _turnBannerSeconds;
+        public float OutBrightness => _outBrightness;
         public float Speed => _speed;
         public float FastSpeed => _fastSpeed;
         public float TapFastForward => _tapFastForward;

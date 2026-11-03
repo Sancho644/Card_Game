@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using Game.Core.Battle;
 using Game.Core.Events;
 using Game.Core.State;
@@ -95,6 +96,12 @@ namespace Game.Presentation.Match
             }
 
             text.Append(_texts.Format(UiTextKeys.BreakdownTotal, power.FinalPower)).Append('\n');
+        }
+
+        public string Sources(IEnumerable<string> cardIds)
+        {
+            var names = cardIds.Select(id => _lookup.CardName(id)).Where(name => !string.IsNullOrEmpty(name)).Distinct().ToArray();
+            return names.Length == 0 ? "" : _texts.Format(UiTextKeys.BattleSources, string.Join(", ", names));
         }
 
         private static string Signed(int value) => value > 0 ? "+" + value : value.ToString();

@@ -91,6 +91,15 @@ namespace Game.Data.Presentation
         public const string ScoutAbilities = "scout.abilities";
         public const string ScoutField = "scout.field";
 
+        public const string Close = "common.close";
+        public const string YourTurn = "turn.yours";
+        public const string OpponentTurn = "turn.opponent";
+        public const string EndVictory = "end.victory";
+        public const string EndDefeat = "end.defeat";
+        public const string EndReasonPrefix = "end.reason.";
+        public const string BattleRetreat = "battle.retreat";
+        public const string BattleSources = "battle.sources";
+
         public const string LogCoin = "log.coin";
         public const string LogOrder = "log.order";
         public const string LogTurn = "log.turn";

@@ -7,6 +7,7 @@ using Game.Core.Events;
 using Game.Core.State;
 using Game.Data.Presentation;
 using Game.Presentation.Animation;
+using Game.Presentation.Audio;
 using Game.Presentation.Table;
 using Game.Presentation.Ui;
 using Game.Services.Match;
@@ -33,7 +34,8 @@ namespace Game.Presentation.Match
         private readonly StatusPresenter _status;
         private readonly BattlePowerPresenter _power;
         private readonly DialogView _handoff;
-        private readonly DialogView _matchEnd;
+        private readonly MatchEndView _matchEnd;
+        private readonly ISoundPlayer _sound;
         private readonly PlayerNames _names;
         private readonly CardNameLookup _lookup;
         private readonly UiTexts _texts;
@@ -52,7 +54,8 @@ namespace Game.Presentation.Match
             StatusPresenter status,
             BattlePowerPresenter power,
             DialogView handoff,
-            DialogView matchEnd,
+            MatchEndView matchEnd,
+            ISoundPlayer sound,
             PlayerNames names,
             CardNameLookup lookup,
             UiTexts texts,
@@ -69,6 +72,7 @@ namespace Game.Presentation.Match
             _power = power;
             _handoff = handoff;
             _matchEnd = matchEnd;
+            _sound = sound;
             _names = names;
             _lookup = lookup;
             _texts = texts;
@@ -219,20 +223,8 @@ namespace Game.Presentation.Match
                     });
             });
 
-        private void ShowMatchEnd(PlayerView view)
-        {
-            var result = view.Result;
-            var title = result == null || result.IsDraw
-                ? _texts.Get(UiTextKeys.EndDraw)
-                : _texts.Format(UiTextKeys.EndWinner, _names.Of(result.Winner.Value));
-            var score = _texts.Format(
-                UiTextKeys.EndScore,
-                _names.Of(PlayerId.Player1),
-                view.Wins(PlayerId.Player1),
-                _names.Of(PlayerId.Player2),
-                view.Wins(PlayerId.Player2));
-            _matchEnd.Show(title, score, _texts.Get(UiTextKeys.ToMenu), _newMatch);
-        }
+        private void ShowMatchEnd(PlayerView view) =>
+            _matchEnd.Show(view, _mode, _names, _texts, _sound, _newMatch);
 
         /// <param name="dealInterval">Pause between new cards flying in; 0 moves everything at once.</param>
         private IAnimationStep CreateSync(float dealInterval) =>

@@ -44,7 +44,8 @@ namespace Game.Presentation.Match
         [SerializeField] private DialogView _breakdown;
         [SerializeField] private DialogView _turnOrder;
         [SerializeField] private DialogView _handoff;
-        [SerializeField] private DialogView _matchEnd;
+        [SerializeField] private MatchEndView _matchEnd;
+        [SerializeField] private UnityEngine.UI.Button _battleDetails;
         [SerializeField] private OptionListView _options;
         [SerializeField] private CardZoomView _zoom;
 
@@ -82,8 +83,9 @@ namespace Game.Presentation.Match
             _actionBar.Init(texts.Get(UiTextKeys.EndTurn), texts.Get(UiTextKeys.Ready), texts.Get(UiTextKeys.OpenField), texts.Get(UiTextKeys.Cancel));
             _log.Init(_settings.LogLines);
             _topBar.Init(texts.Get(UiTextKeys.ShowBothHands));
-            foreach (var dialog in new[] { _breakdown, _turnOrder, _handoff, _matchEnd })
+            foreach (var dialog in new[] { _breakdown, _turnOrder, _handoff })
                 dialog.Hide();
+            _matchEnd.Hide();
             _options.Hide();
             _zoom.HideInstantly();
 
@@ -109,6 +111,7 @@ namespace Game.Presentation.Match
             _decisions = new HumanDecisionUi(
                 humans, selector, _interaction, _actionBar, _turnOrder, _options, _prompt, names, lookup, texts);
 
+            var details = new BattleDetails(_battleDetails, _breakdown, texts);
             var presenters = new IEventPresenter[]
             {
                 new LogPresenter(new EventLogFormatter(texts, names, lookup, faces), _log),
@@ -116,10 +119,12 @@ namespace Game.Presentation.Match
                 new FieldOpenedPresenter(registry, _animation, _app.Sound),
                 new AbilityPlayedPresenter(_layout, registry, _animation, _app.Sound),
                 new CardSoundPresenter(_app.Sound),
-                new TableMovePresenter(),
+
                 new BattleStartedPresenter(registry, _banner, lookup, texts, _animation, _app.Sound),
-                new BattleResolvedPresenter(new BattleSummaryBuilder(texts, names, lookup), _breakdown, texts),
+                new BattleResolvedPresenter(new BattleSummaryBuilder(texts, names, lookup), details, _banner, registry, _animation, _visual, _app.Sound, texts),
+                new TurnBannerPresenter(_banner, details, _launch.Mode, texts, _animation, _app.Sound),
                 new ScoutedPresenter(_breakdown, faces, texts),
+                new TableMovePresenter(),
                 new SkipPresenter(_banner, names, texts, _animation),
             };
 
@@ -135,6 +140,7 @@ namespace Game.Presentation.Match
                 power,
                 _handoff,
                 _matchEnd,
+                _app.Sound,
                 names,
                 lookup,
                 texts,
@@ -142,6 +148,7 @@ namespace Game.Presentation.Match
 
             _interaction.ResyncRequested += () => _presenter.Resync();
             _presenter.HandoffStarted += _interaction.StopLooking;
+            _presenter.HandoffStarted += details.Clear;
             framer.Changed += () => _presenter.Resync();
             _topBar.ShowBothHandsChanged += show =>
             {

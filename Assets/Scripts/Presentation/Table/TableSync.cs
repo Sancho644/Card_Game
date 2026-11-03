@@ -105,7 +105,7 @@ namespace Game.Presentation.Table
 
                 var outOfGame = view.OutOfGame(owner);
                 for (var i = 0; i < outOfGame.Count; i++)
-                    Move(outOfGame[i], side, _layout.Pile(side, PileKind.OutOfGame, i, true));
+                    Move(outOfGame[i], side, _layout.Pile(side, PileKind.OutOfGame, i, true), brightness: _animation.OutBrightness);
             }
 
             for (var i = 0; i < view.Hand.Count; i++)

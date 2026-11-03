@@ -33,3 +33,7 @@ MonoBehaviour:
   _powerCountSeconds: 0.6
   _powerPopupSeconds: 1.1
   _bannerSeconds: 1.6
+  _outcomeSeconds: 0.65
+  _outcomeBannerSeconds: 2.4
+  _turnBannerSeconds: 1
+  _outBrightness: 0.25
