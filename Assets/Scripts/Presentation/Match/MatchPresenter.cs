@@ -40,6 +40,8 @@ namespace Game.Presentation.Match
         private readonly CardNameLookup _lookup;
         private readonly UiTexts _texts;
         private readonly Action _newMatch;
+        private readonly OpponentPacingPresenter _pacing;
+        private int _batchVersion;
         private PlayerView _lastView;
         private bool _disposed;
 
@@ -59,7 +61,8 @@ namespace Game.Presentation.Match
             PlayerNames names,
             CardNameLookup lookup,
             UiTexts texts,
-            Action newMatch)
+            Action newMatch,
+            OpponentPacingPresenter pacing)
         {
             _session = session;
             _presenters = presenters;
@@ -77,6 +80,7 @@ namespace Game.Presentation.Match
             _lookup = lookup;
             _texts = texts;
             _newMatch = newMatch;
+            _pacing = pacing;
         }
 
         /// <summary>The table is about to be handed to the other hot-seat player: nothing private may stay on screen.</summary>
@@ -121,7 +125,12 @@ namespace Game.Presentation.Match
 
             var view = ViewerView();
             _lookup.Remember(view);
-            var context = new PresentationContext(batch, _lastView, view, _queue, CreateSync);
+            var previous = _lastView;
+            _lastView = view;
+            var version = ++_batchVersion;
+            var revealed = RevealedOpponent();
+            var context = new PresentationContext(batch, previous, view, _queue,
+                interval => CreateSnapshotSync(view, revealed, interval));
             for (var i = 0; i < batch.Count; i++)
             {
                 if (!_hotSeat.IsVisible(batch[i]))
@@ -133,7 +142,10 @@ namespace Game.Presentation.Match
 
             context.EnqueueSync();
             _power.Present(_session.GetBattlePower(), context);
-            _queue.Enqueue(RequestDecision);
+            var pause = _pacing.CreateStep(batch, view.Viewer, id => previous?.Field(id)?.Owner ?? view.Field(id)?.Owner);
+            if (pause != null) context.Enqueue(pause);
+            // A newer remote batch may have arrived while these animations were playing.
+            _queue.Enqueue(() => { if (version == _batchVersion) RequestDecision(); });
         }
 
         private void RequestDecision()
@@ -229,6 +241,9 @@ namespace Game.Presentation.Match
         /// <param name="dealInterval">Pause between new cards flying in; 0 moves everything at once.</param>
         private IAnimationStep CreateSync(float dealInterval) =>
             new TweenStep(() => _sync.Sync(ViewerView(), RevealedOpponent(), instant: false, dealInterval));
+
+        private IAnimationStep CreateSnapshotSync(PlayerView view, PlayerView revealed, float interval) =>
+            new TweenStep(() => _sync.Sync(view, revealed, instant: false, interval));
 
         private PlayerView ViewerView() => _session.GetView(_hotSeat.Viewer);
 

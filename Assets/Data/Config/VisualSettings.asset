@@ -58,3 +58,4 @@ MonoBehaviour:
   _powerBadge: {r: 0.1, g: 0.1, b: 0.12, a: 1}
   _powerUp: {r: 0.25, g: 0.8, b: 0.3, a: 1}
   _powerDown: {r: 0.9, g: 0.25, b: 0.2, a: 1}
+  _opponentAction: {r: 1, g: 0.75, b: 0.2, a: 1}

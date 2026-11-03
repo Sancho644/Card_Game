@@ -144,7 +144,9 @@ namespace Game.Presentation.Match
                 names,
                 lookup,
                 texts,
-                () => _app.Scenes.ToMainMenu());
+                () => _app.Scenes.ToMainMenu(),
+                new OpponentPacingPresenter(_launch.Mode, _animation, (id, seconds) =>
+                    new OpponentHighlightStep(() => id.HasValue ? registry.Find(id.Value) : null, _visual.OpponentAction, seconds)));
 
             _interaction.ResyncRequested += () => _presenter.Resync();
             _presenter.HandoffStarted += _interaction.StopLooking;

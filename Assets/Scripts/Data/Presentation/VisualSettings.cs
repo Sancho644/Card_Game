@@ -54,6 +54,9 @@ namespace Game.Data.Presentation
         [SerializeField] private Color _powerUp = new Color(0.25f, 0.80f, 0.30f);
         [SerializeField] private Color _powerDown = new Color(0.90f, 0.25f, 0.20f);
 
+        [SerializeField] private Color _opponentAction = new Color(1f, 0.75f, 0.2f);
+
+        public Color OpponentAction => _opponentAction;
         public Color AbilityFrame => _abilityFrame;
         public Color NeutralFrame => _neutralFrame;
         public Color CardBody => _cardBody;

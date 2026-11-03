@@ -64,6 +64,11 @@ namespace Game.Data.Presentation
         public float OutcomeBannerSeconds => _outcomeBannerSeconds;
         public float TurnBannerSeconds => _turnBannerSeconds;
         public float OutBrightness => _outBrightness;
+        [Header("Opponent pacing")]
+        [Tooltip("Pause after one opponent action, at normal animation speed. Zero disables pacing.")]
+        [SerializeField, Min(0)] private float _opponentActionSeconds = 0.65f;
+
+        public float OpponentActionSeconds => _opponentActionSeconds;
         public float Speed => _speed;
         public float FastSpeed => _fastSpeed;
         public float TapFastForward => _tapFastForward;

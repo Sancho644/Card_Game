@@ -37,3 +37,4 @@ MonoBehaviour:
   _outcomeBannerSeconds: 2.4
   _turnBannerSeconds: 1
   _outBrightness: 0.25
+  _opponentActionSeconds: 0.65
