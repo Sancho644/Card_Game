@@ -29,6 +29,8 @@ namespace Game.Data.Presentation
         [Header("Fields")]
         [SerializeField, Min(0.5f)] private float _fieldScale = 1.2f;
         [SerializeField, Min(0.3f)] private float _creatureOnFieldScale = 0.8f;
+        [Tooltip("Creature height above its field at scale 1. Scales with the larger card to keep faces, backs and highlights apart.")]
+        [SerializeField, Min(0.08f)] private float _creatureOnFieldLift = 0.1f;
         [Tooltip("How much of the field's edge a creature covers, in world units.")]
         [SerializeField, Min(0f)] private float _creatureOverlap = 0.3f;
 
@@ -50,6 +52,7 @@ namespace Game.Data.Presentation
         public float HandScreenMargin => _handScreenMargin;
         public float FieldScale => _fieldScale;
         public float CreatureOnFieldScale => _creatureOnFieldScale;
+        public float CreatureOnFieldLift => _creatureOnFieldLift;
         public float CreatureOverlap => _creatureOverlap;
         public float TopBarShare => _topBarShare;
         public int LogLines => _logLines;

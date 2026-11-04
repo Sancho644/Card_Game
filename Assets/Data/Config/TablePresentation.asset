@@ -23,6 +23,7 @@ MonoBehaviour:
   _handScreenMargin: 0.03
   _fieldScale: 1.4
   _creatureOnFieldScale: 1.2
+  _creatureOnFieldLift: 0.1
   _creatureOverlap: 0.55
   _topBarShare: 0.14
   _logLines: 60

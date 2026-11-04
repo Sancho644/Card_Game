@@ -67,7 +67,10 @@ namespace Game.Presentation.Table
         {
             var scale = _settings.CreatureOnFieldScale;
             var offset = _cardSize.y * (field.Scale + scale) / 2f - _settings.CreatureOverlap;
-            return new CardPose(field.Position + new Vector3(0f, _layerLift * 2f, Sign(owner) * offset), FaceUp, scale);
+            // The prefab has depth on both sides; the hand's small layer step is not enough
+            // to clear a face-down field's back, especially when the field is enlarged.
+            var lift = _settings.CreatureOnFieldLift * Mathf.Max(field.Scale, scale);
+            return new CardPose(field.Position + new Vector3(0f, lift, Sign(owner) * offset), FaceUp, scale);
         }
 
         public CardPose Hand(TableSide side, int index, int count, bool faceUp)
