@@ -29,7 +29,7 @@ namespace Game.Core.Battle
 
             consequences.WinScoredBy = winnerId;
             consequences.SetFate(loserId, CreatureFate.OutOfGame);
-            consequences.SetFate(winnerId, hostKeepsClosedField ? CreatureFate.StaysOnField : CreatureFate.ReturnsToHand);
+            consequences.SetFate(winnerId, CreatureFate.OutOfGame);
             consequences.FieldRemoved = !hostKeepsClosedField;
             return consequences;
         }
@@ -39,10 +39,10 @@ namespace Game.Core.Battle
         {
             switch (_drawRule)
             {
-                case DrawRule.BothReturnToHand:
+                case DrawRule.BothOutOfGame:
                     consequences.WinScoredBy = null;
-                    consequences.SetFate(consequences.Host, CreatureFate.ReturnsToHand);
-                    consequences.SetFate(consequences.Guest, CreatureFate.ReturnsToHand);
+                    consequences.SetFate(consequences.Host, CreatureFate.OutOfGame);
+                    consequences.SetFate(consequences.Guest, CreatureFate.OutOfGame);
                     consequences.FieldRemoved = consequences.FieldWasOpen;
                     break;
                 default:

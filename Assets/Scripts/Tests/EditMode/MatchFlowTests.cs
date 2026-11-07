@@ -65,26 +65,12 @@ namespace Game.Core.Tests
         public void ThirdWin_EndsMatchImmediately()
         {
             var d = Begin(P1);
-            d.Place(P1, Earth250, P1, Plain);
-            d.EndTurn(P1);
-            d.Place(P2, Fire180, P1, Plain);
-            d.Ready(P1);
-            d.Ready(P2);
-            d.EndTurn(P2);
-
-            d.Place(P1, Fire180, P1, Temple);
-            d.EndTurn(P1);
-            d.Place(P2, Water200, P1, Plain);
-            d.Ready(P1);
-            d.Ready(P2);
-            d.EndTurn(P2);
-
-            d.Place(P1, Water200, P1, Forge);
-            d.EndTurn(P1);
-            d.Place(P2, Earth250, P1, Plain);
-            d.Play(P1, Boost50);
-            d.Ready(P2);
-            d.Ready(P1);
+            foreach (var creature in new[] { Fire180, Water200, Earth250 })
+            {
+                d.Place(P1, creature, P1, Plain); d.EndTurn(P1);
+                d.Place(P2, creature, P1, Plain); d.Ready(P1); d.Ready(P2);
+                if (creature != Earth250) d.EndTurn(P2);
+            }
 
             Assert.AreEqual(3, d.Wins(P1));
             Assert.AreEqual(MatchPhase.Ended, d.State.Phase);
@@ -111,22 +97,20 @@ namespace Game.Core.Tests
         public void BothSkipInARow_PlayerWithMoreWinsWins()
         {
             var d = Begin(P1, SmallRules(), SmallDeck(), SmallDeck());
-            d.Place(P1, Fire180, P1, Forge);
-            d.EndTurn(P1);
-            d.Place(P2, Fire180, P1, Forge);
-            d.Play(P1, Boost50);
-            d.Ready(P2);
-            d.Ready(P1);
-            d.EndTurn(P2);
-
-            // Player1's creature holds the Forge; Player2 has no creatures left: no main action for anyone.
-            d.EndTurn(P1);
-            d.EndTurn(P2);
-
+            foreach (var owner in new[] { P1, P2 })
+            {
+                d.Place(P1, Fire180, owner, Forge); d.EndTurn(P1);
+                d.Place(P2, Fire180, owner, Forge);
+                if (owner == P1) d.Open(P1);
+                else { d.Ready(P1); d.Open(P2); }
+                d.Ready(P1 == d.State.Battle.CurrentActor ? P1 : P2);
+                d.Ready(d.State.Battle.CurrentActor);
+                d.EndTurn(P2);
+            }
+            d.EndTurn(P1); d.EndTurn(P2);
             var skips = d.Log.OfType<MainActionSkipped>().ToList();
             Assert.AreEqual(2, skips.Count);
-            Assert.AreEqual(SkipReason.NoChallengeTarget, skips[0].Reason, "Player1 holds the only field and has nothing to challenge.");
-            Assert.AreEqual(SkipReason.NoCreatures, skips[1].Reason, "Player2 has no creatures anywhere.");
+            Assert.IsTrue(skips.All(e => e.Reason == SkipReason.NoFreeField));
             Assert.AreEqual(P1, d.Last<MatchEnded>().Winner);
         }
 
@@ -166,10 +150,9 @@ namespace Game.Core.Tests
         }
 
         [Test]
-        public void BothSkipInARow_EqualWins_MoreCreaturesWins()
+        public void BothSkipInARow_EqualWins_RecycledCreaturesDraw()
         {
-            // Player1 wins on its open «Жертва» field and loses its creature too; Player2 wins the second battle.
-            // 1:1 in wins, but Player1 has no creatures left and Player2 still has one (docs/rules.md §9).
+            // Both players recycle their two spent creatures before the fields run out.
             var rules = RulesWithDeck(new[] { Rarity.Legendary }, new[] { Rarity.Common, Rarity.Epic }, new[] { Rarity.Common });
             var d = Begin(P1, rules,
                 new DeckList(new[] { SacrificeField, Fire180, Water200, Boost50 }),
@@ -186,6 +169,7 @@ namespace Game.Core.Tests
             d.EndTurn(P1);
             d.Place(P2, Water200, P2, Temple);
             d.Ready(P1);
+            d.Open(P2);
             d.Play(P2, Boost50);
             d.Ready(P1);
             d.Ready(P2);
@@ -196,9 +180,9 @@ namespace Game.Core.Tests
 
             Assert.AreEqual(1, d.Wins(P1));
             Assert.AreEqual(1, d.Wins(P2));
-            Assert.AreEqual(P2, d.State.Result.Winner);
-            Assert.AreEqual(P2, d.Last<MatchEnded>().Winner);
-            Assert.AreEqual(MatchEndReason.MoreCreatures, d.Last<MatchEnded>().Reason);
+            Assert.IsNull(d.State.Result.Winner);
+            Assert.IsNull(d.Last<MatchEnded>().Winner);
+            Assert.AreEqual(MatchEndReason.Draw, d.Last<MatchEnded>().Reason);
         }
 
         [Test]

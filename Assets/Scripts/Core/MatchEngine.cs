@@ -68,6 +68,7 @@ namespace Game.Core
                 return CommandResult.Rejected(reason);
 
             _handlers[command.GetType()].Apply(command, _context);
+            CreatureCycleFlow.ReturnExhaustedPlayers(State, _context.Events);
             return CommandResult.Accepted(_context.Events.Drain());
         }
 

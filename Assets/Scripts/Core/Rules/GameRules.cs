@@ -9,7 +9,7 @@ namespace Game.Core.Rules
             int winsToWin,
             int legendaryAbilitiesPerTurn,
             DeckRules deck,
-            DrawRule drawRule = DrawRule.BothReturnToHand)
+            DrawRule drawRule = DrawRule.BothOutOfGame)
         {
             WinsToWin = winsToWin;
             LegendaryAbilitiesPerTurn = legendaryAbilitiesPerTurn;

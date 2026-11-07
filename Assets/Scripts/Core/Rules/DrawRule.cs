@@ -6,7 +6,7 @@ namespace Game.Core.Rules
     /// </summary>
     public enum DrawRule
     {
-        /// <summary>No win; both creatures return to hand; an open field is removed, a closed one stays.</summary>
-        BothReturnToHand,
+        /// <summary>No win; both creatures leave play; an open field is removed, a closed one stays.</summary>
+        BothOutOfGame,
     }
 }

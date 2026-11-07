@@ -36,7 +36,8 @@ namespace Game.Core.Tests
             var forge = d.Field(Anna, Forge);
             Assert.IsFalse(forge.IsOpen);
             Assert.IsFalse(forge.IsRemoved);
-            Assert.AreEqual(Fire180, forge.OccupantOf(Anna).Definition.Id);
+            Assert.IsNull(forge.OccupantOf(Anna));
+            Assert.IsTrue(d.IsOut(Anna, Fire180));
             Assert.IsTrue(d.IsOut(Boris, Water200));
             Assert.AreEqual(1, d.Wins(Anna));
         }
@@ -62,7 +63,7 @@ namespace Game.Core.Tests
             Assert.AreEqual(Anna, result.Winner);
 
             Assert.IsTrue(d.Field(Anna, Forge).IsRemoved);
-            Assert.IsTrue(d.InHand(Anna, Fire180));
+            Assert.IsTrue(d.IsOut(Anna, Fire180));
             Assert.IsTrue(d.IsOut(Boris, Water200));
             Assert.AreEqual(1, d.Wins(Anna));
         }

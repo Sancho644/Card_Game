@@ -144,7 +144,7 @@ namespace Game.Core.Tests
             Assert.AreEqual(P1, d.Last<BattleResolved>().Winner);
             Assert.IsFalse(field.IsRemoved);
             Assert.IsTrue(field.IsOpen);
-            Assert.IsTrue(d.InHand(P1, Fire180));
+            Assert.IsTrue(d.IsOut(P1, Fire180));
             Assert.IsTrue(d.IsOut(P2, Water200));
         }
 
@@ -163,7 +163,7 @@ namespace Game.Core.Tests
         }
 
         [Test]
-        public void SacrificeOnlyGuest_WinningHostStays()
+        public void SacrificeOnlyGuest_HostStillLeavesUnderGeneralRule()
         {
             var d = BattleOnP1Field(GuestSacrificeField, Fire180, Water200, player1Deck: Deck(legendaryField: GuestSacrificeField));
             d.Open(P1);
@@ -171,7 +171,7 @@ namespace Game.Core.Tests
             d.Ready(P2);
 
             Assert.AreEqual(P1, d.Last<BattleResolved>().Winner);
-            Assert.IsFalse(d.IsOut(P1, Fire180));
+            Assert.IsTrue(d.IsOut(P1, Fire180));
             Assert.IsTrue(d.IsOut(P2, Water200));
         }
 

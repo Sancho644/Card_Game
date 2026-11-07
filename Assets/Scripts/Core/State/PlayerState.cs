@@ -21,7 +21,7 @@ namespace Game.Core.State
         /// <summary>Used abilities.</summary>
         public IReadOnlyList<CardInstance> Discard => _discard;
 
-        /// <summary>Defeated creatures.</summary>
+        /// <summary>Creatures spent in battles, waiting for a new cycle or a card effect.</summary>
         public IReadOnlyList<CardInstance> OutOfGame => _outOfGame;
 
         public int Wins { get; internal set; }

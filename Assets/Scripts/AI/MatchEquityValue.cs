@@ -7,13 +7,7 @@ using Game.Core.State;
 
 namespace Game.AI
 {
-    /// <summary>
-    /// The chance to win the match from the score and the creatures each player still has, as if every later
-    /// battle were a coin flip in which the winner scores and keeps its creature and the loser's creature is
-    /// out. A player without creatures cannot fight, and the match goes to the leader by wins, then by creatures
-    /// left (docs/rules.md §9). A sure win is worth +MatchWin, a sure loss −MatchWin. Unlike flat win points,
-    /// this sees that a creature lost late can cost the match and that the last win is worth more than the first.
-    /// </summary>
+    /// <summary>Score equity assuming equal chances in future battles; spent creatures can cycle back.</summary>
     internal sealed class MatchEquityValue : IMatchScoreValue
     {
         private readonly AiWeights _weights;
@@ -36,12 +30,12 @@ namespace Game.AI
         private static int Wins(MatchState state, PlayerId player, BattleConsequences after) =>
             state.Player(player).Wins + (after?.WinScoredBy == player ? 1 : 0);
 
-        /// <summary>Creatures in hand and on the table, less the one the battle puts out of the game.</summary>
+        /// <summary>All creatures, including those that will return in a later cycle.</summary>
         private static int Creatures(MatchState state, PlayerId player, BattleConsequences after)
         {
             var count = state.Player(player).Hand.Count(card => card.Type == CardType.Creature) +
-                        state.Fields.Count(field => field.OccupantOf(player) != null);
-            return after?.FateOf(player) == CreatureFate.OutOfGame ? count - 1 : count;
+                        state.Fields.Count(field => field.OccupantOf(player) != null) + state.Player(player).OutOfGame.Count;
+            return count;
         }
 
         private double Chance(int myWins, int opponentWins, int myCreatures, int opponentCreatures)
@@ -61,8 +55,8 @@ namespace Game.AI
             if (_chances.TryGetValue(key, out var chance))
                 return chance;
 
-            chance = 0.5 * Chance(myWins + 1, opponentWins, myCreatures, opponentCreatures - 1) +
-                     0.5 * Chance(myWins, opponentWins + 1, myCreatures - 1, opponentCreatures);
+            chance = 0.5 * Chance(myWins + 1, opponentWins, myCreatures, opponentCreatures) +
+                     0.5 * Chance(myWins, opponentWins + 1, myCreatures, opponentCreatures);
             _chances[key] = chance;
             return chance;
         }

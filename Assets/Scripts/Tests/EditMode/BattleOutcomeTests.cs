@@ -11,7 +11,7 @@ namespace Game.Core.Tests
     public class BattleOutcomeTests
     {
         [Test]
-        public void ClosedField_HostWins_FieldAndHostCreatureStay_GuestCreatureOut()
+        public void ClosedField_HostWins_FieldStays_BothCreaturesOut()
         {
             var d = BattleOnP1Forge(Water200, Fire180);
             d.Ready(P1);
@@ -24,7 +24,8 @@ namespace Game.Core.Tests
             Assert.AreEqual(P1, result.Winner);
             Assert.IsFalse(forge.IsRemoved);
             Assert.IsFalse(forge.IsOpen);
-            Assert.AreEqual(Water200, forge.OccupantOf(P1).Definition.Id);
+            Assert.IsNull(forge.OccupantOf(P1));
+            Assert.IsTrue(d.IsOut(P1, Water200));
             Assert.IsNull(forge.OccupantOf(P2));
             Assert.IsTrue(d.IsOut(P2, Fire180));
             Assert.AreEqual(1, d.Wins(P1));
@@ -32,7 +33,7 @@ namespace Game.Core.Tests
         }
 
         [Test]
-        public void ClosedField_GuestWins_FieldRemoved_GuestCreatureToHand_HostCreatureOut()
+        public void ClosedField_GuestWins_FieldRemoved_BothCreaturesOut()
         {
             var d = BattleOnP1Forge(Fire180, Water200);
             d.Ready(P1);
@@ -43,14 +44,14 @@ namespace Game.Core.Tests
             Assert.IsTrue(forge.IsRemoved);
             Assert.IsNull(forge.OccupantOf(P1));
             Assert.IsNull(forge.OccupantOf(P2));
-            Assert.IsTrue(d.InHand(P2, Water200));
+            Assert.IsTrue(d.IsOut(P2, Water200));
             Assert.IsTrue(d.IsOut(P1, Fire180));
             Assert.AreEqual(0, d.Wins(P1));
             Assert.AreEqual(1, d.Wins(P2));
         }
 
         [Test]
-        public void OpenField_HostWins_FieldRemoved_HostCreatureToHand_GuestCreatureOut()
+        public void OpenField_HostWins_FieldRemoved_BothCreaturesOut()
         {
             var d = BattleOnP1Forge(Fire180, Water200);
             d.Open(P1);
@@ -62,13 +63,13 @@ namespace Game.Core.Tests
             Assert.AreEqual(170, result.GuestPower);
             Assert.AreEqual(P1, result.Winner);
             Assert.IsTrue(d.Field(P1, Forge).IsRemoved);
-            Assert.IsTrue(d.InHand(P1, Fire180));
+            Assert.IsTrue(d.IsOut(P1, Fire180));
             Assert.IsTrue(d.IsOut(P2, Water200));
             Assert.AreEqual(1, d.Wins(P1));
         }
 
         [Test]
-        public void OpenField_GuestWins_FieldRemoved_GuestCreatureToHand_HostCreatureOut()
+        public void OpenField_GuestWins_FieldRemoved_BothCreaturesOut()
         {
             var d = BattleOnP1Forge(Water200, Fire180);
             d.Open(P1);
@@ -80,7 +81,7 @@ namespace Game.Core.Tests
             Assert.AreEqual(240, result.GuestPower);
             Assert.AreEqual(P2, result.Winner);
             Assert.IsTrue(d.Field(P1, Forge).IsRemoved);
-            Assert.IsTrue(d.InHand(P2, Fire180));
+            Assert.IsTrue(d.IsOut(P2, Fire180));
             Assert.IsTrue(d.IsOut(P1, Water200));
             Assert.AreEqual(1, d.Wins(P2));
         }
@@ -97,7 +98,8 @@ namespace Game.Core.Tests
             Assert.AreEqual(TieBreak.EarlierPlacement, result.TieBreak);
             Assert.AreEqual(1, d.Wins(P1));
             Assert.IsTrue(d.IsOut(P2, Fire180));
-            Assert.AreEqual(Fire180, d.Field(P1, Forge).OccupantOf(P1).Definition.Id, "The host keeps its closed field.");
+            Assert.IsNull(d.Field(P1, Forge).OccupantOf(P1));
+            Assert.IsTrue(d.IsOut(P1, Fire180));
         }
 
         [Test]
@@ -134,7 +136,7 @@ namespace Game.Core.Tests
         }
 
         [Test]
-        public void Draw_ByCardText_EqualPower_BothCreaturesToHand_OpenFieldRemoved_AbilitiesSpent()
+        public void Draw_ByCardText_EqualPower_BothCreaturesOut_OpenFieldRemoved_AbilitiesSpent()
         {
             var d = BattleOnP1Field(NarrowField, Fire180, Earth250, player1Deck: Deck(legendaryField: NarrowField));
             d.Open(P1);
@@ -149,8 +151,8 @@ namespace Game.Core.Tests
             Assert.IsNull(result.Winner, "«Узкая грань»: equal power is a draw, the placement order does not decide it.");
             Assert.AreEqual(TieBreak.None, result.TieBreak);
             Assert.IsTrue(d.Field(P1, NarrowField).IsRemoved);
-            Assert.IsTrue(d.InHand(P1, Fire180));
-            Assert.IsTrue(d.InHand(P2, Earth250));
+            Assert.IsTrue(d.IsOut(P1, Fire180));
+            Assert.IsTrue(d.IsOut(P2, Earth250));
             Assert.IsTrue(d.InDiscard(P1, Boost50));
             Assert.IsTrue(d.InDiscard(P2, Boost40));
             Assert.AreEqual(0, d.Wins(P1) + d.Wins(P2));

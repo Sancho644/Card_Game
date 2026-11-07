@@ -12,7 +12,7 @@ namespace Game.Data.Config
         [Header("Match")]
         [SerializeField, Min(1)] private int _winsToWin = 3;
         [SerializeField, Min(0)] private int _legendaryAbilitiesPerTurn = 1;
-        [SerializeField] private DrawRule _drawRule = DrawRule.BothReturnToHand;
+        [SerializeField] private DrawRule _drawRule = DrawRule.BothOutOfGame;
 
         [Header("Deck: rarities required for each card type")]
         [SerializeField] private List<Rarity> _fieldRarities = OneOfEach();

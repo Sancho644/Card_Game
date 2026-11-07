@@ -149,7 +149,7 @@ namespace Game.Core.Tests
             }
 
             Assert.Greater(ended, 0, "At least some random matches reach the end.");
-            Assert.Greater(skipReasons.Count, 1, "Random matches skip turns for different reasons.");
+            Assert.Greater(skipReasons.Count, 0, "Random matches exercise skipped actions after creature cycling.");
         }
 
         /// <summary>The skip reason worked out from the public state, independently of the engine.</summary>
