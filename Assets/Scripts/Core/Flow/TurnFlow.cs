@@ -32,7 +32,9 @@ namespace Game.Core.Flow
             foreach (var id in PlayerIds.All)
                 _state.Player(id).LegendariesPlayedThisTurn = 0;
             _events.Emit(new TurnStarted(player));
-            FieldDeploymentFlow.Request(_state, _events, player, ChoicePurpose.ReplacementField);
+            // TODO(rules): Keep the after-battle window; replenish before the next turn (docs/decisions.md).
+            if (!_state.Fields.Any(f => f.IsActive))
+                FieldDeploymentFlow.ContinueReplacement(_state, _events);
         }
 
         public RejectReason CheckMainActionAllowed(PlayerId player)

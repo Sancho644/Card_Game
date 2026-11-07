@@ -7,7 +7,14 @@ namespace Game.Core.Flow
     /// <summary>One active field per owner; the remaining fields stay in a private reserve.</summary>
     internal static class FieldDeploymentFlow
     {
-        // TODO(rules): Confirm mandatory free replacement at the next owner turn; see docs/decisions.md.
+        // A replacement round starts only on an empty table. Once started, both owners deploy.
+        public static void ContinueReplacement(MatchState state, EventLog events)
+        {
+            foreach (var player in PlayerIds.All)
+                if (Request(state, events, player, ChoicePurpose.ReplacementField)) return;
+            state.Phase = MatchPhase.Turn;
+        }
+
         public static bool Request(MatchState state, EventLog events, PlayerId player, ChoicePurpose purpose)
         {
             if (state.Fields.Any(f => f.Owner == player && f.IsActive)) return false;
@@ -36,7 +43,7 @@ namespace Game.Core.Flow
             context.State.PendingChoice = null;
             context.Events.Emit(new FieldsDealt(field.Owner, new[] { field.Id }));
             if (purpose == ChoicePurpose.InitialField) ContinueSetup(context);
-            else context.State.Phase = MatchPhase.Turn;
+            else ContinueReplacement(context.State, context.Events);
         }
     }
 }

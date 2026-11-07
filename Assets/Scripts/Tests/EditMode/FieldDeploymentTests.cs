@@ -70,7 +70,7 @@ namespace Game.Core.Tests
         }
 
         [Test]
-        public void RemovedField_ReplacementAtNextOwnerTurn_DoesNotSpendMainAction()
+        public void RemovedField_OtherFieldStillActive_BlocksReplacement()
         {
             var e = Begin(); var field = Field(e, P1, Forge);
             Place(e, P1, Fire180, field.Id); Ok(e, new EndTurn(P1));
@@ -79,15 +79,28 @@ namespace Game.Core.Tests
             Assert.IsTrue(field.IsRemoved);
             Assert.AreEqual(MatchPhase.Turn, e.State.Phase);
             Ok(e, new EndTurn(P2));
-            Assert.AreEqual(ChoicePurpose.ReplacementField, e.State.PendingChoice.Purpose);
-            Assert.AreEqual(2, e.GetView(P1).ChoiceOptions.Count);
-            Assert.IsEmpty(e.GetView(P2).ChoiceOptions);
-            Assert.AreEqual(RejectReason.WrongPhase, e.Execute(new EndTurn(P1)).Reason);
-            Select(e, P1, Temple);
+            Assert.IsNull(e.State.PendingChoice);
             Assert.AreEqual(MatchPhase.Turn, e.State.Phase);
+            Assert.IsEmpty(e.GetLegalActions(P1).OfType<ChooseCard>());
+        }
+
+        [Test]
+        public void EmptyTable_BothPlayersDeploy_BeforeNormalTurn()
+        {
+            var e = Begin();
+            foreach (var field in e.State.Fields.Where(f => f.IsActive))
+                typeof(FieldSlot).GetProperty(nameof(FieldSlot.IsRemoved)).SetValue(field, true);
+            Ok(e, new EndTurn(P1));
+            Assert.AreEqual(P1, e.State.PendingChoice.Player);
+            Select(e, P1, Temple);
+            Assert.AreEqual(P2, e.State.PendingChoice.Player);
+            Assert.AreEqual(1, e.State.Fields.Count(f => f.IsActive));
+            Assert.AreEqual(RejectReason.WrongPhase, e.Execute(new EndTurn(P2)).Reason);
+            Select(e, P2, Temple);
+            Assert.AreEqual(2, e.State.Fields.Count(f => f.IsActive));
+            Assert.AreEqual(MatchPhase.Turn, e.State.Phase);
+            Assert.AreEqual(P2, e.State.ActivePlayer);
             Assert.IsFalse(e.State.MainActionDone);
-            Assert.AreEqual(1, e.State.Fields.Count(f => f.Owner == P1 && f.IsActive));
-            Assert.IsTrue(e.GetLegalActions(P1).OfType<PlaceCreature>().Any());
         }
 
         [Test]
