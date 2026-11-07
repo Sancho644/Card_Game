@@ -42,7 +42,9 @@ namespace Game.Core.Forecast
             if (_view.Battle != null)
                 state.Battle = RestoreBattle(fields);
             if (_view.ChoosingPlayer != null)
-                state.PendingChoice = RestoreChoice(_view.ChoosingPlayer.Value);
+                state.PendingChoice = _view.ChoicePurpose == ChoicePurpose.InitialField || _view.ChoicePurpose == ChoicePurpose.ReplacementField
+                    ? new PendingChoice(_view.ChoosingPlayer.Value, _view.ChoicePurpose.Value, fields.Where(f => f.Owner == _view.ChoosingPlayer.Value && f.IsInReserve).Select(f => f.Card).ToList())
+                    : RestoreChoice(_view.ChoosingPlayer.Value);
             return state;
         }
 
@@ -88,6 +90,7 @@ namespace Game.Core.Forecast
             {
                 IsOpen = view.IsOpen,
                 IsRemoved = view.IsRemoved,
+                IsInReserve = view.IsInReserve,
                 IsLocked = view.IsLocked,
             };
             foreach (var id in PlayerIds.All)

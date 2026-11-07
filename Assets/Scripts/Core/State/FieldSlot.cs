@@ -19,6 +19,8 @@ namespace Game.Core.State
         public FieldCard Definition { get; }
         public int Id => Card.Id;
         public PlayerId Owner => Card.Owner;
+        public bool IsInReserve { get; internal set; }
+        public bool IsActive => !IsInReserve && !IsRemoved;
         public bool IsOpen { get; internal set; }
         public bool IsRemoved { get; internal set; }
 

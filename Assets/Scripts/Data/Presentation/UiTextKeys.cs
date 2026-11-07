@@ -55,6 +55,8 @@ namespace Game.Data.Presentation
         public const string EndScore = "end.score";
 
         public const string ChoiceSignature = "choice.signature";
+        public const string ChoiceField = "choice.field";
+        public const string LogFieldChoice = "log.fieldChoice";
         public const string ChoiceCard = "choice.card";
         public const string ChoiceTrophy = "choice.trophy";
 

@@ -6,6 +6,7 @@ namespace Game.Core.Events
     public sealed class ChoiceRequested : GameEvent
     {
         public ChoiceRequested(PlayerId player, ChoicePurpose purpose, IReadOnlyList<CardRef> options)
+            : base(purpose == ChoicePurpose.TakeAbilityFromDiscard ? (PlayerId?)null : player)
         {
             Player = player;
             Purpose = purpose;

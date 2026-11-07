@@ -78,15 +78,17 @@ namespace Game.Presentation.Table
             foreach (var owner in PlayerIds.All)
             {
                 var side = SideOf(owner, view.Viewer);
-                var fields = view.Fields.Where(field => field.Owner == owner).ToList();
+                var fields = view.Fields.Where(field => field.Owner == owner && !field.IsInReserve).ToList();
                 var removed = 0;
+                var active = 0;
+                var activeCount = fields.Count(field => field.IsActive);
                 for (var i = 0; i < fields.Count; i++)
                 {
                     var field = fields[i];
                     var known = field.CardId != null;
                     var pose = field.IsRemoved
                         ? _layout.Pile(side, PileKind.RemovedFields, removed++, known)
-                        : _layout.Field(side, i, fields.Count, known);
+                        : _layout.Field(side, active++, activeCount, known);
                     // The owner sees the face of a closed field, darkened; the opponent sees its back.
                     var brightness = known && !field.IsOpen && !field.IsRemoved ? _visual.ClosedFieldBrightness : 1f;
                     Move(new CardRef(field.Id, field.CardId), side, pose, StatusOf(field), brightness);

@@ -52,15 +52,12 @@ namespace Game.Core
 
             foreach (var id in PlayerIds.All)
             {
-                var fieldIds = state.Fields.Where(field => field.Owner == id).Select(field => field.Id).ToList();
+                var fieldIds = state.Fields.Where(field => field.Owner == id && field.IsActive).Select(field => field.Id).ToList();
                 _context.Events.Emit(new FieldsDealt(id, fieldIds));
                 _context.Events.Emit(new HandDealt(id, state.Player(id).Hand.Select(CardRef.From).ToList()));
             }
 
-            var coinWinner = PlayerIds.All[_context.Random.Next(PlayerIds.All.Count)];
-            state.CoinTossWinner = coinWinner;
-            state.Phase = MatchPhase.ChoosingTurnOrder;
-            _context.Events.Emit(new CoinTossed(coinWinner));
+            FieldDeploymentFlow.ContinueSetup(_context);
             return _context.Events.Drain();
         }
 
@@ -156,7 +153,7 @@ namespace Game.Core
                 {
                     var card = new CardInstance(nextInstanceId++, id, catalog.Get(cardId));
                     if (card.Type == CardType.Field)
-                        fields.Add(new FieldSlot(card));
+                        fields.Add(new FieldSlot(card) { IsInReserve = true });
                     else
                         player.AddToHand(card);
                 }

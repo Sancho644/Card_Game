@@ -32,6 +32,7 @@ namespace Game.Core.Flow
             foreach (var id in PlayerIds.All)
                 _state.Player(id).LegendariesPlayedThisTurn = 0;
             _events.Emit(new TurnStarted(player));
+            FieldDeploymentFlow.Request(_state, _events, player, ChoicePurpose.ReplacementField);
         }
 
         public RejectReason CheckMainActionAllowed(PlayerId player)
@@ -55,7 +56,7 @@ namespace Game.Core.Flow
         /// <summary>Why the player has no main action, or <see cref="SkipReason.None"/> if they have one.</summary>
         public SkipReason SkipReasonOf(PlayerId player)
         {
-            var fields = _state.Fields.Where(field => !field.IsRemoved).ToList();
+            var fields = _state.Fields.Where(field => field.IsActive).ToList();
             if (_state.Player(player).HasCreatureInHand)
                 return fields.Any(field => field.OccupantOf(player) == null) ? SkipReason.None : SkipReason.NoFreeField;
 

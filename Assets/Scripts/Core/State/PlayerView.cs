@@ -31,7 +31,8 @@ namespace Game.Core.State
             Battle = state.Battle == null ? null : new BattleView(state.Battle);
             ChoosingPlayer = state.PendingChoice?.Player;
             ChoicePurpose = state.PendingChoice?.Purpose;
-            ChoiceOptions = state.PendingChoice == null ? new CardRef[0] : Refs(state.PendingChoice.Options);
+            ChoiceOptions = state.PendingChoice == null ||
+                (state.PendingChoice.Purpose != Game.Core.State.ChoicePurpose.TakeAbilityFromDiscard && state.PendingChoice.Player != viewer) ? new CardRef[0] : Refs(state.PendingChoice.Options);
 
             _wins = PlayerIds.All.Select(id => state.Player(id).Wins).ToArray();
             _legendariesPlayed = PlayerIds.All.Select(id => state.Player(id).LegendariesPlayedThisTurn).ToArray();

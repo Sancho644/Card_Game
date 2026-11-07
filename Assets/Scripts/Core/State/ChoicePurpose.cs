@@ -4,5 +4,7 @@ namespace Game.Core.State
     {
         /// <summary>Take one of the options from the discard pile into the hand.</summary>
         TakeAbilityFromDiscard,
+        InitialField,
+        ReplacementField,
     }
 }

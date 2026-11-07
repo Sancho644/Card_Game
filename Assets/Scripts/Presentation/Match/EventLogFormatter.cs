@@ -43,7 +43,8 @@ namespace Game.Presentation.Match
             Add<AbilityDiscarded>(e => Line(UiTextKeys.LogDiscarded, _names.Of(e.Owner), _faces.NameOf(e.Ability.CardId)));
             Add<AbilityReturnedToHand>(e => Line(UiTextKeys.LogAbilityBack, _names.Of(e.Owner), _faces.NameOf(e.Ability.CardId)));
             Add<FieldLocked>(e => Line(UiTextKeys.LogLocked));
-            Add<ChoiceRequested>(e => Line(UiTextKeys.LogChoice, _names.Of(e.Player)));
+            Add<ChoiceRequested>(e => Line(e.Purpose == Game.Core.State.ChoicePurpose.TakeAbilityFromDiscard
+                ? UiTextKeys.LogChoice : UiTextKeys.LogFieldChoice, _names.Of(e.Player)));
             Add<MatchEnded>(e => Line(UiTextKeys.LogMatchEnd));
         }
 

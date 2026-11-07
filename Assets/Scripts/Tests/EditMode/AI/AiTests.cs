@@ -132,6 +132,12 @@ namespace Game.AI.Tests
             });
             var engine = new MatchEngine(new MatchSetup(deck, deck), cards.Catalog, cards.Rules, new XorShiftRandom(3));
             engine.Start();
+            foreach (var player in PlayerIds.All)
+            {
+                var selected = engine.State.Fields.FirstOrDefault(f => f.Owner == player && f.Definition.Id == "field.warm-hearth")
+                    ?? engine.State.Fields.First(f => f.Owner == player);
+                Assert.IsTrue(engine.Execute(new ChooseCard(player, selected.Id)).IsAccepted);
+            }
             int Card(PlayerId owner, string cardId) =>
                 engine.State.Player(owner).Hand.Concat(engine.State.Player(owner).Discard).First(card => card.Definition.Id == cardId).Id;
             void Do(GameCommand command) =>

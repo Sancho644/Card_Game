@@ -13,6 +13,7 @@ namespace Game.Core.State
             Owner = field.Owner;
             IsOpen = field.IsOpen;
             IsRemoved = field.IsRemoved;
+            IsInReserve = field.IsInReserve;
             IsLocked = field.IsLocked;
             // A closed field removed after a battle stays hidden from the opponent (docs/rules.md §6).
             CardId = field.IsOpen || field.Owner == viewer ? field.Definition.Id : null;
@@ -26,6 +27,8 @@ namespace Game.Core.State
         /// <summary>Card id, or null when the viewer may not see it.</summary>
         public string CardId { get; }
 
+        public bool IsInReserve { get; }
+        public bool IsActive => !IsInReserve && !IsRemoved;
         public bool IsOpen { get; }
         public bool IsRemoved { get; }
         public bool IsLocked { get; }

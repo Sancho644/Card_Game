@@ -23,7 +23,13 @@ namespace Game.Core.Commands.Handlers
             var choice = state.PendingChoice;
             var card = choice.Options.First(option => option.Id == command.CardId);
 
-            // The only purpose so far: take an ability from the discard pile into the hand.
+            if (choice.Purpose == ChoicePurpose.InitialField || choice.Purpose == ChoicePurpose.ReplacementField)
+            {
+                FieldDeploymentFlow.Deploy(context, card.Id, choice.Purpose);
+                return;
+            }
+
+            // Return an ability chosen after battle.
             state.Player(command.Player).MoveDiscardToHand(card);
             context.Events.Emit(new AbilityReturnedToHand(command.Player, CardRef.From(card)));
 

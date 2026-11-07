@@ -23,7 +23,7 @@ namespace Game.Core.Commands.Handlers
             var target = state.FindField(command.TargetFieldId);
             if (target == null)
                 return RejectReason.FieldNotFound;
-            if (target.IsRemoved)
+            if (!target.IsActive)
                 return RejectReason.FieldRemoved;
             if (target.OccupantOf(command.Player) != null)
                 return RejectReason.AlreadyOnField;

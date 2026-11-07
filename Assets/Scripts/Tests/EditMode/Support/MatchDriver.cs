@@ -37,6 +37,9 @@ namespace Game.Core.Tests
         {
             var setup = new MatchSetup(player1Deck ?? TestCards.Deck(), player2Deck ?? TestCards.Deck());
             var engine = new MatchEngine(setup, TestCards.Catalog(), rules ?? GameRules.Default, new XorShiftRandom(seed));
+            // These legacy battle scenarios arrange all fields directly; deployment is tested separately.
+            foreach (var field in engine.State.Fields)
+                typeof(FieldSlot).GetProperty(nameof(FieldSlot.IsInReserve)).SetValue(field, false);
             var driver = new MatchDriver(engine);
             driver._log.AddRange(engine.Start());
             return driver;

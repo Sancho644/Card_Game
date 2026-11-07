@@ -146,14 +146,17 @@ namespace Game.Presentation.Match
 
             var choosing = _selector.IsSelecting && _selector.Source != null;
             _actionBar.ShowCancel(choosing ? _selector.Cancel : (Action)null);
-            _prompt.Show(_texts.Get(choosing ? UiTextKeys.PromptTarget : UiTextKeys.PromptSelect));
+            var fieldChoice = _view?.ChoicePurpose == ChoicePurpose.InitialField || _view?.ChoicePurpose == ChoicePurpose.ReplacementField;
+            _prompt.Show(_texts.Get(fieldChoice ? UiTextKeys.ChoiceField : choosing ? UiTextKeys.PromptTarget : UiTextKeys.PromptSelect));
         }
 
         private void OnOptionsRequested(IReadOnlyList<int> values)
         {
             var title = values.Contains(ActionPath.NoOption)
                 ? UiTextKeys.ChoiceSignature
-                : _view?.ChoosingPlayer != null ? UiTextKeys.ChoiceTrophy : UiTextKeys.ChoiceCard;
+                : _view?.ChoicePurpose == ChoicePurpose.InitialField || _view?.ChoicePurpose == ChoicePurpose.ReplacementField
+                    ? UiTextKeys.ChoiceField
+                    : _view?.ChoosingPlayer != null ? UiTextKeys.ChoiceTrophy : UiTextKeys.ChoiceCard;
             var labels = values
                 .Select(value => value == ActionPath.NoOption ? _texts.Get(UiTextKeys.NoAbility) : _lookup.NameOf(value))
                 .ToList();

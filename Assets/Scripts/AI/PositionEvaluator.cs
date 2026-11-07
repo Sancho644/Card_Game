@@ -55,7 +55,7 @@ namespace Game.AI
                         value += Affinity(field, player, (CreatureCard)creature.Definition) * _weights.FieldAffinityPerPower;
                 }
 
-                if (field.Owner == player && !field.IsRemoved)
+                if (field.Owner == player && field.IsActive)
                     value += _weights.FieldCard - (field.IsLocked && !field.IsOpen ? _weights.LockedField : 0);
             }
 

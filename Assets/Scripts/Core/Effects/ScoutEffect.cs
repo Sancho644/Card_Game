@@ -16,7 +16,7 @@ namespace Game.Core.Effects
         {
             var closedFields = context.State.Fields.Where(field => IsClosedFieldOf(field, context.Opponent)).ToList();
             if (closedFields.Count == 0)
-                return RejectReason.None;
+                return context.Targets.FieldId == null ? RejectReason.None : RejectReason.InvalidTarget;
             return closedFields.Any(field => field.Id == context.Targets.FieldId) ? RejectReason.None : RejectReason.InvalidTarget;
         }
 
@@ -27,6 +27,6 @@ namespace Game.Core.Effects
         }
 
         internal static bool IsClosedFieldOf(FieldSlot field, PlayerId owner) =>
-            field.Owner == owner && !field.IsOpen && !field.IsRemoved;
+            field.Owner == owner && !field.IsOpen && field.IsActive;
     }
 }

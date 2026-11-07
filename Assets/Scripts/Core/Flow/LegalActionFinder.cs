@@ -50,7 +50,7 @@ namespace Game.Core.Flow
             var signatures = new int?[] { null }
                 .Concat(hand.Where(IsSignatureAbility).Select(card => (int?)card.Id))
                 .ToList();
-            var fields = _state.Fields.Where(field => !field.IsRemoved).ToList();
+            var fields = _state.Fields.Where(field => field.IsActive).ToList();
 
             foreach (var creature in hand.Where(card => card.Type == CardType.Creature))
             {
@@ -94,7 +94,7 @@ namespace Game.Core.Flow
                 .Where(card => card != null)
                 .Select(card => card.Id));
             var fields = Option(kinds, AbilityTargetKinds.Field, () => _state.Fields
-                .Where(field => !field.IsRemoved)
+                .Where(field => field.IsActive)
                 .Select(field => field.Id));
             var cards = Option(kinds, AbilityTargetKinds.Card, () =>
             {

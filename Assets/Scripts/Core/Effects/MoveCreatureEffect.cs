@@ -29,7 +29,7 @@ namespace Game.Core.Effects
                 return RejectReason.InvalidTarget;
 
             var field = context.State.FindField(targets.FieldId.Value);
-            if (field == null || field.IsRemoved || field.OccupantOf(owner) != null)
+            if (field == null || !field.IsActive || field.OccupantOf(owner) != null)
                 return RejectReason.InvalidTarget;
             return RejectReason.None;
         }

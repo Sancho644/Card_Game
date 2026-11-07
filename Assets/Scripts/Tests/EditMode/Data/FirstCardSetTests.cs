@@ -165,6 +165,12 @@ namespace Game.Data.Tests
                 _rules.ToRules(),
                 new XorShiftRandom(1));
             engine.Start();
+            foreach (var player in PlayerIds.All)
+            {
+                var selected = engine.State.Fields.FirstOrDefault(f => f.Owner == player && f.Definition.Id == "field.forge")
+                    ?? engine.State.Fields.First(f => f.Owner == player);
+                Ok(engine, new ChooseCard(player, selected.Id));
+            }
             var coinWinner = engine.State.CoinTossWinner.Value;
             Ok(engine, new ChooseTurnOrder(coinWinner, goFirst: coinWinner == PlayerId.Player1));
 
