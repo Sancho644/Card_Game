@@ -57,7 +57,7 @@ namespace Game.Core.Forecast
             };
             if (id == _view.Viewer)
             {
-                foreach (var card in _view.Hand)
+                foreach (var card in _view.Hand.Where(c => _catalog.Get(c.CardId).Type != CardType.Field))
                     player.AddToHand(Instance(id, card));
             }
 
@@ -71,7 +71,8 @@ namespace Game.Core.Forecast
         /// <summary>The opponent's hand gets fresh instance ids: the real ones are hidden too.</summary>
         private void AddGuessedOpponentHand(PlayerState opponent)
         {
-            if (_guess.OpponentHand.Count != _view.OpponentHandCount)
+            var nonFieldCount = _view.OpponentHandCount - _view.Fields.Count(f => f.Owner != _view.Viewer && f.IsInReserve);
+            if (_guess.OpponentHand.Count != nonFieldCount)
                 throw new ArgumentException(
                     $"The guess has {_guess.OpponentHand.Count} cards for a hand of {_view.OpponentHandCount}.");
 

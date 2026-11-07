@@ -25,8 +25,8 @@ namespace Game.Core.State
             ConsecutiveSkips = state.ConsecutiveSkips;
             CoinTossWinner = state.CoinTossWinner;
             Result = state.Result;
-            Hand = state.Player(viewer).Hand.Select(CardRef.From).ToList();
-            OpponentHandCount = state.Player(viewer.Opponent()).Hand.Count;
+            Hand = state.Player(viewer).Hand.Concat(state.Fields.Where(f => f.Owner == viewer && f.IsInReserve).Select(f => f.Card)).Select(CardRef.From).ToList();
+            OpponentHandCount = state.Player(viewer.Opponent()).Hand.Count + state.Fields.Count(f => f.Owner == viewer.Opponent() && f.IsInReserve);
             Fields = state.Fields.Select(field => new FieldView(field, viewer)).ToList();
             Battle = state.Battle == null ? null : new BattleView(state.Battle);
             ChoosingPlayer = state.PendingChoice?.Player;

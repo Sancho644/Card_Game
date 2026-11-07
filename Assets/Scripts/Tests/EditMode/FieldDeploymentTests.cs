@@ -16,6 +16,21 @@ namespace Game.Core.Tests
         private static readonly PlayerId P2 = PlayerId.Player2;
 
         [Test]
+        public void Fields_AppearInHand_AndLeaveItWhenPlayed()
+        {
+            var e = Create(); var events = e.Start();
+            Assert.AreEqual(9, e.GetView(P1).Hand.Count);
+            Assert.AreEqual(9, e.GetView(P2).OpponentHandCount);
+            Assert.AreEqual(9, events.OfType<HandDealt>().First().Cards.Count);
+            var field = Field(e, P1, Forge);
+            Assert.IsTrue(e.GetView(P1).Hand.Any(c => c.InstanceId == field.Id));
+            Select(e, P1, Forge);
+            Assert.AreEqual(8, e.GetView(P1).Hand.Count);
+            Assert.AreEqual(8, e.GetView(P2).OpponentHandCount);
+            Assert.IsFalse(e.GetView(P1).Hand.Any(c => c.InstanceId == field.Id));
+        }
+
+        [Test]
         public void Setup_OffersPrivateReserveBeforeCoin()
         {
             var e = Create(); var events = e.Start();
@@ -94,6 +109,8 @@ namespace Game.Core.Tests
             var guesses = new HiddenCardsGuess(e.State.Player(P2).Hand.Select(c => c.Definition.Id).ToList(),
                 e.State.Fields.Where(f => f.Owner == P2).ToDictionary(f => f.Id, f => f.Definition.Id));
             var f = new ForecastBuilder(Catalog(), GameRules.Default).Build(e.GetView(P1), guesses, new XorShiftRandom(5));
+            Assert.AreEqual(9, f.GetView(P1).Hand.Count);
+            Assert.AreEqual(9, f.GetView(P2).Hand.Count);
             Select(f, P1, Forge);
             Assert.AreEqual(5, f.State.Fields.Count(x => x.IsInReserve));
             Assert.AreEqual(3, f.GetLegalActions(P2).Count);

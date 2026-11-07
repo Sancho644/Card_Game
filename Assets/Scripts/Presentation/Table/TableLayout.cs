@@ -56,6 +56,13 @@ namespace Game.Presentation.Table
             _camera = camera;
         }
 
+        public bool IsOwnFieldZone(Vector3 point)
+        {
+            var pose = Field(TableSide.Bottom, 0, 1, true);
+            return Mathf.Abs(point.x - pose.Position.x) <= _fieldSpacing &&
+                Mathf.Abs(point.z - pose.Position.z) <= _cardSize.y * pose.Scale / 2f;
+        }
+
         public CardPose Field(TableSide side, int index, int count, bool faceUp) =>
             new CardPose(
                 new Vector3(RowX(index, count, _fieldSpacing), 0f, Sign(side) * _fieldRowDistance),

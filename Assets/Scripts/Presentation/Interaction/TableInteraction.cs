@@ -6,6 +6,7 @@ using Game.Presentation.Audio;
 using Game.Presentation.Cards;
 using Game.Presentation.Input;
 using Game.Presentation.Ui;
+using Game.Presentation.Table;
 using UnityEngine;
 
 namespace Game.Presentation.Interaction
@@ -28,6 +29,7 @@ namespace Game.Presentation.Interaction
     {
         private const float DragHeight = 1.6f;
 
+        private readonly TableLayout _layout;
         private readonly PointerInput _input;
         private readonly TableRaycaster _raycaster;
         private readonly CardViewRegistry _registry;
@@ -55,8 +57,9 @@ namespace Game.Presentation.Interaction
             AnimationQueue queue,
             AnimationSpeed speed,
             VisualSettings visual,
-            ISoundPlayer sound)
+            ISoundPlayer sound, TableLayout layout)
         {
+            _layout = layout;
             _input = input;
             _raycaster = raycaster;
             _registry = registry;
@@ -207,6 +210,7 @@ namespace Game.Presentation.Interaction
         /// </summary>
         private bool TapWhileChosen(Vector2 position, CardView card)
         {
+            if (TryPlaceField(position, card)) return true;
             var target = TargetAt(position);
             if (target != null)
             {
@@ -299,7 +303,8 @@ namespace Game.Presentation.Interaction
             }
 
             var target = TargetAt(position);
-            if (target != null)
+            if (TryPlaceField(position, _raycaster.CardAt(position, dragged))) { }
+            else if (target != null)
             {
                 _selector.TapCard(target.Value);
             }
@@ -322,6 +327,15 @@ namespace Game.Presentation.Interaction
             }
 
             return null;
+        }
+
+        private bool TryPlaceField(Vector2 position, CardView card)
+        {
+            if (!CanAct || !_selector.TargetsOwnFieldZone || (card != null && card.IsInHand)) return false;
+            if (!_layout.IsOwnFieldZone(_raycaster.PointAtHeight(position, 0f))) return false;
+            _focus.Unpin();
+            _selector.ChooseOwnFieldZone();
+            return true;
         }
 
         private void OnQueueIdle() => _speed.EndFastForward();

@@ -54,7 +54,7 @@ namespace Game.Core
             {
                 var fieldIds = state.Fields.Where(field => field.Owner == id && field.IsActive).Select(field => field.Id).ToList();
                 _context.Events.Emit(new FieldsDealt(id, fieldIds));
-                _context.Events.Emit(new HandDealt(id, state.Player(id).Hand.Select(CardRef.From).ToList()));
+                _context.Events.Emit(new HandDealt(id, GetView(id).Hand));
             }
 
             FieldDeploymentFlow.ContinueSetup(_context);

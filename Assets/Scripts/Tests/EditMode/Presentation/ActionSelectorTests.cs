@@ -26,6 +26,25 @@ namespace Game.Presentation.Tests
         }
 
         [Test]
+        public void FieldFromHand_WaitsForTable_WithoutOpeningOptions()
+        {
+            var command = new ChooseCard(Player, 10);
+            _selector.SetActions(new GameCommand[] { command, new ChooseCard(Player, 11) }, fieldDeployment: true);
+            CollectionAssert.AreEquivalent(new[] { 10, 11 }, _selector.Sources);
+            Assert.IsNull(_options);
+            _selector.TapCard(10);
+            Assert.IsNull(_chosen);
+            Assert.IsTrue(_selector.TargetsOwnFieldZone);
+            Assert.IsNull(_options);
+            _selector.Cancel();
+            _selector.ChooseOwnFieldZone();
+            Assert.IsNull(_chosen);
+            _selector.TapCard(10);
+            _selector.ChooseOwnFieldZone();
+            Assert.AreSame(command, _chosen);
+        }
+
+        [Test]
         public void Placement_CreatureThenField()
         {
             var target = new PlaceCreature(Player, 1, 20);

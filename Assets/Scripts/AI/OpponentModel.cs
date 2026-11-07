@@ -103,7 +103,7 @@ namespace Game.AI
         /// <summary>The guess must have exactly as many cards as the opponent holds; a mismatch means a memory gap.</summary>
         private List<string> FitHand(List<string> hand, IRandom random)
         {
-            var size = _view.OpponentHandCount;
+            var size = _view.OpponentHandCount - _view.Fields.Count(f => f.Owner != _view.Viewer && f.IsInReserve);
             if (hand.Count > size)
                 hand.RemoveRange(size, hand.Count - size);
 

@@ -10,7 +10,7 @@ namespace Game.Presentation.Interaction
     /// </summary>
     public sealed class ActionPathBuilder
     {
-        public IReadOnlyList<ActionPath> Build(IEnumerable<GameCommand> commands)
+        public IReadOnlyList<ActionPath> Build(IEnumerable<GameCommand> commands, bool fieldDeployment = false)
         {
             var paths = new List<ActionPath>();
             var placements = new List<(GameCommand command, int creature, int field, int? signature)>();
@@ -29,7 +29,9 @@ namespace Game.Presentation.Interaction
                         paths.Add(new ActionPath(play, play.AbilityId, AbilitySteps(play.Targets)));
                         break;
                     case ChooseCard choose:
-                        paths.Add(new ActionPath(choose, null, new[] { new PathStep(PathStepKind.Option, choose.CardId) }));
+                        paths.Add(fieldDeployment
+                            ? new ActionPath(choose, choose.CardId, new[] { new PathStep(PathStepKind.OwnFieldZone, 0) })
+                            : new ActionPath(choose, null, new[] { new PathStep(PathStepKind.Option, choose.CardId) }));
                         break;
                 }
             }

@@ -121,7 +121,7 @@ namespace Game.Presentation.Match
                 ButtonFor(actions.OfType<Ready>().FirstOrDefault()),
                 ButtonFor(actions.OfType<OpenField>().FirstOrDefault()));
             _interaction.Enabled = true;
-            _selector.SetActions(actions);
+            _selector.SetActions(actions, view.ChoicePurpose == ChoicePurpose.InitialField || view.ChoicePurpose == ChoicePurpose.ReplacementField);
         }
 
         private void ShowTurnOrder(PlayerView view, IReadOnlyList<ChooseTurnOrder> order)
@@ -154,9 +154,7 @@ namespace Game.Presentation.Match
         {
             var title = values.Contains(ActionPath.NoOption)
                 ? UiTextKeys.ChoiceSignature
-                : _view?.ChoicePurpose == ChoicePurpose.InitialField || _view?.ChoicePurpose == ChoicePurpose.ReplacementField
-                    ? UiTextKeys.ChoiceField
-                    : _view?.ChoosingPlayer != null ? UiTextKeys.ChoiceTrophy : UiTextKeys.ChoiceCard;
+                : _view?.ChoosingPlayer != null ? UiTextKeys.ChoiceTrophy : UiTextKeys.ChoiceCard;
             var labels = values
                 .Select(value => value == ActionPath.NoOption ? _texts.Get(UiTextKeys.NoAbility) : _lookup.NameOf(value))
                 .ToList();

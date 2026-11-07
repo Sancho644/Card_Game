@@ -39,9 +39,9 @@ namespace Game.Presentation.Interaction
                 .Distinct()
                 .ToList();
 
-        public void SetActions(IReadOnlyList<GameCommand> commands)
+        public void SetActions(IReadOnlyList<GameCommand> commands, bool fieldDeployment = false)
         {
-            _paths = _builder.Build(commands);
+            _paths = _builder.Build(commands, fieldDeployment);
             Reset(notify: false);
             if (_paths.Count > 0 && _paths.All(path => path.Source == null))
                 Begin(null);
@@ -65,6 +65,13 @@ namespace Game.Presentation.Interaction
                 Begin(instanceId);
             else if (_active)
                 Cancel();
+        }
+
+        public bool TargetsOwnFieldZone => Pending().Any(path => path.Steps[_step].Kind == PathStepKind.OwnFieldZone);
+
+        public void ChooseOwnFieldZone()
+        {
+            if (TargetsOwnFieldZone) Advance(0);
         }
 
         public void ChooseOption(int value) => Advance(value);
