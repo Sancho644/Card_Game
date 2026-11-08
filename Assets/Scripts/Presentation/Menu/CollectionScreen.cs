@@ -21,6 +21,9 @@ namespace Game.Presentation.Menu
         private readonly CollectionSettings _style;
         private readonly CollectionUi _ui;
         private readonly CollectionCardView _cardView;
+        private readonly UnityEngine.UI.Button _collectionTab;
+        private readonly UnityEngine.UI.Button _deckTab;
+        private readonly TMP_Text _emptyMessage;
         private readonly UnityEngine.UI.Button _remove;
         private readonly UnityEngine.UI.Button _delete;
         private readonly RectTransform _root;
@@ -44,6 +47,7 @@ namespace Game.Presentation.Menu
         private readonly List<GameObject> _slots = new List<GameObject>();
         private readonly Action _closed;
         private readonly Action _playAi;
+        private bool _browseCollection;
         private int _editing;
         private int _page;
         private CardType? _type;
@@ -69,10 +73,15 @@ namespace Game.Presentation.Menu
             _delete.GetComponentInChildren<TMP_Text>().fontSize = style.SmallSize;
             _name.characterLimit = PlayerCollection.NameLimit;
             _deckTitle = _ui.Text(_root, "DeckTitle", T("deck"), .025f, .77f, .25f, .05f);
-            _filterLabel = _ui.Text(_root, "Filter", "", .30f, .77f, .35f, .05f, style.SmallSize);
-            _ui.Button(_root, "AllCards", T("all"), .58f, .775f, .12f, .045f, () => { _type = null; _rarity = null; _page = 0; RefreshCards(); });
+            _filterLabel = _ui.Text(_root, "Filter", "", .30f, .77f, .18f, .05f, style.SmallSize);
+            _deckTab = _ui.Button(_root, "DeckCards", T("deckCards"), .49f, .775f, .10f, .045f, () => Browse(false));
+            _collectionTab = _ui.Button(_root, "CollectionCards", T("browseCollection"), .60f, .775f, .10f, .045f, () => Browse(true));
+            _deckTab.GetComponentInChildren<TMP_Text>().fontSize = style.SmallSize;
+            _collectionTab.GetComponentInChildren<TMP_Text>().fontSize = style.SmallSize;
             _deck = _ui.Rect(_root, "DeckSlots", .025f, .17f, .255f, .59f);
             _grid = _ui.Rect(_root, "CardGrid", .30f, .22f, .40f, .54f);
+            _emptyMessage = _ui.Text(_grid, "EmptyDeck", T("emptyDeck"), .05f, .2f, .9f, .6f);
+            _emptyMessage.alignment = TextAlignmentOptions.Center;
             _previous = _ui.Button(_root, "Previous", T("previous"), .30f, .16f, .1f, .045f, () => { _page--; RefreshCards(); });
             _pageLabel = _ui.Text(_root, "Page", "", .41f, .16f, .18f, .045f, style.SmallSize);
             _pageLabel.alignment = TextAlignmentOptions.Center;
@@ -106,6 +115,7 @@ namespace Game.Presentation.Menu
         private void Close() { Rename(_name.text); _root.gameObject.SetActive(false); _closed(); }
         private void EditPreset(int index)
         {
+            _browseCollection = false;
             _editing = index; _page = 0; _focused = null; _type = null; _rarity = null;
             _name.SetTextWithoutNotify(_app.Collection.Get(index).Name);
             Refresh();
@@ -156,6 +166,7 @@ namespace Game.Presentation.Menu
                 var label = TypeName(type) + " · " + RarityName(rarity) + "\n" + (card?.DisplayName ?? T("empty"));
                 var button = _ui.Button(_deck, "Slot" + index, label, 0, 1 - (index + 1) / 9f, 1, .102f, () =>
                 {
+                    _browseCollection = true;
                     _type = slotType; _rarity = slotRarity; _page = 0; _focused = card;
                     RefreshCards(); RefreshDetails();
                 });
@@ -163,16 +174,25 @@ namespace Game.Presentation.Menu
                 _slots.Add(button.gameObject); index++;
             }
         }
+        private void Browse(bool collection)
+        {
+            _browseCollection = collection; _type = null; _rarity = null; _page = 0;
+            _focused = null; RefreshCards(); RefreshDetails();
+        }
         private void RefreshCards()
         {
             Clear(_cards);
-            var list = _app.Collection.OwnedCards.Select(_app.Database.Find)
+            var source = _browseCollection ? _app.Collection.OwnedCards : _app.Collection.Get(_editing).Cards;
+            var list = source.Select(_app.Database.Find)
                 .Where(c => (!_type.HasValue || c.Type == _type) && (!_rarity.HasValue || c.Rarity == _rarity))
                 .OrderBy(c => c.Type).ThenBy(c => c.Rarity).ThenBy(c => c.DisplayName).ToList();
+            _emptyMessage.gameObject.SetActive(list.Count == 0);
+            _deckTab.GetComponent<UnityEngine.UI.Image>().color = _browseCollection ? _style.Button : _style.Selected;
+            _collectionTab.GetComponent<UnityEngine.UI.Image>().color = _browseCollection ? _style.Selected : _style.Button;
             var pages = Math.Max(1, (list.Count + PageSize - 1) / PageSize);
             _page = Mathf.Clamp(_page, 0, pages - 1);
             _pageLabel.text = _app.Texts.Format("collection.page", _page + 1, pages, list.Count);
-            _filterLabel.text = _type.HasValue ? TypeName(_type.Value) + " · " + RarityName(_rarity.Value) : T("all");
+            _filterLabel.text = _type.HasValue ? TypeName(_type.Value) + " · " + RarityName(_rarity.Value) : T(_browseCollection ? "all" : "deckCards");
             _previous.interactable = _page > 0; _next.interactable = _page + 1 < pages;
             var selected = _app.Collection.Get(_editing).Cards;
             var visible = list.Skip(_page * PageSize).Take(PageSize).ToList();
