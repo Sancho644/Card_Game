@@ -109,7 +109,8 @@ namespace Game.AI
         private static bool IsForbidden(MatchEngine engine, PlayerId player, int abilityId)
         {
             var reason = engine.Validate(new PlayAbility(player, abilityId));
-            return reason == RejectReason.BlockedByFieldCondition
+            return reason == RejectReason.AbilityRequirementNotMet
+                   || reason == RejectReason.BlockedByFieldCondition
                    || reason == RejectReason.BlockedByAbility
                    || reason == RejectReason.LegendaryLimitReached
                    || reason == RejectReason.SignatureCreatureNotInBattle;

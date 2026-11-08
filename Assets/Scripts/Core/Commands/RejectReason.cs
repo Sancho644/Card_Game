@@ -32,5 +32,6 @@ namespace Game.Core.Commands
         FieldLocked,
         SignatureNeedsBattle,
         NotAChoiceOption,
+        AbilityRequirementNotMet,
     }
 }

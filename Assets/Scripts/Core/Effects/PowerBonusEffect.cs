@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Game.Core.Battle;
+using Game.Core.Cards;
 using Game.Core.State;
 
 namespace Game.Core.Effects
 {
     /// <summary>"+N to your creature's power", optionally only when every requirement is met.</summary>
-    public sealed class PowerBonusEffect : IBattleEffect
+    public sealed class PowerBonusEffect : IBattleEffect, IAbilityPlayRequirement
     {
         private readonly int _amount;
         private readonly IReadOnlyList<IEffectRequirement> _requirements;
@@ -16,6 +17,9 @@ namespace Game.Core.Effects
             _amount = amount;
             _requirements = requirements ?? new IEffectRequirement[0];
         }
+
+        public bool AllowsPlay(PlayerId caster, BattleState battle, CardDefinition creature) =>
+            _requirements.OfType<IAbilityPlayRequirement>().All(r => r.AllowsPlay(caster, battle, creature));
 
         public BattleStep Step => BattleStep.Power;
 

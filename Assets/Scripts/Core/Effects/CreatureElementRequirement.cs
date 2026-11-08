@@ -5,7 +5,7 @@ using Game.Core.State;
 namespace Game.Core.Effects
 {
     /// <summary>The caster's creature has the given element.</summary>
-    public sealed class CreatureElementRequirement : IEffectRequirement
+    public sealed class CreatureElementRequirement : IEffectRequirement, IAbilityPlayRequirement
     {
         private readonly Element _element;
 
@@ -13,6 +13,9 @@ namespace Game.Core.Effects
         {
             _element = element;
         }
+
+        public bool AllowsPlay(PlayerId caster, BattleState battle, CardDefinition creature) =>
+            creature is CreatureCard card && card.Element == _element;
 
         public bool IsMet(BattleCalculation calculation, PlayerId caster) =>
             calculation.CreatureOf(caster).Element == _element;

@@ -67,6 +67,9 @@ namespace Game.Core.Flow
                     return RejectReason.BlockedByAbility;
             }
 
+            if (ability.Effects.OfType<IAbilityPlayRequirement>().Any(r => !r.AllowsPlay(player, battle, battleCreature)))
+                return RejectReason.AbilityRequirementNotMet;
+
             var context = new PlayContext(_match, player, card, targets, battle, isBeforeBattle);
             foreach (var effect in ability.Effects.OfType<IPlayEffect>())
             {
