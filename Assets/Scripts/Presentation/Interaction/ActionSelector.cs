@@ -24,6 +24,7 @@ namespace Game.Presentation.Interaction
         public event Action<IReadOnlyList<int>> OptionsRequested;
 
         public bool IsSelecting => _active;
+        public bool HasFieldPlacement => _paths.Any(p => p.Steps.Any(s => s.Kind == PathStepKind.OwnFieldZone));
 
         /// <summary>The selected source card, or null.</summary>
         public int? Source { get; private set; }

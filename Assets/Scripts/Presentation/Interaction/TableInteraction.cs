@@ -29,6 +29,7 @@ namespace Game.Presentation.Interaction
     {
         private const float DragHeight = 1.6f;
 
+        private readonly FieldPlacementOutline _fieldOutline;
         private readonly TableLayout _layout;
         private readonly PointerInput _input;
         private readonly TableRaycaster _raycaster;
@@ -60,6 +61,7 @@ namespace Game.Presentation.Interaction
             ISoundPlayer sound, TableLayout layout)
         {
             _layout = layout;
+            _fieldOutline = new FieldPlacementOutline(layout);
             _input = input;
             _raycaster = raycaster;
             _registry = registry;
@@ -101,6 +103,8 @@ namespace Game.Presentation.Interaction
             if (_disposed)
                 return;
 
+            _fieldOutline.Show(_enabled && _selector.HasFieldPlacement,
+                _selector.TargetsOwnFieldZone ? _visual.Selected : _visual.Target);
             foreach (var card in _registry.All)
                 card.SetHighlight(null);
             if (!_enabled)
@@ -135,6 +139,7 @@ namespace Game.Presentation.Interaction
                 return;
 
             _disposed = true;
+            _fieldOutline.Dispose();
             _input.Tapped -= OnTap;
             _input.LongPressed -= OnLongPress;
             _input.Hovered -= OnHover;

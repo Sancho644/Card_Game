@@ -26,6 +26,10 @@ namespace Game.Data.Presentation
         [Tooltip("Free space between the hand and the edges of the safe area, in fractions of the screen width.")]
         [SerializeField, Range(0f, 0.2f)] private float _handScreenMargin = 0.03f;
 
+        [Header("Field placement outline")]
+        [SerializeField, Min(0.01f)] private float _fieldOutlineWidth = 0.05f;
+        [SerializeField, Min(0.01f)] private float _fieldOutlineLift = 0.04f;
+
         [Header("Fields")]
         [SerializeField, Min(0.5f)] private float _fieldScale = 1.2f;
         [SerializeField, Min(0.3f)] private float _creatureOnFieldScale = 0.8f;
@@ -41,6 +45,8 @@ namespace Game.Data.Presentation
         [Header("Event log")]
         [SerializeField, Min(5)] private int _logLines = 60;
 
+        public float FieldOutlineWidth => _fieldOutlineWidth;
+        public float FieldOutlineLift => _fieldOutlineLift;
         public float LongPressSeconds => _longPressSeconds;
         public float DragThresholdPixels => _dragThresholdPixels;
         public float HandCardScale => _handCardScale;

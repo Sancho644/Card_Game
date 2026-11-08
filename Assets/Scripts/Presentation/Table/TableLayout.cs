@@ -49,6 +49,8 @@ namespace Game.Presentation.Table
 
         /// <summary>Size of a card at scale 1, in world units.</summary>
         public Vector2 CardSize => _cardSize;
+        public float FieldOutlineWidth => _settings.FieldOutlineWidth;
+        public float FieldOutlineLift => _settings.FieldOutlineLift;
 
         public void Configure(TablePresentationSettings settings, Camera camera)
         {
