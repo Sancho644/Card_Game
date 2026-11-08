@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 433be1909001c1344b22ff70208b8ca8, type: 3}
+  m_Name: Collection
+  m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.CollectionSettings
+  _background: {r: 0.055, g: 0.075, b: 0.11, a: 1}
+  _panel: {r: 0.09, g: 0.12, b: 0.17, a: 1}
+  _button: {r: 0.15, g: 0.21, b: 0.28, a: 1}
+  _selected: {r: 0.14, g: 0.38, b: 0.43, a: 1}
+  _text: {r: 0.94, g: 0.96, b: 0.98, a: 1}
+  _muted: {r: 0.65, g: 0.75, b: 0.83, a: 1}
+  _fontSize: 24
+  _titleSize: 34
+  _smallSize: 19

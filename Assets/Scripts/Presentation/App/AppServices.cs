@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Game.Services.Collection;
 using Game.Core.Cards;
 using Game.Core.Randomness;
 using Game.Core.Rules;
@@ -43,8 +45,11 @@ namespace Game.Presentation.App
             PlayerSettings = playerSettings ?? throw new ArgumentNullException(nameof(playerSettings));
             Sound = sound ?? throw new ArgumentNullException(nameof(sound));
             Difficulty = ai.DefaultProfileId;
+            Collection = new PlayerCollection(new PlayerPrefsCollectionStore(), Catalog, Rules,
+                decks.Select(d => new DeckPreset(d.DisplayName, d.ToDeckList().CardIds)).ToList());
         }
 
+        public PlayerCollection Collection { get; }
         public CardDatabase Database { get; }
         public CardCatalog Catalog { get; }
         public GameRules Rules { get; }

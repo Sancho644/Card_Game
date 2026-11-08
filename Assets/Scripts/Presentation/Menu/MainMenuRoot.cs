@@ -23,6 +23,8 @@ namespace Game.Presentation.Menu
         [SerializeField] private OptionListView _options;
         [SerializeField, Tooltip("Loaded when this scene is opened directly in the editor")] private string _bootstrapScene = "Bootstrap";
 
+        [SerializeField] private CollectionSettings _collectionSettings;
+        private CollectionScreen _collection;
         private AppServices _app;
         private bool _searchingForMatch;
 
@@ -41,11 +43,14 @@ namespace Game.Presentation.Menu
             _searching.Hide();
             _options.Hide();
             _app.DeckIndex = Mathf.Clamp(_app.DeckIndex, 0, Mathf.Max(0, _app.Decks.Count - 1));
+            _collection = new CollectionScreen(_menu.transform.parent, _menu.GetComponentInChildren<TMPro.TMP_Text>(true).font,
+                _collectionSettings, _app, ShowMenu, PlayVersusAi);
             ShowMenu();
         }
 
         private void OnDestroy()
         {
+            _collection?.Dispose();
             if (_searchingForMatch)
                 _app.Matchmaking.Cancel();
         }
@@ -55,7 +60,7 @@ namespace Game.Presentation.Menu
                 Texts.Get(UiTextKeys.MenuTitle),
                 Texts.Get(UiTextKeys.MenuVersusAi),
                 Texts.Get(UiTextKeys.MenuHotSeat),
-                Texts.Format(UiTextKeys.MenuDeck, _app.Decks[_app.DeckIndex].DisplayName),
+                Texts.Format("collection.menu", _app.Collection.Selected.Name),
                 Texts.Format(UiTextKeys.MenuDifficulty, DifficultyName(_app.Difficulty)),
                 Texts.Format(UiTextKeys.MenuFastAnimations, Texts.Get(_app.PlayerSettings.FastAnimations ? UiTextKeys.On : UiTextKeys.Off)),
                 PlayVersusAi,
@@ -73,16 +78,7 @@ namespace Game.Presentation.Menu
         private void ChooseDeck()
         {
             _menu.Hide();
-            _options.Show(
-                Texts.Get(UiTextKeys.MenuChooseDeck),
-                _app.Decks.Select(deck => deck.DisplayName).ToList(),
-                index =>
-                {
-                    _app.DeckIndex = index;
-                    ShowMenu();
-                },
-                Texts.Get(UiTextKeys.Cancel),
-                ShowMenu);
+            _collection.Show();
         }
 
         private void ChooseDifficulty()
@@ -103,10 +99,11 @@ namespace Game.Presentation.Menu
 
         private void PlayVersusAi()
         {
+            if (!_app.Collection.Validate(_app.Collection.SelectedIndex).IsValid) { ChooseDeck(); return; }
             _menu.Hide();
             _searchingForMatch = true;
             _searching.Show(Texts.Get(UiTextKeys.SearchTitle), Texts.Get(UiTextKeys.SearchHint), Texts.Get(UiTextKeys.Cancel), CancelSearch);
-            _app.Matchmaking.FindMatch(new MatchRequest(_app.Decks[_app.DeckIndex].ToDeckList(), _app.Difficulty), OnMatchFound);
+            _app.Matchmaking.FindMatch(new MatchRequest(_app.Collection.Selected.ToDeckList(), _app.Difficulty), OnMatchFound);
         }
 
         private void CancelSearch()
@@ -133,6 +130,7 @@ namespace Game.Presentation.Menu
         /// <summary>Hot-seat: the menu deck is the first player's, the second player picks theirs now.</summary>
         private void ChooseSecondDeck()
         {
+            if (!_app.Collection.Validate(_app.Collection.SelectedIndex).IsValid) { ChooseDeck(); return; }
             _menu.Hide();
             _options.Show(
                 Texts.Get(UiTextKeys.MenuChooseSecondDeck),
@@ -144,7 +142,7 @@ namespace Game.Presentation.Menu
 
         private void PlayHotSeat(int firstDeck, int secondDeck)
         {
-            var setup = new MatchSetup(_app.Decks[firstDeck].ToDeckList(), _app.Decks[secondDeck].ToDeckList());
+            var setup = new MatchSetup(_app.Collection.Selected.ToDeckList(), _app.Decks[secondDeck].ToDeckList());
             var seed = ((ulong)(uint)_app.Random.Next(int.MaxValue) << 31) ^ (uint)_app.Random.Next(int.MaxValue);
             _app.PendingMatch = new MatchLaunch(
                 new LocalMatchSession(_app.Catalog, _app.Rules),

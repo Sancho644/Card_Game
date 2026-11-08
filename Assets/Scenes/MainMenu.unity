@@ -2989,6 +2989,7 @@ MonoBehaviour:
   _searching: {fileID: 18523303}
   _options: {fileID: 442690676}
   _bootstrapScene: Bootstrap
+  _collectionSettings: {fileID: 11400000, guid: 5a8467d43e5ea3b40bc2be7b09163bd8, type: 2}
 --- !u!4 &1760543828
 Transform:
   m_ObjectHideFlags: 0
