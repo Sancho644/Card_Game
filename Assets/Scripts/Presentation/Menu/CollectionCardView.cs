@@ -37,8 +37,13 @@ namespace Game.Presentation.Menu
             else if (face.ElementIcon != null) Icon(art, "Element", face.ElementIcon, face.StripColor, .20f, .16f, .60f, .68f);
             else
             {
-                var sigil = Text(art, "Sigil", "◆", .15f, .15f, .70f, .70f, _style.TitleSize * 2);
-                sigil.color = face.RarityColor; sigil.alignment = TextAlignmentOptions.Center;
+                var bounds = _ui.Rect(art, "SigilBounds", .30f, .20f, .40f, .60f);
+                var sigil = Panel(bounds, "Sigil", 0, 0, 1, 1, face.RarityColor);
+                var square = sigil.gameObject.AddComponent<UnityEngine.UI.AspectRatioFitter>();
+                square.aspectMode = UnityEngine.UI.AspectRatioFitter.AspectMode.FitInParent;
+                square.aspectRatio = 1;
+                sigil.localRotation = Quaternion.Euler(0, 0, 45);
+                Panel(sigil, "Inset", .15f, .15f, .70f, .70f, face.RarityColor * new Color(.5f, .5f, .5f, 1));
             }
             var strip = Panel(body, "StatsStrip", .055f, .35f, .89f, .085f, face.StripColor);
             var stats = Text(strip, "Stats", face.Stats, .025f, .04f, .95f, .92f, _style.SmallSize * .8f);
