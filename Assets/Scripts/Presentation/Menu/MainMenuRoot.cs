@@ -60,7 +60,7 @@ namespace Game.Presentation.Menu
                 Texts.Get(UiTextKeys.MenuTitle),
                 Texts.Get(UiTextKeys.MenuVersusAi),
                 Texts.Get(UiTextKeys.MenuHotSeat),
-                Texts.Format("collection.menu", _app.Collection.Selected.Name),
+                Texts.Format("collection.menu", string.IsNullOrEmpty(_app.Collection.Selected.Name) ? Texts.Get("collection.emptyPreset") : _app.Collection.Selected.Name),
                 Texts.Format(UiTextKeys.MenuDifficulty, DifficultyName(_app.Difficulty)),
                 Texts.Format(UiTextKeys.MenuFastAnimations, Texts.Get(_app.PlayerSettings.FastAnimations ? UiTextKeys.On : UiTextKeys.Off)),
                 PlayVersusAi,

@@ -6,6 +6,7 @@ using Game.Core.Decks;
 using Game.Data.Cards;
 using Game.Data.Presentation;
 using Game.Presentation.App;
+using Game.Presentation.Cards;
 using Game.Services.Collection;
 using TMPro;
 using UnityEngine;
@@ -19,11 +20,15 @@ namespace Game.Presentation.Menu
         private readonly AppServices _app;
         private readonly CollectionSettings _style;
         private readonly CollectionUi _ui;
+        private readonly CollectionCardView _cardView;
+        private readonly UnityEngine.UI.Button _remove;
+        private readonly UnityEngine.UI.Button _delete;
         private readonly RectTransform _root;
         private readonly RectTransform _grid;
         private readonly RectTransform _deck;
         private readonly TMP_InputField _name;
         private readonly TMP_Text _status;
+        private readonly TMP_Text _deckTitle;
         private readonly TMP_Text _pageLabel;
         private readonly TMP_Text _filterLabel;
         private readonly TMP_Text _detailName;
@@ -49,6 +54,7 @@ namespace Game.Presentation.Menu
         {
             _app = app; _style = style; _closed = closed; _playAi = playAi;
             _ui = new CollectionUi(font, style);
+            _cardView = new CollectionCardView(_ui, style, new CardFaceBuilder(app.Database, style.CardVisuals, app.Texts));
             _root = _ui.Panel(parent, "Collection", 0, 0, 1, 1, style.Background);
             _ui.Text(_root, "Title", T("title"), .025f, .92f, .65f, .06f, style.TitleSize);
             _ui.Button(_root, "Close", T("back"), .83f, .925f, .145f, .055f, Close);
@@ -58,9 +64,11 @@ namespace Game.Presentation.Menu
                 var index = i;
                 _presets[i] = _ui.Button(_root, "Preset" + i, "", .025f + i * .19f, .84f, .18f, .06f, () => EditPreset(index));
             }
-            _name = _ui.Input(_root, "DeckName", .62f, .84f, .355f, .06f, T("name"), Rename);
+            _name = _ui.Input(_root, "DeckName", .62f, .84f, .25f, .06f, T("name"), Rename);
+            _delete = _ui.Button(_root, "DeletePreset", T("deletePreset"), .88f, .84f, .095f, .06f, DeletePreset);
+            _delete.GetComponentInChildren<TMP_Text>().fontSize = style.SmallSize;
             _name.characterLimit = PlayerCollection.NameLimit;
-            _ui.Text(_root, "DeckTitle", T("deck"), .025f, .77f, .25f, .05f);
+            _deckTitle = _ui.Text(_root, "DeckTitle", T("deck"), .025f, .77f, .25f, .05f);
             _filterLabel = _ui.Text(_root, "Filter", "", .30f, .77f, .35f, .05f, style.SmallSize);
             _ui.Button(_root, "AllCards", T("all"), .58f, .775f, .12f, .045f, () => { _type = null; _rarity = null; _page = 0; RefreshCards(); });
             _deck = _ui.Rect(_root, "DeckSlots", .025f, .17f, .255f, .59f);
@@ -78,7 +86,8 @@ namespace Game.Presentation.Menu
             _detailText.alignment = TextAlignmentOptions.TopLeft;
             _detailText.enableAutoSizing = true;
             _detailText.fontSizeMin = 15; _detailText.fontSizeMax = style.SmallSize;
-            _add = _ui.Button(details, "AddToDeck", T("replace"), .06f, .025f, .88f, .10f, Add);
+            _add = _ui.Button(details, "AddToDeck", T("replace"), .06f, .025f, .88f, .08f, Add);
+            _remove = _ui.Button(details, "RemoveFromDeck", T("remove"), .06f, .115f, .88f, .08f, Remove);
             _status = _ui.Text(_root, "Status", "", .025f, .015f, .54f, .12f, style.SmallSize);
             _use = _ui.Button(_root, "UseDeck", T("use"), .59f, .045f, .18f, .075f, Use);
             _play = _ui.Button(_root, "PlayAi", T("play"), .79f, .045f, .185f, .075f, Play);
@@ -116,12 +125,14 @@ namespace Game.Presentation.Menu
         {
             for (var i = 0; i < _presets.Length; i++)
             {
-                _presets[i].GetComponentInChildren<TMP_Text>().text = (i + 1) + ". " + _app.Collection.Get(i).Name;
+                _presets[i].GetComponentInChildren<TMP_Text>().text = (i + 1) + ". " + (string.IsNullOrEmpty(_app.Collection.Get(i).Name) ? T("emptyPreset") : _app.Collection.Get(i).Name);
                 _presets[i].GetComponent<UnityEngine.UI.Image>().color = i == _editing ? _style.Selected : _style.Button;
             }
+            _delete.interactable = _app.Collection.Get(_editing).Cards.Count > 0 || !string.IsNullOrEmpty(_app.Collection.Get(_editing).Name);
+            _deckTitle.text = _app.Texts.Format("collection.deckCount", _app.Collection.Get(_editing).Cards.Count);
             var result = _app.Collection.Validate(_editing);
             _use.interactable = _play.interactable = result.IsValid;
-            _status.text = result.IsValid ? _app.Texts.Format("collection.saved", _app.Collection.Selected.Name) : string.Join("\n", result.Errors.Select(ErrorText).Distinct());
+            _status.text = result.IsValid ? _app.Texts.Format("collection.saved", (string.IsNullOrEmpty(_app.Collection.Selected.Name) ? T("emptyPreset") : _app.Collection.Selected.Name)) : string.Join("\n", result.Errors.Select(ErrorText).Distinct());
         }
         private string ErrorText(DeckError error)
         {
@@ -168,22 +179,19 @@ namespace Game.Presentation.Menu
             for (var i = 0; i < visible.Count; i++)
             {
                 var card = visible[i];
-                var label = card.DisplayName + "\n" + TypeName(card.Type) + " · " + RarityName(card.Rarity) +
-                    (selected.Contains(card.Id) ? "\n" + T("inDeck") : "");
-                var button = _ui.Button(_grid, "Card_" + card.Id, label, (i % 2) * .51f, 1 - (i / 2 + 1) / 3f, .49f, .31f,
-                    () => { _focused = card; RefreshDetails(); RefreshCards(); });
-                button.GetComponentInChildren<TMP_Text>().fontSize = _style.SmallSize;
-                button.GetComponent<UnityEngine.UI.Image>().color = _focused == card ? _style.Selected : _style.Button;
-                _cards.Add(button.gameObject);
+                var button = _cardView.Create(_grid, card, i, selected.Contains(card.Id), _focused == card,
+                    T("inDeck"), () => { _focused = card; RefreshDetails(); RefreshCards(); });
+                _cards.Add(button.transform.parent.parent.parent.gameObject);
             }
         }
         private void RefreshDetails()
         {
+            _remove.interactable = _focused != null && _app.Collection.Get(_editing).Cards.Contains(_focused.Id);
             _add.interactable = _focused != null && !_app.Collection.Get(_editing).Cards.Contains(_focused.Id);
             _detailName.text = _focused == null ? T("inspect") : _focused.DisplayName;
             _art.sprite = _focused?.Art;
             _art.enabled = _art.sprite != null;
-            _detailText.rectTransform.anchorMin = new Vector2(.06f, .16f);
+            _detailText.rectTransform.anchorMin = new Vector2(.06f, .22f);
             _detailText.rectTransform.anchorMax = new Vector2(.94f, _art.enabled ? .54f : .81f);
             _detailText.rectTransform.offsetMin = _detailText.rectTransform.offsetMax = Vector2.zero;
             _detailText.text = _focused == null ? T("hint") : TypeName(_focused.Type) + " · " + RarityName(_focused.Rarity) + "\n\n" + Stats(_focused) + _focused.Description;
@@ -197,6 +205,12 @@ namespace Game.Presentation.Menu
             return "";
         }
         private void Add() { if (_focused == null) return; _app.Collection.Replace(_editing, _focused.Id); Refresh(); }
+        private void Remove() { if (_focused == null) return; _app.Collection.Remove(_editing, _focused.Id); Refresh(); }
+        private void DeletePreset()
+        {
+            _app.Collection.Delete(_editing);
+            _name.SetTextWithoutNotify(""); _focused = null; Refresh();
+        }
         private void Use() { Rename(_name.text); if (_app.Collection.Select(_editing)) Close(); }
         private void Play() { Rename(_name.text); if (!_app.Collection.Select(_editing)) return; _root.gameObject.SetActive(false); _playAi(); }
         private static void Clear(List<GameObject> objects)

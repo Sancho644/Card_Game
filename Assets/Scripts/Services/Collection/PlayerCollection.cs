@@ -30,11 +30,11 @@ namespace Game.Services.Collection
             {
                 var fallback = defaults[i % defaults.Count];
                 var saved = store.Read(Key(i, "cards"));
-                var cards = saved == null ? fallback.Cards.ToArray() : saved.Split('\n');
-                if (cards.Length == 0 || cards.Any(id => string.IsNullOrEmpty(id) || !catalog.TryGet(id, out _)))
+                var cards = saved == null ? fallback.Cards.ToArray() : saved.Length == 0 ? Array.Empty<string>() : saved.Split('\n');
+                if (cards.Any(id => string.IsNullOrEmpty(id) || !catalog.TryGet(id, out _)))
                     cards = fallback.Cards.ToArray();
                 var name = CleanName(store.Read(Key(i, "name")));
-                _presets[i] = new DeckPreset(name.Length == 0 ? fallback.Name : name, cards);
+                _presets[i] = new DeckPreset(saved == null && name.Length == 0 ? fallback.Name : name, cards);
             }
             if (!int.TryParse(store.Read("collection.v1.selected"), out _selected) || _selected < 0 || _selected >= PresetCount)
                 _selected = 0;
@@ -62,6 +62,20 @@ namespace Game.Services.Collection
             var cards = preset.Cards.Where(id => _catalog.Get(id).Type != card.Type || _catalog.Get(id).Rarity != card.Rarity).ToList();
             cards.Add(cardId);
             _presets[index] = new DeckPreset(preset.Name, cards);
+            Persist(index);
+        }
+
+        public void Remove(int index, string cardId)
+        {
+            var preset = Get(index);
+            _presets[index] = new DeckPreset(preset.Name, preset.Cards.Where(id => id != cardId));
+            Persist(index);
+        }
+
+        public void Delete(int index)
+        {
+            CheckIndex(index);
+            _presets[index] = new DeckPreset("", Array.Empty<string>());
             Persist(index);
         }
 

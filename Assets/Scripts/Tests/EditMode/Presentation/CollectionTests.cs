@@ -66,6 +66,28 @@ namespace Game.Presentation.Tests
             var c = Load(); Assert.AreEqual(0, c.SelectedIndex); Assert.IsTrue(c.Validate(0).IsValid);
         }
         [Test]
+        public void RemoveCard_PersistsEmptySlot_WithoutRemovingOwnership()
+        {
+            var c = Load(); var id = c.Get(0).Cards[0];
+            c.Remove(0, id); var loaded = Load();
+            Assert.AreEqual(8, loaded.Get(0).Cards.Count);
+            Assert.IsFalse(loaded.Get(0).Cards.Contains(id));
+            Assert.Contains(id, loaded.OwnedCards.ToArray());
+            Assert.IsFalse(loaded.Select(0));
+            loaded.Replace(0, id); Assert.IsTrue(loaded.Select(0));
+        }
+        [Test]
+        public void DeletePreset_PreservesPersistentEmptyCell_WhichCanBeRebuilt()
+        {
+            var c = Load(); var cards = c.Get(1).Cards.ToArray();
+            c.Delete(1); var loaded = Load();
+            Assert.IsEmpty(loaded.Get(1).Cards); Assert.IsEmpty(loaded.Get(1).Name);
+            Assert.IsFalse(loaded.Select(1)); Assert.AreEqual(9, loaded.Get(2).Cards.Count);
+            loaded.Rename(1, "Новая"); foreach (var id in cards) loaded.Replace(1,id);
+            Assert.IsTrue(loaded.Select(1)); Assert.AreEqual("Новая", Load().Get(1).Name);
+        }
+
+        [Test]
         public void Names_TrimmedLimited_EmptyDoesNotOverwrite()
         {
             var c = Load(); c.Rename(0, new string('А', 80)); Assert.AreEqual(32, Load().Get(0).Name.Length);
