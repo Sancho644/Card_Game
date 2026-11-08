@@ -1,5 +1,27 @@
 # Стиль артов карт
 
+## Утверждённый макет карты существа
+
+Автор выбрал вариант №2 полной карты: крупный арт с тонкой тёмно-бирюзовой рамкой и бронзовыми деталями.
+
+![Утверждённый макет карты существа](art-references/creature-card-layout-v1.png)
+
+- Сила — крупный круглый значок в верхнем левом углу.
+- Стихия — значок в верхнем правом углу, подпись непосредственно под ним.
+- Название — контрастная широкая плашка снизу, под основной частью арта.
+- Тип и редкость — компактно под названием.
+- Арт занимает большую часть карты; лицо персонажа и важные детали не должны перекрываться значками.
+- Это визуальный эталон для переноса в Unity, а не готовая текстура лица карты. Название, сила, стихия и редкость должны выводиться отдельными элементами из данных; сила должна сохранять возможность анимации в битве.
+- Для длинных названий предусмотреть перенос или уменьшение шрифта в пределах плашки.
+- Для существ с эффектами потребуется адаптация макета с местом для описания: у «Каменного жука» эффект отсутствует.
+
+Макет создан встроенным imagegen на основе утверждённого арта. Исходная иллюстрация жука остаётся отдельным ассетом.
+
+Промпт утверждённого макета:
+
+```text
+Use case: ui-mockup / stylized-concept. Create ONE finished high-fidelity FRONT FACE design concept for a creature card in an original fantasy card game. Use the supplied Stone Beetle illustration as the actual artwork, preserving its friendly stylized animated-fantasy appearance, sandstone plates, amber eyes and moss. This is a card FRAME AND INFORMATION LAYOUT exploration, not a new creature illustration. Same subject and image across all design variants. Portrait card, width to height approximately 0.70, fully visible straight-on and flat, no tilted perspective, no hand holding it, no tabletop scene, no other cards. Card occupies almost the entire portrait image with a narrow plain neutral dark backdrop margin. Thoughtful professional game UI art direction: refined tactile materials, controlled ornament, polished bevels with clean readable silhouettes. Suitable for PC and mobile, strong hierarchy: art, title, huge power number, unmistakable Earth icon. Keep UI legible at thumbnail size. Warm fantasy style matching the reference. Common rarity should look restrained, no extravagant legendary gold or jewels. Only the following textual data, reproduced accurately in Russian: title "Каменный жук", power "135", element "Земля", rarity "Обычная", type "Существо". The creature has NO rules ability, so no invented rules paragraph. No mana/health/attack/defense counters or extra numbers, no logo, no watermark, no English. Earth symbol must be an ORIGINAL simple angular stacked-stones or rock icon, not a leaf. Illustrate sensible production-ready areas for live title/power/element text; do not put letters over visually busy art. Use the reference image intact in the art window where possible; modest crop allowed but preserve the face and dominant shell. VARIANT 2 — ART FIRST. A clean contemporary fantasy card with a very thin dark teal stone-and-bronze perimeter frame, almost full-card artwork, simplified restrained corners. Power "135" in a BIG high-contrast circular stone badge in the TOP LEFT. Earth rock emblem in a matching small badge in the TOP RIGHT, with "Земля" beneath the icon on a discrete tiny plate. Give both upper badges generous readable outlines. Title "Каменный жук" on a broad opaque DARK plaque near the BOTTOM with light large lettering. Tiny "Существо" and "Обычная" labels below the title. Art and character dominate; minimize frame texture behind typography. No rules box.
+```
 Автор выбрал вариант №2 «Каменного жука»: яркое стилизованное мультяшное фэнтези.
 
 Эталон: `Assets/Art/Cards/Creatures/creature.stone-beetle-v1.png`. Арт назначен в поле `_art` карты `creature.stone-beetle`; рамка и игровые надписи формируются Unity.
