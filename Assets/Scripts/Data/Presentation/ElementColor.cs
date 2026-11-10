@@ -13,11 +13,15 @@ namespace Game.Data.Presentation
         [Tooltip("Shown on the strip under the art and in the art placeholder, so the element reads not only by color")]
         public Sprite Icon;
 
+        [Tooltip("Creature card frame for this element")]
+        public Sprite CreatureFrame;
+
         public ElementColor(Element element, Color color)
         {
             Element = element;
             Color = color;
             Icon = null;
+            CreatureFrame = null;
         }
     }
 }

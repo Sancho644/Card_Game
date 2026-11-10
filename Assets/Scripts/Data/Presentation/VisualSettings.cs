@@ -89,6 +89,13 @@ namespace Game.Data.Presentation
             return index < 0 ? _neutralFrame : _elements[index].Color;
         }
 
+        public Sprite CreatureFrameOf(Element element)
+        {
+            var index = _elements.FindIndex(entry => entry.Element == element);
+            var frame = index < 0 ? null : _elements[index].CreatureFrame;
+            return frame != null ? frame : _creatureStyle != null ? _creatureStyle.Frame : null;
+        }
+
         public Sprite IconOf(Element element)
         {
             var index = _elements.FindIndex(entry => entry.Element == element);

@@ -1,3 +1,5 @@
+using System.Linq;
+using Game.Core.Cards;
 using Game.Data.Cards;
 using Game.Data.Presentation;
 using Game.Presentation.Cards;
@@ -24,6 +26,36 @@ namespace Game.Presentation.Tests
         }
         [TearDown]
         public void TearDown(){if(_view!=null)Object.DestroyImmediate(_view.gameObject);}
+        [Test]
+        public void EveryElement_HasDistinctFrame_AllCreaturesUseTheirElementFrame()
+        {
+            var visual=AssetDatabase.LoadAssetAtPath<VisualSettings>("Assets/Data/Config/VisualSettings.asset");
+            var elements=(Element[])System.Enum.GetValues(typeof(Element));
+            var frames=elements.Select(visual.CreatureFrameOf).ToArray();
+            Assert.IsTrue(frames.All(f=>f!=null));Assert.AreEqual(6,frames.Distinct().Count());
+            var database=AssetDatabase.LoadAssetAtPath<CardDatabase>("Assets/Data/CardDatabase.asset");
+            foreach(var card in database.Cards.OfType<CreatureDef>())
+            {
+                var face=_faces.Build(card.Id);
+                Assert.AreSame(visual.CreatureFrameOf(card.Element),face.CreatureFrame,card.Id);
+            }
+            Assert.IsNull(_faces.Build("ability.heat").CreatureFrame);
+        }
+        [Test]
+        public void DisplayedCreatureFrame_ChangesWhenElementChanges()
+        {
+            var database=AssetDatabase.LoadAssetAtPath<CardDatabase>("Assets/Data/CardDatabase.asset");
+            foreach(var card in database.Cards.OfType<CreatureDef>().GroupBy(c=>c.Element).Select(g=>g.First()))
+            {
+                var face=_faces.Build(card.Id);
+                Object.DestroyImmediate(_view.gameObject);
+                _view=Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Card3D.prefab")).GetComponent<CardView>();
+                _view.Bind(1,card.Id,face,_skin);
+                var graphic=_view.GetComponentInChildren<CreatureCardFaceView>();
+                Assert.AreSame(face.CreatureFrame,graphic.transform.Find("Frame").GetComponent<UnityEngine.UI.Image>().sprite);
+            }
+        }
+
         [Test]
         public void CreaturePower_IsLive_RestoresBase_AndSurvivesDimming()
         {

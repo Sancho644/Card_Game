@@ -17,21 +17,27 @@ MonoBehaviour:
   - Element: 0
     Color: {r: 0.95, g: 0.85, b: 0.45, a: 1}
     Icon: {fileID: 21300000, guid: a96208a008d45f84299f98527f6ae69d, type: 3}
+    CreatureFrame: {fileID: 21300000, guid: 99ab7860af5220847aadb43712132002, type: 3}
   - Element: 1
     Color: {r: 0.45, g: 0.3, b: 0.6, a: 1}
     Icon: {fileID: 21300000, guid: 5ee4112bb5b0fd04d883ea0c74ecbc7d, type: 3}
+    CreatureFrame: {fileID: 21300000, guid: 841d602a04e608f4585810c28f00f5f4, type: 3}
   - Element: 2
     Color: {r: 0.55, g: 0.42, b: 0.25, a: 1}
     Icon: {fileID: 21300000, guid: 1338a5c5fee59c844a6ff25d017548b8, type: 3}
+    CreatureFrame: {fileID: 21300000, guid: f03646f731bbd2f429333684fc2f4f5d, type: 3}
   - Element: 3
     Color: {r: 0.25, g: 0.55, b: 0.9, a: 1}
     Icon: {fileID: 21300000, guid: 7cfc8930fcff30f40ab0ce93755683b6, type: 3}
+    CreatureFrame: {fileID: 21300000, guid: 37a48338d90d7864d8adb8d010f26649, type: 3}
   - Element: 4
     Color: {r: 0.9, g: 0.35, b: 0.2, a: 1}
     Icon: {fileID: 21300000, guid: f057ba4579868d342b592560c6b7c9f4, type: 3}
+    CreatureFrame: {fileID: 21300000, guid: da514f1fee459a648b8c2dea22a17fb8, type: 3}
   - Element: 5
     Color: {r: 0.45, g: 0.8, b: 0.6, a: 1}
     Icon: {fileID: 21300000, guid: ddde44eef7e9c034fbd6150672f40794, type: 3}
+    CreatureFrame: {fileID: 21300000, guid: ac9b6b449ae7ccc45913b95f510fda34, type: 3}
   _abilityFrame: {r: 0.7, g: 0.72, b: 0.78, a: 1}
   _neutralFrame: {r: 0.6, g: 0.6, b: 0.6, a: 1}
   _cardBody: {r: 0.12, g: 0.12, b: 0.15, a: 1}

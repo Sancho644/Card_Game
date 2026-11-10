@@ -17,8 +17,9 @@ namespace Game.Presentation.Cards
             Sprite elementIcon,
             Sprite art,
             int? power,
-            bool hasCondition = false, string typeLabel = "")
+            bool hasCondition = false, string typeLabel = "", Sprite creatureFrame = null)
         {
+            CreatureFrame = creatureFrame;
             TypeLabel = typeLabel;
             Title = title;
             Stats = stats;
@@ -34,6 +35,7 @@ namespace Game.Presentation.Cards
             HasCondition = hasCondition;
         }
 
+        public Sprite CreatureFrame { get; }
         public string TypeLabel { get; }
         public string Title { get; }
 
