@@ -6,12 +6,14 @@ namespace Game.Data.Presentation
     {
         [SerializeField] private VisualSettings _cardVisuals;
         [Header("Library artwork")]
+        [SerializeField] private Sprite _backgroundArt;
         [SerializeField] private Sprite _panelArt;
         [SerializeField] private Sprite _buttonArt;
         [SerializeField] private Rect _panelCrop = new Rect(.008f,.012f,.984f,.976f);
         [SerializeField] private Rect _buttonCrop = new Rect(.002f,.24f,.996f,.58f);
         [SerializeField, Min(.1f)] private float _sliceDensity = 3;
         [SerializeField, Min(.1f)] private float _buttonSliceDensity = 8;
+        public Sprite BackgroundArt => _backgroundArt;
         public Sprite PanelArt => _panelArt;
         public Sprite ButtonArt => _buttonArt;
         public Rect PanelCrop => _panelCrop;

@@ -1,0 +1,7 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "docs/mockups/collection-v2/03-library-editor.png",
+  "output": "Assets/Art/UI/Collection/background-v1.png",
+  "prompt": "Use case: stylized-concept. Asset type: production full-screen Unity card-game collection UI background texture, landscape 16:9. The attached image is a STYLE REFERENCE ONLY: match its dark teal-green stone background, fine cracked weathered slate and subtle painterly fantasy materials. Create ONLY the clean underlying stone backdrop, with no UI whatsoever. Fill every pixel edge to edge with a softly illuminated deep teal stone surface, broad irregular slate plates and restrained thin cracks, muted turquoise highlights in the upper third, gentle darkening near edges, sufficient visible midtone stone detail so it never reads as flat black. Keep contrast low behind ivory text and cards, medium-sized texture marks rather than noisy tiny speckling. Front-facing flat orthographic surface, no perspective room, no objects, no floor horizon. No decorative foliage, leaves, vines, plants, gold frames, borders, buttons, cards, icons, letters, text, logos or watermarks. The finished graphic must work behind existing bronze-trimmed panels and remain coherent when cropped from 16:9 to 21:9. Preserve approved dark teal stone aesthetic. Opaque image.",
+  "verification": "Unity Play mode: editor and deck library screenshots at 1920x1080; background aspect, viewport coverage, sibling order and raycast exclusion verified at 1920x1080 and 2100x900; console without errors or warnings."
+}

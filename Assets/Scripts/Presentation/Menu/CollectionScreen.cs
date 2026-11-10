@@ -43,6 +43,14 @@ namespace Game.Presentation.Menu
             _app=app;_style=style;_closed=closed;_playAi=playAi;_ui=new CollectionUi(font,style);
             _cardView=new CollectionCardView(_ui,style,new Game.Presentation.Cards.CardFaceBuilder(app.Database,style.CardVisuals,app.Texts));
             _root=_ui.Panel(parent,"Collection",0,0,1,1,style.Background);
+            if(style.BackgroundArt!=null){
+                var backdrop=_ui.Rect(_root,"Backdrop",0,0,1,1);
+                var image=backdrop.gameObject.AddComponent<UnityEngine.UI.Image>();
+                image.sprite=style.BackgroundArt;image.raycastTarget=false;
+                var fit=backdrop.gameObject.AddComponent<UnityEngine.UI.AspectRatioFitter>();
+                fit.aspectMode=UnityEngine.UI.AspectRatioFitter.AspectMode.EnvelopeParent;
+                fit.aspectRatio=style.BackgroundArt.rect.width/style.BackgroundArt.rect.height;
+            }
             _editor=new CollectionEditorView(_root,_ui,style,app.Texts);
             _library=new CollectionLibraryView(_root,_ui,style,app.Texts);
             _editorDeck=new CollectionDeckGrid(_editor.Deck,_ui,_cardView,app.Database,app.Texts);
