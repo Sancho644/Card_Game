@@ -26,6 +26,8 @@ Use case: ui-mockup / stylized-concept. Create ONE finished high-fidelity FRONT 
 
 Эталон: `Assets/Art/Cards/Creatures/creature.stone-beetle-v1.png`. Арт назначен в поле `_art` карты `creature.stone-beetle`; рамка и игровые надписи формируются Unity.
 
+Полный первый набор: 18 артов существ, включая эталон. Каталог ассетов, настройки импорта и все промпты генерации: `docs/creature-art-set-v1.md`.
+
 ## Ориентиры
 
 - Крупные, ясные формы и выразительный силуэт, узнаваемый в маленьком размере.

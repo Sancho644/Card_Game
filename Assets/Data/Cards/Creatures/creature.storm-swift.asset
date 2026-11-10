@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayName: "\u0413\u0440\u043E\u0437\u043E\u0432\u043E\u0439 \u0441\u0442\u0440\u0438\u0436"
   _description: 
   _rarity: 0
-  _art: {fileID: 0}
+  _art: {fileID: 21300000, guid: 8c1c4a7d3fe50ba44b90cd170bf00604, type: 3}
   _frame: {fileID: 0}
   _element: 5
   _power: 140
