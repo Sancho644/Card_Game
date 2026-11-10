@@ -32,6 +32,7 @@ namespace Game.Presentation.Ui
         [SerializeField] private TMP_Text _rarity;
         [SerializeField] private Button _close;
 
+        private CreatureCardFaceView _creatureFace;
         private CardSkin _skin;
         private AnimationSettings _animation;
         private float _dimAlpha;
@@ -127,6 +128,15 @@ namespace Game.Presentation.Ui
 
         private void ShowFace(CardFace face)
         {
+            foreach(Transform child in _card) if(_creatureFace==null||child!=_creatureFace.transform)child.gameObject.SetActive(true);
+            if(_creatureFace!=null)_creatureFace.gameObject.SetActive(false);
+            _frame.enabled=true;
+            if(face.Power.HasValue&&_skin.CreatureStyle!=null)
+            {
+                if(_creatureFace==null)_creatureFace=CreatureCardFaceView.Create(_card);
+                foreach(Transform child in _card)if(child!=_creatureFace.transform)child.gameObject.SetActive(false);
+                _frame.enabled=false;_creatureFace.Bind(face,_skin,_title.font);return;
+            }
             _frame.color = face.FrameColor;
             SetImage(_rarityBadge, face.RarityIcon, face.RarityColor, keepWithoutSprite: true);
             _strip.color = face.StripColor;

@@ -45,7 +45,7 @@ namespace Game.Presentation.Cards
                 element.HasValue ? _visual.IconOf(element.Value) : null,
                 card.Art,
                 card is CreatureDef creature ? creature.Power : (int?)null,
-                card is FieldDef field && field.Conditions.Count > 0);
+                card is FieldDef field && field.Conditions.Count > 0, _texts.Get("collection.type." + card.Type));
         }
 
         public string NameOf(string cardId)

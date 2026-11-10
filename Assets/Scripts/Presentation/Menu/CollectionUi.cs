@@ -11,6 +11,7 @@ namespace Game.Presentation.Menu
         private readonly TMP_FontAsset _font;
         private readonly CollectionSettings _style;
         public CollectionUi(TMP_FontAsset font, CollectionSettings style) { _font = font; _style = style; }
+        public TMP_FontAsset Font => _font;
         public RectTransform Rect(Transform parent, string name, float x, float y, float w, float h)
         {
             var rect = new GameObject(name, typeof(RectTransform)).GetComponent<RectTransform>();

@@ -2,6 +2,8 @@
     "name": "Game.Presentation.Tests.EditMode",
     "rootNamespace": "Game.Presentation.Tests",
     "references": [
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
         "Game.Core",
         "Game.Data",
         "Game.Presentation",

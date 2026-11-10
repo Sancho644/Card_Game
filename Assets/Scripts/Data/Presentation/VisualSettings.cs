@@ -8,6 +8,8 @@ namespace Game.Data.Presentation
     [CreateAssetMenu(menuName = "Game/Config/Visual Settings", fileName = "VisualSettings")]
     public sealed class VisualSettings : ScriptableObject
     {
+        [SerializeField] private CreatureCardStyle _creatureStyle;
+
         [Header("Card frames")]
         [SerializeField] private List<ElementColor> _elements = new List<ElementColor>
         {
@@ -56,6 +58,7 @@ namespace Game.Data.Presentation
 
         [SerializeField] private Color _opponentAction = new Color(1f, 0.75f, 0.2f);
 
+        public CreatureCardStyle CreatureStyle => _creatureStyle;
         public Color OpponentAction => _opponentAction;
         public Color AbilityFrame => _abilityFrame;
         public Color NeutralFrame => _neutralFrame;

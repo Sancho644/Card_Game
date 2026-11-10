@@ -44,6 +44,7 @@ namespace Game.Presentation.Cards
         [SerializeField] private TMP_Text _powerText;
         [SerializeField] private Collider _collider;
 
+        private CreatureCardFaceView _creatureFace;
         private MaterialPropertyBlock _block;
         private Tween _move;
         private Tween _powerFlash;
@@ -75,7 +76,7 @@ namespace Game.Presentation.Cards
         public Transform Visual => _visual != null ? _visual : transform;
 
         /// <summary>World position of the power badge, where power changes pop up.</summary>
-        public Vector3 PowerAnchor => _powerBadge != null ? _powerBadge.transform.position : transform.position;
+        public Vector3 PowerAnchor => _creatureFace != null && _creatureFace.gameObject.activeSelf ? _creatureFace.PowerText.transform.position : _powerBadge != null ? _powerBadge.transform.position : transform.position;
 
         public void Bind(int instanceId, string cardId, CardFace face, CardSkin skin)
         {
@@ -133,6 +134,13 @@ namespace Game.Presentation.Cards
         /// <summary>Shows the creature's current power in a badge, in place of its base power; null hides it.</summary>
         public void SetPower(int? power)
         {
+            if (_creatureFace != null && _creatureFace.gameObject.activeSelf)
+            {
+                _creatureFace.SetPower(power);
+                if (_powerBadge != null) _powerBadge.SetActive(false);
+                if (_basePower != null) _basePower.SetActive(false);
+                return;
+            }
             if (_powerBadge == null)
                 return;
             _powerBadge.SetActive(power.HasValue);
@@ -158,6 +166,8 @@ namespace Game.Presentation.Cards
         /// <summary>Tints the power badge for a moment: green when the power grew, red when it fell.</summary>
         public Tween FlashPower(Color color, float duration)
         {
+            if (_creatureFace != null && _creatureFace.gameObject.activeSelf)
+                return _creatureFace.FlashPower(color,duration);
             if (_powerBadge == null || _powerBackground == null)
                 return null;
 
@@ -299,6 +309,8 @@ namespace Game.Presentation.Cards
 
         private void ApplyFace()
         {
+            foreach (var item in LegacyFace()) if(item != null && item != _powerBadge && item != _basePower) item.SetActive(true);
+            if (_creatureFace != null) _creatureFace.gameObject.SetActive(false);
             var text = Dim(_skin.Text);
             SetColor(_frame, Dim(_face.FrameColor));
             SetColor(_body, Dim(_skin.Body));
@@ -334,7 +346,24 @@ namespace Game.Presentation.Cards
                 SetColor(_basePowerBackground, Dim(_skin.PowerBadge));
                 SetText(_basePowerText, _face.Power.Value.ToString(), text);
             }
+            if(_face.Power.HasValue && _skin.CreatureStyle != null)
+            {
+                if(_creatureFace==null)
+                {
+                    _creatureFace=CreatureCardFaceView.Create(Visual);
+                    var canvas=_creatureFace.gameObject.AddComponent<UnityEngine.Canvas>();canvas.renderMode=RenderMode.WorldSpace;
+                    var rect=(RectTransform)_creatureFace.transform;rect.anchorMin=rect.anchorMax=new Vector2(.5f,.5f);
+                    rect.sizeDelta=new Vector2(700,1000);rect.localScale=Vector3.one*(_skin.CreatureStyle.WorldSize.y/1000);
+                    rect.localPosition=new Vector3(0,0,_skin.CreatureStyle.FaceDepth);
+                }
+                _creatureFace.Bind(_face,_skin,_title.font);_creatureFace.SetDimming(_dimming);
+                foreach(var item in LegacyFace())if(item!=null)item.SetActive(false);
+            }
         }
+
+        private GameObject[] LegacyFace() => new[] { _frame?.gameObject,_body?.gameObject,_rarityBadge?.gameObject,
+            _art?.gameObject,_artPlaceholder?.gameObject,_artIcon?.gameObject,_strip?.gameObject,_stripIcon?.gameObject,
+            _title?.gameObject,_stats?.gameObject,_text?.gameObject,_rarity?.gameObject,_basePower,_powerBadge };
 
         private Color Dim(Color color) => new Color(color.r * _dimming, color.g * _dimming, color.b * _dimming, color.a);
 

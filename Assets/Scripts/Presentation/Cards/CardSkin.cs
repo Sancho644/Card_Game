@@ -10,6 +10,7 @@ namespace Game.Presentation.Cards
 
         public CardSkin(VisualSettings visual)
         {
+            CreatureStyle = visual.CreatureStyle;
             Body = visual.CardBody;
             Back = visual.CardBack;
             BackArt = visual.CardBackArt;
@@ -19,6 +20,7 @@ namespace Game.Presentation.Cards
             StripIcon = visual.StripIconColor;
         }
 
+        public CreatureCardStyle CreatureStyle { get; }
         public Color Body { get; }
         public Color Back { get; }
         public Sprite BackArt { get; }

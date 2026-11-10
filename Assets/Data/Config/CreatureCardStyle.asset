@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8da3c4c686ba8c4a8e670e0d18100be, type: 3}
+  m_Name: CreatureCardStyle
+  m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.CreatureCardStyle
+  _frame: {fileID: 21300000, guid: f03646f731bbd2f429333684fc2f4f5d, type: 3}
+  _ink: {r: 1, g: 0.94, b: 0.8, a: 1}
+  _art:
+    serializedVersion: 2
+    x: 0.035
+    y: 0.265
+    width: 0.93
+    height: 0.71
+  _power:
+    serializedVersion: 2
+    x: 0.06
+    y: 0.787
+    width: 0.275
+    height: 0.125
+  _elementIcon:
+    serializedVersion: 2
+    x: 0.755
+    y: 0.815
+    width: 0.15
+    height: 0.12
+  _element:
+    serializedVersion: 2
+    x: 0.732
+    y: 0.777
+    width: 0.21
+    height: 0.042
+  _title:
+    serializedVersion: 2
+    x: 0.09
+    y: 0.15
+    width: 0.82
+    height: 0.095
+  _type:
+    serializedVersion: 2
+    x: 0.155
+    y: 0.045
+    width: 0.3
+    height: 0.04
+  _rarity:
+    serializedVersion: 2
+    x: 0.565
+    y: 0.045
+    width: 0.3
+    height: 0.04
+  _rules:
+    serializedVersion: 2
+    x: 0.08
+    y: 0.29
+    width: 0.84
+    height: 0.13
+  _worldSize: {x: 1.4, y: 2}
+  _faceDepth: -0.03

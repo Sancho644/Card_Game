@@ -27,6 +27,12 @@ namespace Game.Presentation.Menu
             var button = _ui.Button(holder, "Card_" + card.Id, "", 0, 0, 1, 1, clicked);
             button.GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
             button.GetComponent<UnityEngine.UI.Image>().color = selected ? _style.CardVisuals.Selected : face.RarityColor;
+            if(face.Power.HasValue && _style.CardVisuals.CreatureStyle!=null)
+            {
+                var view=CreatureCardFaceView.Create(button.transform);
+                view.Bind(face,new CardSkin(_style.CardVisuals),_ui.Font);
+                return button;
+            }
             var body = Panel(button.transform, "Face", .025f, .018f, .95f, .964f, _style.CardVisuals.CardBody);
             Panel(body, "ElementAccent", 0, .975f, 1, .025f, face.FrameColor);
             var title = Text(body, "Name", face.Title, .055f, .855f, .89f, .105f, _style.SmallSize);

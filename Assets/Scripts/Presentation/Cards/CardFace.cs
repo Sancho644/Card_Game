@@ -17,8 +17,9 @@ namespace Game.Presentation.Cards
             Sprite elementIcon,
             Sprite art,
             int? power,
-            bool hasCondition = false)
+            bool hasCondition = false, string typeLabel = "")
         {
+            TypeLabel = typeLabel;
             Title = title;
             Stats = stats;
             Body = body;
@@ -33,6 +34,7 @@ namespace Game.Presentation.Cards
             HasCondition = hasCondition;
         }
 
+        public string TypeLabel { get; }
         public string Title { get; }
 
         /// <summary>The element of a creature, bonuses and penalties of a field, the card type of an ability.</summary>

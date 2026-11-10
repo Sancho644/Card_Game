@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63ab14cc9bae69e489a9b686c3de644b, type: 3}
   m_Name: VisualSettings
   m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.VisualSettings
+  _creatureStyle: {fileID: 11400000, guid: 69ac59fe50ba70445a22cbfbe8fb4d24, type: 2}
   _elements:
   - Element: 0
     Color: {r: 0.95, g: 0.85, b: 0.45, a: 1}
