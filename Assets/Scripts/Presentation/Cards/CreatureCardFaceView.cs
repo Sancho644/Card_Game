@@ -45,9 +45,9 @@ namespace Game.Presentation.Cards
                 art.uvRect=new Rect(uv.x/tex.width,uv.y/tex.height,uv.width/tex.width,uv.height/tex.height);
                 Remember(art,Color.white);
             }
-            else {Remember(art,face.FrameColor*new Color(.3f,.3f,.3f,1));Image("ArtIcon",new Rect(.25f,.43f,.5f,.27f),face.ElementIcon,face.FrameColor);}
+            else {Remember(art,face.FrameColor*new Color(.3f,.3f,.3f,1));Image("ArtIcon",new Rect(.25f,.43f,.5f,.27f),face.ElementIcon,Color.white);}
             Image("Frame",new Rect(0,0,1,1),face.CreatureFrame != null ? face.CreatureFrame : style.Frame,Color.white);
-            Image("ElementIcon",style.ElementIcon,face.ElementIcon,face.FrameColor);
+            Image("ElementIcon",style.ElementIcon,face.ElementIcon,Color.white);
             _power=Text("Power",style.Power,face.Power?.ToString()??"",style.Ink);
             Text("Element",style.Element,face.Stats,style.Ink);
             Text("Title",style.Title,face.Title,style.Ink);

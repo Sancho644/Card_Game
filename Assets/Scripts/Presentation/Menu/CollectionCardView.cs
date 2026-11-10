@@ -40,7 +40,7 @@ namespace Game.Presentation.Menu
             var art = Panel(body, "ArtWindow", .055f, .44f, .89f, .40f,
                 face.StripColor * new Color(.32f, .32f, .32f, 1));
             if (face.Art != null) Icon(art, "Art", face.Art, Color.white, 0, 0, 1, 1);
-            else if (face.ElementIcon != null) Icon(art, "Element", face.ElementIcon, face.StripColor, .20f, .16f, .60f, .68f);
+            else if (face.ElementIcon != null) Icon(art, "Element", face.ElementIcon, Color.white, .20f, .16f, .60f, .68f);
             else
             {
                 var bounds = _ui.Rect(art, "SigilBounds", .30f, .20f, .40f, .60f);

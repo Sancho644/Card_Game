@@ -317,7 +317,7 @@ namespace Game.Presentation.Cards
             SetSprite(_rarityBadge, _face.RarityIcon, Dim(_face.RarityColor));
             SetColor(_strip, Dim(_face.StripColor));
             var ink = Dim(_skin.InkOn(_face.StripColor));
-            SetIcon(_stripIcon, _face.ElementIcon, ink);
+            SetIcon(_stripIcon, _face.ElementIcon, Dim(Color.white));
             SetText(_title, _face.Title, text);
             SetText(_stats, _face.Stats, ink);
             SetText(_text, _face.Body, text);
@@ -336,7 +336,7 @@ namespace Game.Presentation.Cards
                 var shade = _face.FrameColor * _skin.PlaceholderBrightness;
                 shade.a = 1f;
                 SetColor(_artPlaceholder, Dim(shade));
-                SetIcon(_artIcon, _face.ElementIcon, Dim(_face.FrameColor));
+                SetIcon(_artIcon, _face.ElementIcon, Dim(Color.white));
             }
 
             if (_basePower != null)

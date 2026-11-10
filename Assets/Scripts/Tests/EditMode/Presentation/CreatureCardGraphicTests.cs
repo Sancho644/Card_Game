@@ -57,6 +57,29 @@ namespace Game.Presentation.Tests
         }
 
         [Test]
+        public void ElementIcons_AreDistinct_KeepPaintedColors_AndSupportDimming()
+        {
+            var visual=AssetDatabase.LoadAssetAtPath<VisualSettings>("Assets/Data/Config/VisualSettings.asset");
+            var elements=(Element[])System.Enum.GetValues(typeof(Element));
+            var icons=elements.Select(visual.IconOf).ToArray();
+            Assert.IsTrue(icons.All(icon=>icon!=null));Assert.AreEqual(6,icons.Distinct().Count());
+            var database=AssetDatabase.LoadAssetAtPath<CardDatabase>("Assets/Data/CardDatabase.asset");
+            foreach(var card in database.Cards.OfType<CreatureDef>().GroupBy(c=>c.Element).Select(g=>g.First()))
+            {
+                Object.DestroyImmediate(_view.gameObject);
+                _view=Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Card3D.prefab")).GetComponent<CardView>();
+                _view.Bind(1,card.Id,_faces.Build(card.Id),_skin);
+                var graphic=_view.GetComponentInChildren<CreatureCardFaceView>();
+                var icon=graphic.transform.Find("ElementIcon").GetComponent<UnityEngine.UI.Image>();
+                Assert.AreSame(visual.IconOf(card.Element),icon.sprite,card.Id);
+                Assert.AreEqual(Color.white,icon.color,card.Id);
+                _view.SetDimming(.5f);Assert.AreEqual(new Color(.5f,.5f,.5f,1),icon.color,card.Id);
+                _view.SetDimming(1);Assert.AreEqual(Color.white,icon.color,card.Id);
+                var placeholder=graphic.transform.Find("ArtIcon");
+                if(placeholder!=null)Assert.AreEqual(Color.white,placeholder.GetComponent<UnityEngine.UI.Image>().color,card.Id);
+            }
+        }
+        [Test]
         public void CreaturePower_IsLive_RestoresBase_AndSurvivesDimming()
         {
             _view.Bind(1,"creature.stone-beetle",_faces.Build("creature.stone-beetle"),_skin);

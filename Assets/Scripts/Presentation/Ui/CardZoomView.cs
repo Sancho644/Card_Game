@@ -141,7 +141,7 @@ namespace Game.Presentation.Ui
             SetImage(_rarityBadge, face.RarityIcon, face.RarityColor, keepWithoutSprite: true);
             _strip.color = face.StripColor;
             var ink = _skin.InkOn(face.StripColor);
-            SetImage(_stripIcon, face.ElementIcon, ink, keepWithoutSprite: false);
+            SetImage(_stripIcon, face.ElementIcon, Color.white, keepWithoutSprite: false);
 
             var hasArt = face.Art != null;
             _art.gameObject.SetActive(hasArt);
@@ -156,7 +156,7 @@ namespace Game.Presentation.Ui
                 var shade = face.FrameColor * _skin.PlaceholderBrightness;
                 shade.a = 1f;
                 _artPlaceholder.color = shade;
-                SetImage(_artIcon, face.ElementIcon, face.FrameColor, keepWithoutSprite: false);
+                SetImage(_artIcon, face.ElementIcon, Color.white, keepWithoutSprite: false);
             }
 
             _basePower.SetActive(face.Power.HasValue);
