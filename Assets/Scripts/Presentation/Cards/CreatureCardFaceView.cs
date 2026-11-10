@@ -86,7 +86,8 @@ namespace Game.Presentation.Cards
         private TMP_Text Text(string name,Rect area,string value,Color color)
         {
             var text=Node(name,area).gameObject.AddComponent<TextMeshProUGUI>();text.font=_font;text.text=value;text.richText=false;
-            text.enableAutoSizing=true;text.fontSizeMin=1;text.fontSizeMax=250;text.alignment=TextAlignmentOptions.Center;
+            // Center the visible glyphs, independent of the font's ascender/descender metrics.
+            text.enableAutoSizing=true;text.fontSizeMin=1;text.fontSizeMax=250;text.alignment=TextAlignmentOptions.Midline;
             text.overflowMode=TextOverflowModes.Ellipsis;text.raycastTarget=false;Remember(text,color);return text;
         }
         private void OnDestroy() => DOTween.Kill(this);

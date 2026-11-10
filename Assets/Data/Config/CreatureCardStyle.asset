@@ -22,38 +22,38 @@ MonoBehaviour:
     height: 0.71
   _power:
     serializedVersion: 2
-    x: 0.06
-    y: 0.787
-    width: 0.275
-    height: 0.125
+    x: 0.055
+    y: 0.77
+    width: 0.29
+    height: 0.18
   _elementIcon:
     serializedVersion: 2
-    x: 0.755
-    y: 0.815
-    width: 0.15
-    height: 0.12
+    x: 0.73
+    y: 0.818
+    width: 0.2
+    height: 0.16
   _element:
     serializedVersion: 2
     x: 0.732
-    y: 0.777
+    y: 0.778
     width: 0.21
     height: 0.042
   _title:
     serializedVersion: 2
-    x: 0.09
+    x: 0.08
     y: 0.15
-    width: 0.82
-    height: 0.095
+    width: 0.84
+    height: 0.105
   _type:
     serializedVersion: 2
     x: 0.155
-    y: 0.045
+    y: 0.06
     width: 0.3
     height: 0.04
   _rarity:
     serializedVersion: 2
     x: 0.565
-    y: 0.045
+    y: 0.06
     width: 0.3
     height: 0.04
   _rules:

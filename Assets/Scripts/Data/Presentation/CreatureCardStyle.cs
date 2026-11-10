@@ -7,12 +7,12 @@ namespace Game.Data.Presentation
         [SerializeField] private Sprite _frame;
         [SerializeField] private Color _ink = new Color(1f, .94f, .80f);
         [SerializeField] private Rect _art = new Rect(.035f,.265f,.93f,.71f);
-        [SerializeField] private Rect _power = new Rect(.06f,.787f,.275f,.125f);
-        [SerializeField] private Rect _elementIcon = new Rect(.755f,.815f,.15f,.12f);
-        [SerializeField] private Rect _element = new Rect(.732f,.777f,.21f,.042f);
-        [SerializeField] private Rect _title = new Rect(.09f,.15f,.82f,.095f);
-        [SerializeField] private Rect _type = new Rect(.155f,.045f,.30f,.04f);
-        [SerializeField] private Rect _rarity = new Rect(.565f,.045f,.30f,.04f);
+        [SerializeField] private Rect _power = new Rect(.055f,.77f,.29f,.18f);
+        [SerializeField] private Rect _elementIcon = new Rect(.73f,.818f,.20f,.16f);
+        [SerializeField] private Rect _element = new Rect(.732f,.778f,.21f,.042f);
+        [SerializeField] private Rect _title = new Rect(.08f,.15f,.84f,.105f);
+        [SerializeField] private Rect _type = new Rect(.155f,.06f,.30f,.04f);
+        [SerializeField] private Rect _rarity = new Rect(.565f,.06f,.30f,.04f);
         [SerializeField] private Rect _rules = new Rect(.08f,.29f,.84f,.13f);
         [SerializeField] private Vector2 _worldSize = new Vector2(1.4f,2f);
         [SerializeField] private float _faceDepth = -.03f;
