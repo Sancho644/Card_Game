@@ -23,6 +23,8 @@ namespace Game.Presentation.Menu
         private readonly CollectionCardView _cardView;
         private readonly UnityEngine.UI.Button _collectionTab;
         private readonly UnityEngine.UI.Button _deckTab;
+        private readonly UnityEngine.UI.Button _allTypes;
+        private readonly Dictionary<CardType, UnityEngine.UI.Button> _typeTabs = new Dictionary<CardType, UnityEngine.UI.Button>();
         private readonly TMP_Text _emptyMessage;
         private readonly UnityEngine.UI.Button _remove;
         private readonly UnityEngine.UI.Button _delete;
@@ -78,8 +80,16 @@ namespace Game.Presentation.Menu
             _collectionTab = _ui.Button(_root, "CollectionCards", T("browseCollection"), .60f, .775f, .10f, .045f, () => Browse(true));
             _deckTab.GetComponentInChildren<TMP_Text>().fontSize = style.SmallSize;
             _collectionTab.GetComponentInChildren<TMP_Text>().fontSize = style.SmallSize;
+            var typeFilters = _ui.Rect(_root, "TypeFilters", .30f, .718f, .40f, .044f);
+            _allTypes = TypeButton(typeFilters, "FilterAll", T("filter.All"), 0, () => FilterType(null));
+            var typeIndex = 1;
+            foreach (CardType type in Enum.GetValues(typeof(CardType)))
+            {
+                var selectedType = type;
+                _typeTabs.Add(type, TypeButton(typeFilters, "Filter" + type, T("filter." + type), typeIndex++, () => FilterType(selectedType)));
+            }
             _deck = _ui.Rect(_root, "DeckSlots", .025f, .17f, .255f, .59f);
-            _grid = _ui.Rect(_root, "CardGrid", .30f, .22f, .40f, .54f);
+            _grid = _ui.Rect(_root, "CardGrid", .30f, .22f, .40f, .485f);
             _emptyMessage = _ui.Text(_grid, "EmptyDeck", T("emptyDeck"), .05f, .2f, .9f, .6f);
             _emptyMessage.alignment = TextAlignmentOptions.Center;
             _previous = _ui.Button(_root, "Previous", T("previous"), .30f, .16f, .1f, .045f, () => { _page--; RefreshCards(); });
@@ -179,6 +189,18 @@ namespace Game.Presentation.Menu
             _browseCollection = collection; _type = null; _rarity = null; _page = 0;
             _focused = null; RefreshCards(); RefreshDetails();
         }
+        private UnityEngine.UI.Button TypeButton(Transform parent, string name, string label, int index, Action clicked)
+        {
+            var button = _ui.Button(parent, name, label, index * .25f, 0, .235f, 1, clicked);
+            var text = button.GetComponentInChildren<TMP_Text>();
+            text.enableAutoSizing = true; text.fontSizeMin = _style.SmallSize * .8f; text.fontSizeMax = _style.SmallSize;
+            return button;
+        }
+        private void FilterType(CardType? type)
+        {
+            _type = type; _rarity = null; _page = 0; _focused = null;
+            RefreshCards(); RefreshDetails();
+        }
         private void RefreshCards()
         {
             Clear(_cards);
@@ -187,12 +209,18 @@ namespace Game.Presentation.Menu
                 .Where(c => (!_type.HasValue || c.Type == _type) && (!_rarity.HasValue || c.Rarity == _rarity))
                 .OrderBy(c => c.Type).ThenBy(c => c.Rarity).ThenBy(c => c.DisplayName).ToList();
             _emptyMessage.gameObject.SetActive(list.Count == 0);
+            _emptyMessage.text = T(_type.HasValue ? "noMatchingCards" : "emptyDeck");
             _deckTab.GetComponent<UnityEngine.UI.Image>().color = _browseCollection ? _style.Button : _style.Selected;
             _collectionTab.GetComponent<UnityEngine.UI.Image>().color = _browseCollection ? _style.Selected : _style.Button;
+            _allTypes.GetComponent<UnityEngine.UI.Image>().color = !_type.HasValue ? _style.Selected : _style.Button;
+            foreach (var tab in _typeTabs)
+                tab.Value.GetComponent<UnityEngine.UI.Image>().color = _type == tab.Key ? _style.Selected : _style.Button;
             var pages = Math.Max(1, (list.Count + PageSize - 1) / PageSize);
             _page = Mathf.Clamp(_page, 0, pages - 1);
             _pageLabel.text = _app.Texts.Format("collection.page", _page + 1, pages, list.Count);
-            _filterLabel.text = _type.HasValue ? TypeName(_type.Value) + " · " + RarityName(_rarity.Value) : T(_browseCollection ? "all" : "deckCards");
+            _filterLabel.text = _type.HasValue
+                ? T("filter." + _type.Value) + (_rarity.HasValue ? " · " + RarityName(_rarity.Value) : "")
+                : T(_browseCollection ? "all" : "deckCards");
             _previous.interactable = _page > 0; _next.interactable = _page + 1 < pages;
             var selected = _app.Collection.Get(_editing).Cards;
             var visible = list.Skip(_page * PageSize).Take(PageSize).ToList();
