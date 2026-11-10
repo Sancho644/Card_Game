@@ -88,6 +88,35 @@ namespace Game.Presentation.Tests
         }
 
         [Test]
+        public void LegacySlots_KeepNamesCardsAndSelection_WhenLibraryGrows()
+        {
+            _store.Write("collection.v1.deck.0.name","Старая колода");
+            _store.Write("collection.v1.deck.0.cards",string.Join("\n",_defaults[0].Cards));
+            _store.Write("collection.v1.deck.1.name","");_store.Write("collection.v1.deck.1.cards","");
+            _store.Write("collection.v1.selected","2");
+            var c=Load();Assert.AreEqual(3,c.Count);Assert.AreEqual("Старая колода",c.Get(0).Name);Assert.IsEmpty(c.Get(1).Cards);Assert.AreEqual(2,c.SelectedIndex);
+            for(var i=3;i<15;i++)Assert.AreEqual(i,c.Create("Черновик "+i));
+            var loaded=Load();Assert.AreEqual(15,loaded.Count);Assert.AreEqual(2,loaded.SelectedIndex);
+            Assert.AreEqual("Старая колода",loaded.Get(0).Name);CollectionAssert.AreEqual(_defaults[0].Cards,loaded.Get(0).Cards);
+            Assert.IsEmpty(loaded.Get(1).Cards);Assert.AreEqual("Черновик 14",loaded.Get(14).Name);
+        }
+        [Test]
+        public void AddedDeck_CanBeSelectedAndCleared_WithoutLosingOtherSlots()
+        {
+            var c=Load();var index=c.Create("Четвёртая");foreach(var id in _defaults[0].Cards)c.Replace(index,id);
+            Assert.IsTrue(c.Select(index));var loaded=Load();Assert.AreEqual(index,loaded.SelectedIndex);
+            CollectionAssert.AreEqual(_defaults[0].Cards,loaded.Get(index).Cards);
+            loaded.Delete(index);var cleared=Load();Assert.AreEqual(4,cleared.Count);Assert.IsEmpty(cleared.Get(index).Cards);
+            Assert.AreEqual(9,cleared.Get(0).Cards.Count);Assert.IsFalse(cleared.Select(index));
+            Assert.Throws<ArgumentException>(()=>cleared.Create(" \n"));Assert.AreEqual(4,cleared.Count);
+        }
+        [Test]
+        public void CorruptedLibraryCount_DoesNotHideLegacySlots()
+        {
+            _store.Write("collection.v1.count","-7");Assert.AreEqual(3,Load().Count);
+            _store.Write("collection.v1.count","invalid");Assert.AreEqual(3,Load().Count);
+        }
+        [Test]
         public void Names_TrimmedLimited_EmptyDoesNotOverwrite()
         {
             var c = Load(); c.Rename(0, new string('А', 80)); Assert.AreEqual(32, Load().Get(0).Name.Length);

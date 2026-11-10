@@ -5,6 +5,19 @@ namespace Game.Data.Presentation
     public sealed class CollectionSettings : ScriptableObject
     {
         [SerializeField] private VisualSettings _cardVisuals;
+        [Header("Library artwork")]
+        [SerializeField] private Sprite _panelArt;
+        [SerializeField] private Sprite _buttonArt;
+        [SerializeField] private Rect _panelCrop = new Rect(.008f,.012f,.984f,.976f);
+        [SerializeField] private Rect _buttonCrop = new Rect(.002f,.24f,.996f,.58f);
+        [SerializeField, Min(.1f)] private float _sliceDensity = 3;
+        [SerializeField, Min(.1f)] private float _buttonSliceDensity = 8;
+        public Sprite PanelArt => _panelArt;
+        public Sprite ButtonArt => _buttonArt;
+        public Rect PanelCrop => _panelCrop;
+        public Rect ButtonCrop => _buttonCrop;
+        public float SliceDensity => _sliceDensity;
+        public float ButtonSliceDensity => _buttonSliceDensity;
         public VisualSettings CardVisuals => _cardVisuals;
         [SerializeField] private Color _background = new Color(0.055f, 0.075f, 0.11f, 1f);
         [SerializeField] private Color _panel = new Color(0.09f, 0.12f, 0.17f, 1f);

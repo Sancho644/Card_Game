@@ -1,0 +1,16 @@
+{
+  "generator": "Built-in image_gen",
+  "reference": "docs/mockups/collection-v2/03-library-editor.png",
+  "transparent_background": true,
+  "assets": [
+    {
+      "file": "Assets/Art/UI/Collection/panel-v1.png",
+      "prompt": "Use case: precise-object-edit / ui-mockup. Input image 1 is the approved visual style reference ONLY. Generate ONE standalone production Unity UI sprite, NOT a complete screen. Match the dark teal stone surfaces, restrained warm bronze bevel edging and chamfered architectural corners of the reference. No leaves, no vines, no plants, no floral engraving. No text, no letters, no symbols, no icons, no numbers, no cards. Straight-on flat orthographic graphic, crisp symmetrical edges, suitable for nine-slice resizing. Interior completely opaque, outside silhouette fully transparent, no shadow beyond the contour, no glow. Borders have uniform thickness along straight sides; all ornamental changes are confined to corners. One LARGE RECTANGULAR PANEL with width to height ratio 3:2. Thin double bronze stone frame, corners beveled about 3 percent of width, large calm empty deep teal matte stone center with very subtle low-contrast texture. The frame hugs the canvas edges with only 1 percent transparent margin. 95 percent of the center is empty and unobstructed; no central shapes or lighting hotspots. A neutral reusable container for the collection grid and deck matrix."
+    },
+    {
+      "file": "Assets/Art/UI/Collection/button-v1.png",
+      "prompt": "Use case: precise-object-edit / ui-mockup. Input image 1 is the approved visual style reference ONLY. Generate ONE standalone production Unity UI sprite, NOT a complete screen. Match the dark teal stone surfaces, restrained warm bronze bevel edging and chamfered architectural corners of the reference. No leaves, no vines, no plants, no floral engraving. No text, no letters, no symbols, no icons, no numbers, no cards. Straight-on flat orthographic graphic, crisp symmetrical edges, suitable for nine-slice resizing. Interior completely opaque, outside silhouette fully transparent, no shadow beyond the contour, no glow. Borders have uniform thickness along straight sides; all ornamental changes are confined to corners. One WIDE EMPTY BUTTON background, width to height 4:1. Dark teal smooth stone fill, substantial but restrained bronze beveled rim, neatly cut octagonal corners, warm upper edge highlight and darker lower bevel. No embossed central design. Canvas tightly fits the button with only 1 percent transparent margin. Clear distinct tactile edge, center uniform and dark enough for ivory live text. A neutral normal-state button usable for search inputs, filter tabs and primary actions."
+    }
+  ],
+  "rendering": "Runtime 9-slice sprites use configurable normalized crops and borders; source PNG files are unchanged."
+}

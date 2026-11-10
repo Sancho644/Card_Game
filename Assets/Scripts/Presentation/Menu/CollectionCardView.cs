@@ -16,21 +16,30 @@ namespace Game.Presentation.Menu
         public CollectionCardView(CollectionUi ui, CollectionSettings style, CardFaceBuilder faces)
         { _ui = ui; _style = style; _faces = faces; }
 
-        public UnityEngine.UI.Button Create(Transform parent, CardDef card, int index, bool inDeck, bool selected, string inDeckText, Action clicked)
+        public UnityEngine.UI.Button Create(Transform parent, CardDef card, int index, bool inDeck, bool selected, string inDeckText, Action clicked, int columns = 4, int rows = 2)
         {
             var face = _faces.Build(card.Id);
-            var cell = _ui.Rect(parent, "CardCell", index % 3 / 3f, 1 - (index / 3 + 1) / 2f, 1f / 3, .5f);
+            var cell = _ui.Rect(parent, "CardCell", index % columns / (float)columns, 1 - (index / columns + 1) / (float)rows, 1f / columns, 1f / rows);
             var padding = _ui.Rect(cell, "Padding", .05f, .055f, .90f, .89f);
             var holder = _ui.Rect(padding, "CardBounds", 0, 0, 1, 1);
             var fit = holder.gameObject.AddComponent<UnityEngine.UI.AspectRatioFitter>();
             fit.aspectMode = UnityEngine.UI.AspectRatioFitter.AspectMode.FitInParent; fit.aspectRatio = .70f;
             var button = _ui.Button(holder, "Card_" + card.Id, "", 0, 0, 1, 1, clicked);
             button.GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
+            button.GetComponent<UnityEngine.UI.Image>().sprite = null;
             button.GetComponent<UnityEngine.UI.Image>().color = selected ? _style.CardVisuals.Selected : face.RarityColor;
+            var outline = button.gameObject.AddComponent<UnityEngine.UI.Outline>();
+            outline.effectColor = selected ? new Color(1f,.7f,.2f) : new Color(.5f,.65f,.6f,.3f);
+            outline.effectDistance = new Vector2(selected ? 4 : 1, selected ? -4 : -1);
             if(face.Power.HasValue && _style.CardVisuals.CreatureStyle!=null)
             {
                 var view=CreatureCardFaceView.Create(button.transform);
                 view.Bind(face,new CardSkin(_style.CardVisuals),_ui.Font);
+                outline.enabled=false;
+                button.GetComponent<UnityEngine.UI.Image>().color=Color.clear;
+                var frameOutline=view.transform.Find("Frame").gameObject.AddComponent<UnityEngine.UI.Outline>();
+                frameOutline.effectColor=new Color(1f,.65f,.15f,.8f);frameOutline.effectDistance=new Vector2(2,-2);frameOutline.enabled=selected;
+                if(inDeck) Text(button.transform,"InDeck",inDeckText,.32f,.92f,.36f,.05f,_style.SmallSize*.6f).alignment=TextAlignmentOptions.Center;
                 return button;
             }
             var body = Panel(button.transform, "Face", .025f, .018f, .95f, .964f, _style.CardVisuals.CardBody);
@@ -53,7 +62,8 @@ namespace Game.Presentation.Menu
             }
             var strip = Panel(body, "StatsStrip", .055f, .35f, .89f, .085f, face.StripColor);
             var stats = Text(strip, "Stats", face.Stats, .025f, .04f, .95f, .92f, _style.SmallSize * .8f);
-            stats.color = _style.CardVisuals.StripIconColor; stats.alignment = TextAlignmentOptions.Center;
+            stats.color = _style.CardVisuals.StripIconColor; stats.alignment = TextAlignmentOptions.Midline;
+            stats.fontSizeMin = 1; stats.textWrappingMode = TextWrappingModes.NoWrap;
             if (face.Power.HasValue)
             {
                 var badge = Panel(art, "PowerBadge", .61f, .04f, .35f, .27f, _style.CardVisuals.PowerBadge);

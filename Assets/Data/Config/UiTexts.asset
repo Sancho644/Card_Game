@@ -337,3 +337,45 @@ MonoBehaviour:
     Text: "\u0421\u043F\u043E\u0441\u043E\u0431\u043D\u043E\u0441\u0442\u0438"
   - Key: collection.noMatchingCards
     Text: "\u041D\u0435\u0442 \u043A\u0430\u0440\u0442 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u043E\u0433\u043E \u0442\u0438\u043F\u0430."
+  - Key: library.myDecks
+    Text: "\u041C\u043E\u0438 \u043A\u043E\u043B\u043E\u0434\u044B"
+  - Key: library.collection
+    Text: "\u041A\u043E\u043B\u043B\u0435\u043A\u0446\u0438\u044F"
+  - Key: library.newDeck
+    Text: "+ \u041D\u043E\u0432\u0430\u044F \u043A\u043E\u043B\u043E\u0434\u0430"
+  - Key: library.newName
+    Text: "\u041D\u043E\u0432\u0430\u044F \u043A\u043E\u043B\u043E\u0434\u0430 {0}"
+  - Key: library.searchCards
+    Text: "\u041F\u043E\u0438\u0441\u043A \u043A\u0430\u0440\u0442..."
+  - Key: library.searchDecks
+    Text: "\u041F\u043E\u0438\u0441\u043A \u043A\u043E\u043B\u043E\u0434..."
+  - Key: library.rarity
+    Text: "\u0420\u0435\u0434\u043A\u043E\u0441\u0442\u044C"
+  - Key: library.saved
+    Text: "\u0421\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u043E"
+  - Key: library.ready
+    Text: "\u0413\u043E\u0442\u043E\u0432\u0430 \u043A \u0438\u0433\u0440\u0435"
+  - Key: library.incomplete
+    Text: "\u0417\u0430\u043F\u043E\u043B\u043D\u0438\u0442\u0435 \u0432\u0441\u0435 9 \u044F\u0447\u0435\u0435\u043A \u043A\u043E\u043B\u043E\u0434\u044B."
+  - Key: library.noResults
+    Text: "\u041D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E"
+  - Key: library.cardCount
+    Text: "{0} \u043A\u0430\u0440\u0442"
+  - Key: library.deckCount
+    Text: "{0} \u043A\u043E\u043B\u043E\u0434"
+  - Key: library.unnamed
+    Text: "\u0411\u0435\u0437 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u044F"
+  - Key: library.emptySlot
+    Text: +
+  - Key: library.edit
+    Text: "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C"
+  - Key: library.details
+    Text: "\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435"
+  - Key: library.removeCard
+    Text: "\u0423\u0431\u0440\u0430\u0442\u044C"
+  - Key: library.clearDeck
+    Text: "\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C \u043A\u043E\u043B\u043E\u0434\u0443"
+  - Key: library.close
+    Text: "\u0417\u0430\u043A\u0440\u044B\u0442\u044C"
+  - Key: library.actions
+    Text: ...
