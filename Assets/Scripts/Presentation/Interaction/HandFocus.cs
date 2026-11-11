@@ -33,6 +33,7 @@ namespace Game.Presentation.Interaction
         private readonly Func<IEnumerable<CardView>> _cards;
         private readonly float _cardHeight;
         private readonly float _cardAspect;
+        private readonly HashSet<CardView> _knownHand = new HashSet<CardView>();
         private CardView _hovered;
         private CardView _pinned;
         private CardView _lifted;
@@ -51,6 +52,7 @@ namespace Game.Presentation.Interaction
         /// <summary>The pointer is over this card (null: over none); only hand cards lift.</summary>
         public void Hover(CardView card)
         {
+            ReconcileHand();
             _hovered = card;
             Apply();
         }
@@ -58,18 +60,24 @@ namespace Game.Presentation.Interaction
         /// <summary>Keeps the card up until <see cref="Unpin"/>.</summary>
         public void Pin(CardView card)
         {
+            ReconcileHand();
             _pinned = card;
             Apply();
         }
 
         public void Unpin()
         {
+            ReconcileHand();
             _pinned = null;
             Apply();
         }
 
         /// <summary>Rebuilds neighbour offsets after the hand changes or its cards move to new slots.</summary>
-        public void Refresh() => Apply(force: true);
+        public void Refresh()
+        {
+            ReconcileHand();
+            Apply(force: true);
+        }
 
         /// <summary>A card picked up to drag: it grows a little and turns to face the player; the hand settles.</summary>
         public void Grab(CardView card)
@@ -124,6 +132,18 @@ namespace Game.Presentation.Interaction
 
         private List<CardView> Hand() =>
             _cards().Where(card => card != null && card.IsInHand).OrderBy(card => card.transform.position.x).ToList();
+
+        private void ReconcileHand()
+        {
+            var hand = Hand();
+            if (_knownHand.SetEquals(hand)) return;
+            // Even a card that stayed in hand may move under a stationary pointer when creatures return.
+            // Drop the old gesture; a fresh hover/tap may then choose a card in the new fan.
+            _hovered = null;
+            _pinned = null;
+            _knownHand.Clear();
+            _knownHand.UnionWith(hand);
+        }
 
         private void Lift(CardView card)
         {

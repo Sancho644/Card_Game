@@ -113,14 +113,17 @@ namespace Game.Presentation.Cards
             _status.gameObject.SetActive(!string.IsNullOrEmpty(status));
         }
 
-        /// <summary>Shows whether the field's condition acts in the current battle; only fields with a condition show it.</summary>
+        /// <summary>Strikes through cancelled condition text instead of showing a separate badge.</summary>
         public void SetCondition(ConditionMark mark)
         {
-            var shown = mark != ConditionMark.None && _face != null && _face.HasCondition;
+            var cancelled = mark == ConditionMark.Cancelled && _face != null && _face.HasCondition;
             if (_conditionBadge != null)
-                _conditionBadge.SetActive(shown);
+                _conditionBadge.SetActive(false);
             if (_conditionCancelled != null)
-                _conditionCancelled.SetActive(shown && mark == ConditionMark.Cancelled);
+                _conditionCancelled.SetActive(false);
+            if (_text != null)
+                _text.fontStyle = cancelled ? _text.fontStyle | FontStyles.Strikethrough
+                    : _text.fontStyle & ~FontStyles.Strikethrough;
         }
 
         /// <summary>Darkens the face, e.g. the owner's own closed field. 1 is the normal face.</summary>

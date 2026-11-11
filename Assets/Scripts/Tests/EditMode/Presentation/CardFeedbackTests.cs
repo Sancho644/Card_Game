@@ -10,9 +10,11 @@ namespace Game.Presentation.Tests
 {
     public sealed class CardFeedbackTests
     {
-        [TestCase(false)]
-        [TestCase(true)]
-        public void ReturnedCreature_DoesNotRestoreOldHoverOrPin(bool pinned)
+        [TestCase(false, false)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(true, true)]
+        public void ReturnedCreature_DoesNotRestoreOldHoverOrPin(bool pinned, bool focusedCardLeaves)
         {
             var activeBefore = DOTween.TotalActiveTweens();
             var cameraGo = new GameObject("RecycleFocusCamera");
@@ -26,7 +28,7 @@ namespace Game.Presentation.Tests
                 {
                     cards[i] = Object.Instantiate(prefab).GetComponent<CardView>();
                     cards[i].transform.position = new Vector3(i - 1, 0, 10);
-                    cards[i].SetInHand(true);
+                    cards[i].SetInHand(focusedCardLeaves || i != 0);
                 }
                 var focus = new HandFocus(camera, animation, () => cards, new Vector2(1.4f, 2));
                 if (pinned) focus.Pin(cards[1]);
@@ -35,10 +37,13 @@ namespace Game.Presentation.Tests
                 Assert.IsTrue(cards[1].IsFocused);
 
                 // The same CardView survives in the field/out pile and later returns to the hand.
-                cards[1].SetInHand(false);
-                focus.Refresh();
-                foreach (var card in cards) DOTween.Complete(card);
-                cards[1].SetInHand(true);
+                if (focusedCardLeaves)
+                {
+                    cards[1].SetInHand(false);
+                    focus.Refresh();
+                    foreach (var card in cards) DOTween.Complete(card);
+                }
+                cards[focusedCardLeaves ? 1 : 0].SetInHand(true);
                 focus.Refresh();
                 foreach (var card in cards) DOTween.Complete(card);
                 foreach (var card in cards)
@@ -63,6 +68,31 @@ namespace Game.Presentation.Tests
                 Object.DestroyImmediate(cameraGo);
             }
             Assert.AreEqual(activeBefore, DOTween.TotalActiveTweens(), "The test must not leave tweens targeting destroyed cards.");
+        }
+
+        [Test]
+        public void CancelledFieldCondition_StrikesTextWithoutBadge_AndRestoresIt()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Card3D.prefab");
+            var card = Object.Instantiate(prefab).GetComponent<CardView>();
+            try
+            {
+                var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+                var face = new CardFace("Поле", "", "Условие", "", Color.white, Color.white, null,
+                    Color.white, null, null, null, hasCondition: true);
+                typeof(CardView).GetField("_face", flags).SetValue(card, face);
+                var text = (TMPro.TMP_Text)typeof(CardView).GetField("_text", flags).GetValue(card);
+                var badge = (GameObject)typeof(CardView).GetField("_conditionBadge", flags).GetValue(card);
+                card.SetCondition(ConditionMark.Cancelled);
+                Assert.IsTrue((text.fontStyle & TMPro.FontStyles.Strikethrough) != 0);
+                Assert.IsFalse(badge.activeSelf);
+                card.SetCondition(ConditionMark.Active);
+                Assert.IsFalse((text.fontStyle & TMPro.FontStyles.Strikethrough) != 0);
+                Assert.IsFalse(badge.activeSelf);
+                card.SetCondition(ConditionMark.None);
+                Assert.IsFalse((text.fontStyle & TMPro.FontStyles.Strikethrough) != 0);
+            }
+            finally { Object.DestroyImmediate(card.gameObject); }
         }
 
         [TestCase(false)]

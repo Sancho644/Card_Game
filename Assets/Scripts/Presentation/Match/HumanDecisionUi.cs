@@ -147,7 +147,10 @@ namespace Game.Presentation.Match
             var choosing = _selector.IsSelecting && _selector.Source != null;
             _actionBar.ShowCancel(choosing ? _selector.Cancel : (Action)null);
             var fieldChoice = _view?.ChoicePurpose == ChoicePurpose.InitialField || _view?.ChoicePurpose == ChoicePurpose.ReplacementField;
-            _prompt.Show(_texts.Get(fieldChoice ? UiTextKeys.ChoiceField : choosing ? UiTextKeys.PromptTarget : UiTextKeys.PromptSelect));
+            if (fieldChoice || choosing)
+                _prompt.Show(_texts.Get(fieldChoice ? UiTextKeys.ChoiceField : UiTextKeys.PromptTarget));
+            else
+                _prompt.Hide();
         }
 
         private void OnOptionsRequested(IReadOnlyList<int> values)
