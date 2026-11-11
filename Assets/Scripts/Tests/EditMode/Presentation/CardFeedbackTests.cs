@@ -12,6 +12,54 @@ namespace Game.Presentation.Tests
     {
         [TestCase(false)]
         [TestCase(true)]
+        public void ReturnedCreature_DoesNotRestoreOldHoverOrPin(bool pinned)
+        {
+            var cameraGo = new GameObject("RecycleFocusCamera");
+            var cards = new CardView[3];
+            try
+            {
+                var camera = cameraGo.AddComponent<Camera>();
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Card3D.prefab");
+                var animation = AssetDatabase.LoadAssetAtPath<AnimationSettings>("Assets/Data/Config/AnimationSettings.asset");
+                for (var i = 0; i < cards.Length; i++)
+                {
+                    cards[i] = Object.Instantiate(prefab).GetComponent<CardView>();
+                    cards[i].transform.position = new Vector3(i - 1, 0, 10);
+                    cards[i].SetInHand(true);
+                }
+                var focus = new HandFocus(camera, animation, () => cards, new Vector2(1.4f, 2));
+                if (pinned) focus.Pin(cards[1]);
+                else focus.Hover(cards[1]);
+                foreach (var card in cards) DOTween.Complete(card);
+                Assert.IsTrue(cards[1].IsFocused);
+
+                // The same CardView survives in the field/out pile and later returns to the hand.
+                cards[1].SetInHand(false);
+                focus.Refresh();
+                foreach (var card in cards) DOTween.Complete(card);
+                cards[1].SetInHand(true);
+                focus.Refresh();
+                foreach (var card in cards) DOTween.Complete(card);
+                foreach (var card in cards)
+                {
+                    Assert.IsFalse(card.IsFocused, "Recycling must not resurrect old selection.");
+                    Assert.IsFalse(card.IsDisplaced);
+                    Assert.AreEqual(Vector3.zero, card.Visual.localPosition);
+                }
+
+                // A new gesture must still be able to raise the returned creature.
+                focus.Pin(cards[1]);
+                Assert.IsTrue(cards[1].IsFocused);
+            }
+            finally
+            {
+                foreach (var card in cards) if (card != null) Object.DestroyImmediate(card.gameObject);
+                Object.DestroyImmediate(cameraGo);
+            }
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
         public void PlayedFocusedCard_ReleasesItsNeighbours(bool refreshWithoutPointerMove)
         {
             var cameraGo = new GameObject("FocusCamera");

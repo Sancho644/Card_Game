@@ -97,7 +97,11 @@ namespace Game.Presentation.Interaction
 
         private void Apply(bool force = false)
         {
-            var wanted = Valid(_hovered) ?? Valid(_pinned);
+            // Forget a card once it leaves the hand. Keeping the reference would lift it again
+            // when recycled creatures return, even without a new hover or tap.
+            _hovered = Valid(_hovered);
+            _pinned = Valid(_pinned);
+            var wanted = _hovered ?? _pinned;
             if (!force && wanted == _lifted)
                 return;
 
