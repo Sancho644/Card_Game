@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84466612480cb0e40a435d503bb49bf2, type: 3}
   m_Name: LoadingScreen
   m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.LoadingScreenSettings
+  _showOnTransitions: 0
   _background: {fileID: 21300000, guid: c24a269a8885b0640b6b28e65469a21f, type: 3}
   _seal: {fileID: 21300000, guid: bb530eb773b41a44fb29bd57e014fe53, type: 3}
   _style: {fileID: 11400000, guid: 5a8467d43e5ea3b40bc2be7b09163bd8, type: 2}

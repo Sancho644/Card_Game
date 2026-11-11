@@ -29,6 +29,7 @@ namespace Game.Presentation.Ui
         private int _shownPercent = -1;
 
         public bool IsVisible => gameObject.activeSelf && _group.alpha > 0;
+        public bool ShowOnTransitions => _settings.ShowOnTransitions;
         public float Progress => _progress;
 
         public void Initialize(LoadingScreenSettings settings, UiTexts texts)

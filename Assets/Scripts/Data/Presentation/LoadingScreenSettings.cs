@@ -5,6 +5,7 @@ namespace Game.Data.Presentation
     [CreateAssetMenu(menuName = "Game/Config/Loading Screen", fileName = "LoadingScreen")]
     public sealed class LoadingScreenSettings : ScriptableObject
     {
+        [SerializeField] private bool _showOnTransitions;
         [SerializeField] private Sprite _background;
         [SerializeField] private Sprite _seal;
         [SerializeField] private CollectionSettings _style;
@@ -16,6 +17,7 @@ namespace Game.Data.Presentation
         [SerializeField, Min(1)] private float _tipSeconds = 6f;
         [SerializeField] private string[] _tips = { "loading.tip.zoom", "loading.tip.field", "loading.tip.ready" };
 
+        public bool ShowOnTransitions => _showOnTransitions;
         public Sprite Background => _background;
         public Sprite Seal => _seal;
         public CollectionSettings Style => _style;

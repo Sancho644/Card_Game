@@ -32,14 +32,14 @@ namespace Game.Presentation.App
         {
             if (IsLoading) return;
             IsLoading = true;
-            _loading.Show();
-            StartCoroutine(Transition(scene));
+            var showOverlay = _loading.ShowOnTransitions;
+            if (showOverlay) _loading.Show();
+            StartCoroutine(Transition(scene, showOverlay));
         }
 
-        private IEnumerator Transition(string scene)
+        private IEnumerator Transition(string scene, bool showOverlay)
         {
-            // Render the overlay before loading work starts on the next frame.
-            yield return null;
+            if (showOverlay) yield return null;
             _operation = BeginLoad(scene);
             if (_operation == null)
             {
@@ -47,17 +47,20 @@ namespace Game.Presentation.App
                 IsLoading = false;
                 yield break;
             }
-            _operation.allowSceneActivation = false;
+            _operation.allowSceneActivation = !showOverlay;
             while (!_operation.isDone)
             {
-                _loading.SetProgress(_operation.progress);
-                if (_operation.progress >= .9f) _operation.allowSceneActivation = true;
+                if (showOverlay)
+                {
+                    _loading.SetProgress(_operation.progress);
+                    if (_operation.progress >= .9f) _operation.allowSceneActivation = true;
+                }
                 yield return null;
             }
-            _loading.SetProgress(1);
+            if (showOverlay) _loading.SetProgress(1);
             // Scene roots receive services in sceneLoaded, then build their UI in Start.
             yield return null;
-            yield return _loading.FadeOut();
+            if (showOverlay) yield return _loading.FadeOut();
             _operation = null;
             IsLoading = false;
         }
