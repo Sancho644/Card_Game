@@ -68,6 +68,9 @@ namespace Game.Presentation.Interaction
             Apply();
         }
 
+        /// <summary>Rebuilds neighbour offsets after the hand changes or its cards move to new slots.</summary>
+        public void Refresh() => Apply(force: true);
+
         /// <summary>A card picked up to drag: it grows a little and turns to face the player; the hand settles.</summary>
         public void Grab(CardView card)
         {
@@ -92,10 +95,10 @@ namespace Game.Presentation.Interaction
             }
         }
 
-        private void Apply()
+        private void Apply(bool force = false)
         {
             var wanted = Valid(_hovered) ?? Valid(_pinned);
-            if (wanted == Valid(_lifted))
+            if (!force && wanted == _lifted)
                 return;
 
             _lifted = wanted;

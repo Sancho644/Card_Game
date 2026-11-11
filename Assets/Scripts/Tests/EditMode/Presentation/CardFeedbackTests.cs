@@ -1,6 +1,8 @@
 using Game.Data.Presentation;
 using Game.Presentation.Cards;
 using Game.Presentation.Table;
+using Game.Presentation.Interaction;
+using DG.Tweening;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -8,6 +10,50 @@ namespace Game.Presentation.Tests
 {
     public sealed class CardFeedbackTests
     {
+        [TestCase(false)]
+        [TestCase(true)]
+        public void PlayedFocusedCard_ReleasesItsNeighbours(bool refreshWithoutPointerMove)
+        {
+            var cameraGo = new GameObject("FocusCamera");
+            var cards = new CardView[3];
+            try
+            {
+                var camera = cameraGo.AddComponent<Camera>();
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Card3D.prefab");
+                var animation = AssetDatabase.LoadAssetAtPath<AnimationSettings>("Assets/Data/Config/AnimationSettings.asset");
+                Assert.NotNull(animation);
+                for (var i = 0; i < cards.Length; i++)
+                {
+                    cards[i] = Object.Instantiate(prefab).GetComponent<CardView>();
+                    cards[i].transform.position = new Vector3(i - 1, 0, 10);
+                    cards[i].SetInHand(true);
+                }
+                var focus = new HandFocus(camera, animation, () => cards, new Vector2(1.4f, 2));
+                focus.Hover(cards[1]);
+                foreach (var card in cards) DOTween.Complete(card);
+                Assert.IsTrue(cards[0].IsDisplaced);
+                Assert.IsTrue(cards[2].IsDisplaced);
+
+                cards[1].SetInHand(false);
+                // TableSync has compacted the root slots, but no pointer movement is required to settle their visuals.
+                cards[0].Place(new CardPose(new Vector3(-.5f, 0, 10), Quaternion.identity));
+                cards[2].Place(new CardPose(new Vector3(.5f, 0, 10), Quaternion.identity));
+                if (refreshWithoutPointerMove) focus.Refresh();
+                else focus.Hover(null);
+                foreach (var card in cards) DOTween.Complete(card);
+                foreach (var card in new[] { cards[0], cards[2] })
+                {
+                    Assert.IsFalse(card.IsDisplaced, "Played card must not leave neighbour spread behind.");
+                    Assert.AreEqual(Vector3.zero, card.Visual.localPosition);
+                }
+            }
+            finally
+            {
+                foreach (var card in cards) if (card != null) Object.DestroyImmediate(card.gameObject);
+                Object.DestroyImmediate(cameraGo);
+            }
+        }
+
         [TestCase(5)]
         [TestCase(9)]
         public void HandFan_OuterEdgesAndCentresPointDown(int count)

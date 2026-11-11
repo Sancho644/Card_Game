@@ -343,6 +343,10 @@ namespace Game.Presentation.Interaction
             return true;
         }
 
-        private void OnQueueIdle() => _speed.EndFastForward();
+        private void OnQueueIdle()
+        {
+            _speed.EndFastForward();
+            _focus.Refresh();
+        }
     }
 }
