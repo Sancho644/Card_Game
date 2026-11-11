@@ -8,6 +8,8 @@ namespace Game.Data.Presentation
         public const string PlayerYou = "player.you";
         public const string PlayerOpponent = "player.opponent";
         public const string MenuTitle = "menu.title";
+        public const string LoadingTitle = "loading.title";
+        public const string LoadingPercent = "loading.percent";
         public const string MenuVersusAi = "menu.versus-ai";
         public const string MenuHotSeat = "menu.hot-seat";
         public const string MenuDeck = "menu.deck";

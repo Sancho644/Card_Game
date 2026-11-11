@@ -4,7 +4,7 @@ using DG.Tweening;
 namespace Game.Presentation.Animation
 {
     /// <summary>Plays a DOTween tween created at the step's turn, so it starts from the current state.</summary>
-    public sealed class TweenStep : IAnimationStep
+    public sealed class TweenStep : IAnimationStep, IDisposable
     {
         private readonly Func<Tween> _create;
         private Tween _tween;
@@ -32,5 +32,8 @@ namespace Game.Presentation.Animation
             if (_tween != null && _tween.IsActive())
                 _tween.Kill(complete: true);
         }
+
+        /// <summary>Cancel without applying final values or running completion callbacks during scene unload.</summary>
+        public void Dispose() => _tween?.Kill(complete: false);
     }
 }

@@ -47,7 +47,9 @@ namespace Game.Presentation.Animation
         {
             _stopped = true;
             _steps.Clear();
+            var current = _current;
             _current = null;
+            (current as IDisposable)?.Dispose();
         }
 
         private void Pump()

@@ -8,6 +8,7 @@ using Game.Data.Config;
 using Game.Data.Decks;
 using Game.Data.Presentation;
 using Game.Presentation.Audio;
+using Game.Presentation.Ui;
 using Game.Services.Matchmaking;
 using Game.Services.Settings;
 using UnityEngine;
@@ -28,6 +29,8 @@ namespace Game.Presentation.App
         [SerializeField] private MatchmakingConfig _matchmaking;
         [SerializeField] private UiTexts _texts;
         [SerializeField] private SoundSettings _sounds;
+        [SerializeField] private LoadingScreenSettings _loadingSettings;
+        [SerializeField] private LoadingScreenView _loadingScreen;
         [SerializeField] private List<DeckDef> _decks = new List<DeckDef>();
 
         [Header("Scenes")]
@@ -39,6 +42,10 @@ namespace Game.Presentation.App
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
+            var loading = Instantiate(_loadingScreen, transform);
+            loading.Initialize(_loadingSettings, _texts);
+            var scenes = gameObject.AddComponent<SceneNavigator>();
+            scenes.Configure(_mainMenuScene, _matchScene, loading);
 
             var catalog = _database.ToCatalog();
             var rules = _rules.ToRules();
@@ -57,7 +64,7 @@ namespace Game.Presentation.App
                 _decks.Where(deck => deck != null).ToList(),
                 _ai,
                 matchmaking,
-                new SceneNavigator(_mainMenuScene, _matchScene),
+                scenes,
                 random,
                 new LocalPlayerSettingsService(new PlayerPrefsSettingsStore()),
                 sound);

@@ -3,7 +3,7 @@ using DG.Tweening;
 
 namespace Game.Presentation.Animation
 {
-    public sealed class DelayStep : IAnimationStep
+    public sealed class DelayStep : IAnimationStep, IDisposable
     {
         private readonly float _seconds;
         private Tween _delay;
@@ -16,5 +16,6 @@ namespace Game.Presentation.Animation
         public void Play(Action done) => _delay = DOVirtual.DelayedCall(_seconds, () => done());
 
         public void Complete() => _delay?.Kill();
+        public void Dispose() => _delay?.Kill();
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Game.Presentation.Animation
 {
     /// <summary>Highlights the already visible card during a scalable pause; a missing card still gets the pause.</summary>
-    public sealed class OpponentHighlightStep : IAnimationStep
+    public sealed class OpponentHighlightStep : IAnimationStep, IDisposable
     {
         private readonly Func<CardView> _findCard;
         private readonly Color _color;
@@ -39,5 +39,7 @@ namespace Game.Presentation.Animation
         {
             if (_card != null) _card.SetHighlight(null);
         }
+
+        public void Dispose() => _delay?.Kill();
     }
 }
