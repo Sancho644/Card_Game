@@ -369,7 +369,10 @@ namespace Game.Presentation.Cards
                     rect.localPosition=new Vector3(0,0,_skin.CreatureStyle.FaceDepth);
                 }
                 _creatureFace.Bind(_face,_skin,_title.font);_creatureFace.SetDimming(_dimming);
-                foreach(var item in LegacyFace())if(item!=null)item.SetActive(false);
+                // Transparent world-space creature canvases need an opaque front-facing depth plate.
+                // The back is culled from this side; without the plate, canvas distance sorting can
+                // draw a left creature over its right neighbour after the hand is rearranged.
+                foreach(var item in LegacyFace())if(item!=null)item.SetActive(_frame != null && item == _frame.gameObject);
             }
         }
 

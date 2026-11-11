@@ -10,6 +10,48 @@ namespace Game.Presentation.Tests
 {
     public sealed class CardFeedbackTests
     {
+        [TestCase(6)]
+        [TestCase(9)]
+        public void HandCreatureFace_HasOpaqueFrontBackingBehindItsArt(int count)
+        {
+            var go = new GameObject("HandDepthTest");
+            var cameraGo = new GameObject("HandDepthCamera");
+            GameObject instance = null;
+            try
+            {
+                var settings = AssetDatabase.LoadAssetAtPath<TablePresentationSettings>("Assets/Data/Config/TablePresentation.asset");
+                var style = AssetDatabase.LoadAssetAtPath<CreatureCardStyle>("Assets/Data/Config/CreatureCardStyle.asset");
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Card3D.prefab");
+                instance = Object.Instantiate(prefab);
+                var card = instance.GetComponent<CardView>();
+                var visual = AssetDatabase.LoadAssetAtPath<VisualSettings>("Assets/Data/Config/VisualSettings.asset");
+                var database = AssetDatabase.LoadAssetAtPath<Game.Data.Cards.CardDatabase>("Assets/Data/CardDatabase.asset");
+                var texts = AssetDatabase.LoadAssetAtPath<UiTexts>("Assets/Data/Config/UiTexts.asset");
+                var faces = new CardFaceBuilder(database, visual, texts);
+                card.Bind(999, "creature.lord-of-crimson-forge", faces.Build("creature.lord-of-crimson-forge"), new CardSkin(visual));
+                var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+                var back = (Renderer)typeof(CardView).GetField("_frame", flags).GetValue(card);
+                Assert.IsTrue(back.gameObject.activeInHierarchy && back.enabled, "Creature binding must retain the opaque front backing.");
+                Assert.Less(back.sharedMaterial.renderQueue, 2500, "The backing must occlude transparent creature canvases.");
+                Assert.AreEqual(1f, back.sharedMaterial.GetFloat("_ZWrite"));
+                var backOffset = instance.transform.InverseTransformPoint(back.transform.position);
+                var faceOffset = instance.transform.InverseTransformPoint(card.Visual.TransformPoint(Vector3.forward * style.FaceDepth));
+                var layout = go.AddComponent<TableLayout>();
+                layout.Configure(settings, cameraGo.AddComponent<Camera>());
+                var normal = Quaternion.Euler(settings.CameraPitch, 0, 0) * Vector3.forward;
+                for (var i = 1; i < count; i++)
+                {
+                    var left = layout.Hand(TableSide.Bottom, i - 1, count, true);
+                    var right = layout.Hand(TableSide.Bottom, i, count, true);
+                    var leftFace = left.Position + left.Rotation * (faceOffset * left.Scale);
+                    var rightBack = right.Position + right.Rotation * (backOffset * right.Scale);
+                    Assert.Greater(Vector3.Dot(leftFace - rightBack, normal), .005f,
+                        "The complete creature art must be behind its right neighbour, not only the glow or root transform.");
+                }
+            }
+            finally { if (instance != null) Object.DestroyImmediate(instance); Object.DestroyImmediate(go); Object.DestroyImmediate(cameraGo); }
+        }
+
         [TestCase(false, false)]
         [TestCase(true, false)]
         [TestCase(false, true)]
