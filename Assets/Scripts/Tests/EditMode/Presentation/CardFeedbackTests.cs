@@ -14,6 +14,7 @@ namespace Game.Presentation.Tests
         [TestCase(true)]
         public void ReturnedCreature_DoesNotRestoreOldHoverOrPin(bool pinned)
         {
+            var activeBefore = DOTween.TotalActiveTweens();
             var cameraGo = new GameObject("RecycleFocusCamera");
             var cards = new CardView[3];
             try
@@ -53,15 +54,22 @@ namespace Game.Presentation.Tests
             }
             finally
             {
-                foreach (var card in cards) if (card != null) Object.DestroyImmediate(card.gameObject);
+                foreach (var card in cards) if (card != null)
+                {
+                    // EditMode does not run the card's normal MonoBehaviour destruction lifecycle.
+                    DOTween.Kill(card, complete: false);
+                    Object.DestroyImmediate(card.gameObject);
+                }
                 Object.DestroyImmediate(cameraGo);
             }
+            Assert.AreEqual(activeBefore, DOTween.TotalActiveTweens(), "The test must not leave tweens targeting destroyed cards.");
         }
 
         [TestCase(false)]
         [TestCase(true)]
         public void PlayedFocusedCard_ReleasesItsNeighbours(bool refreshWithoutPointerMove)
         {
+            var activeBefore = DOTween.TotalActiveTweens();
             var cameraGo = new GameObject("FocusCamera");
             var cards = new CardView[3];
             try
@@ -97,9 +105,14 @@ namespace Game.Presentation.Tests
             }
             finally
             {
-                foreach (var card in cards) if (card != null) Object.DestroyImmediate(card.gameObject);
+                foreach (var card in cards) if (card != null)
+                {
+                    DOTween.Kill(card, complete: false);
+                    Object.DestroyImmediate(card.gameObject);
+                }
                 Object.DestroyImmediate(cameraGo);
             }
+            Assert.AreEqual(activeBefore, DOTween.TotalActiveTweens(), "The test must not leave tweens targeting destroyed cards.");
         }
 
         [TestCase(5)]
