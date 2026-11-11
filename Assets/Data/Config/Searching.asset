@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a09d21304e870b4d867276c9e527f52, type: 3}
+  m_Name: Searching
+  m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.SearchingSettings
+  _background: {fileID: 21300000, guid: 6c5507c9837a5e74db49f82c5d48049b, type: 3}
+  _unknownCard: {fileID: 21300000, guid: 2431641aa7d24fd419aa78e8f6df521e, type: 3}
+  _accent: {r: 0.12, g: 1, b: 0.92, a: 1}
+  _pulseSeconds: 1.6
+  _floatSeconds: 3
+  _floatPixels: 5
+  _swayDegrees: 0.8

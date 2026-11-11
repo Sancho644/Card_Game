@@ -21,6 +21,12 @@ namespace Game.Data.Presentation
         public const string On = "toggle.on";
         public const string Off = "toggle.off";
         public const string SearchTitle = "search.title";
+        public const string SearchModeAi = "search.mode.ai";
+        public const string SearchVersus = "search.versus";
+        public const string SearchTimer = "search.timer";
+        public const string SearchDeck = "search.deck";
+        public const string SearchCancel = "search.cancel";
+        public const string SearchUnknown = "search.unknown";
         public const string SearchHint = "search.hint";
         public const string ToMenu = "button.to-menu";
         public const string ElementPrefix = "element.";

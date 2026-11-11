@@ -1,5 +1,6 @@
 using System;
-using DG.Tweening;
+using Game.Data.Presentation;
+using Game.Presentation.App;
 using Game.Presentation.Ui;
 using TMPro;
 using UnityEngine;
@@ -7,16 +8,30 @@ using UnityEngine.UI;
 
 namespace Game.Presentation.Menu
 {
-    /// <summary>"Searching for an opponent": a turning spinner, a pulsing hint and a cancel button.</summary>
+    /// <summary>Selected deck versus an unknown opponent, with an elapsed timer and cancellable search.</summary>
     public sealed class SearchingView : MonoBehaviour
     {
         [SerializeField] private TMP_Text _title;
         [SerializeField] private TMP_Text _hint;
-        [SerializeField] private RectTransform _spinner;
         [SerializeField] private Button _cancel;
-        [SerializeField, Min(0.1f)] private float _turnSeconds = 1.2f;
+        private SearchingLayout _layout;
+        private AppServices _app;
+        private float _startedAt;
+        private int _shownSeconds;
 
-        private Sequence _animation;
+        public void Initialize(SearchingSettings settings, CollectionSettings style, AppServices app)
+        {
+            var font = _title.font;
+            foreach (Transform child in transform) child.gameObject.SetActive(false);
+            var image = GetComponent<UnityEngine.UI.Image>();
+            if (image != null) image.enabled = false;
+            _app = app;
+            // TMP applies its initial defaults in Awake; build under an active parent before styling text.
+            gameObject.SetActive(true);
+            _layout = new SearchingLayout(transform, font, style, settings, app);
+            _title = _layout.Title; _hint = _layout.Hint; _cancel = _layout.Cancel;
+            gameObject.SetActive(false);
+        }
 
         public void Show(string title, string hint, string cancelLabel, Action cancel)
         {
@@ -25,34 +40,29 @@ namespace Game.Presentation.Menu
             UiButtons.SetLabel(_cancel, cancelLabel);
             UiButtons.Bind(_cancel, cancel);
             gameObject.SetActive(true);
-            Animate();
+            _layout.RefreshDeck();
+            _startedAt = Time.unscaledTime;
+            _shownSeconds = -1;
+            transform.SetAsLastSibling();
+            Update();
         }
 
         public void Hide()
         {
-            Stop();
             gameObject.SetActive(false);
         }
 
-        private void OnDestroy() => Stop();
-
-        private void Animate()
+        private void Update()
         {
-            Stop();
-            _spinner.localRotation = Quaternion.identity;
-            _hint.alpha = 1f;
-            _animation = DOTween.Sequence()
-                .Join(_spinner.DOLocalRotate(new Vector3(0, 0, -360), _turnSeconds, RotateMode.FastBeyond360).SetEase(Ease.Linear))
-                .Join(_hint.DOFade(0.35f, _turnSeconds / 2).SetLoops(2, LoopType.Yoyo))
-                .SetLoops(-1)
-                .SetUpdate(true);
+            if (_layout == null) return;
+            var elapsed = Mathf.Max(0, Time.unscaledTime - _startedAt);
+            _layout.Animate(elapsed);
+            var seconds = Mathf.FloorToInt(elapsed);
+            if (seconds == _shownSeconds) return;
+            _shownSeconds = seconds;
+            _layout.Timer.text = _app.Texts.Format(UiTextKeys.SearchTimer, seconds / 60, seconds % 60);
         }
 
-        private void Stop()
-        {
-            if (_animation != null && _animation.IsActive())
-                _animation.Kill();
-            _animation = null;
-        }
+        private void OnDestroy() => _layout?.Dispose();
     }
 }

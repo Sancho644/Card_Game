@@ -25,6 +25,7 @@ namespace Game.Presentation.Menu
 
         [SerializeField] private CollectionSettings _collectionSettings;
         [SerializeField] private MainMenuSettings _menuSettings;
+        [SerializeField] private SearchingSettings _searchSettings;
         private CollectionScreen _collection;
         private AppServices _app;
         private bool _searchingForMatch;
@@ -41,6 +42,7 @@ namespace Game.Presentation.Menu
                 return;
             }
 
+            _searching.Initialize(_searchSettings, _collectionSettings, _app);
             _searching.Hide();
             _options.Hide();
             _app.DeckIndex = Mathf.Clamp(_app.DeckIndex, 0, Mathf.Max(0, _app.Decks.Count - 1));
@@ -105,7 +107,7 @@ namespace Game.Presentation.Menu
             if (!_app.Collection.Validate(_app.Collection.SelectedIndex).IsValid) { ChooseDeck(); return; }
             _menu.Hide();
             _searchingForMatch = true;
-            _searching.Show(Texts.Get(UiTextKeys.SearchTitle), Texts.Get(UiTextKeys.SearchHint), Texts.Get(UiTextKeys.Cancel), CancelSearch);
+            _searching.Show(Texts.Get(UiTextKeys.SearchTitle), Texts.Get(UiTextKeys.SearchHint), Texts.Get(UiTextKeys.SearchCancel), CancelSearch);
             _app.Matchmaking.FindMatch(new MatchRequest(_app.Collection.Selected.ToDeckList(), _app.Difficulty), OnMatchFound);
         }
 
