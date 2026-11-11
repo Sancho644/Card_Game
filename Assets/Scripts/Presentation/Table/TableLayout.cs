@@ -46,6 +46,12 @@ namespace Game.Presentation.Table
 
         private TablePresentationSettings _settings;
         private Camera _camera;
+        private TacticalHudSettings _tactical;
+        public bool TacticalBattle=>_tactical!=null;
+        public void ConfigureTactical(TacticalHudSettings settings)=>_tactical=settings;
+        public CardPose BattleField(bool faceUp)=>new CardPose(new Vector3(0,.05f,0),Face(faceUp),_tactical.BattleFieldScale);
+        public CardPose BattleCreature(TableSide owner)=>new CardPose(new Vector3(owner==TableSide.Bottom?-_tactical.BattleSpacing:_tactical.BattleSpacing,.3f,0),FacingCamera,_tactical.BattleCreatureScale);
+        public CardPose ParkedField(bool faceUp)=>new CardPose(new Vector3(-4.6f,0,3.8f),Face(faceUp),.85f);
 
         /// <summary>Size of a card at scale 1, in world units.</summary>
         public Vector2 CardSize => _cardSize;
@@ -88,7 +94,7 @@ namespace Game.Presentation.Table
             var centre = (count - 1) / 2f;
             var lift = _handLift + index * _layerLift;
             if (side == TableSide.Top)
-                return new CardPose(new Vector3(x, index * _layerLift, _opponentHandDistance), Face(faceUp));
+                return new CardPose(new Vector3(x, index * _layerLift, _tactical!=null?_tactical.OpponentHandDistance:_opponentHandDistance), Face(faceUp));
             var position = new Vector3(x, lift, -_handDistance);
 
             // The whole fan keeps the same arc however many cards there are, so the outer ones never sink off screen.
@@ -144,7 +150,7 @@ namespace Game.Presentation.Table
 
             if (side == TableSide.Top)
             {
-                var top = new Vector3(0f, 0f, _opponentHandDistance);
+                var top = new Vector3(0f, 0f, _tactical!=null?_tactical.OpponentHandDistance:_opponentHandDistance);
                 return Mathf.Clamp(2f * (VisibleHalfWidth(top) - _cardSize.x / 2f) / (count - 1), _minHandSpacing, spacing);
             }
 
@@ -166,8 +172,9 @@ namespace Game.Presentation.Table
         private float VisibleHalfWidth(Vector3 point)
         {
             var safe = Screen.safeArea;
-            var left = safe.xMin / Screen.width + _settings.HandScreenMargin;
-            var right = safe.xMax / Screen.width - _settings.HandScreenMargin;
+            var pixels=_camera.pixelRect;
+            var left = (Mathf.Max(safe.xMin,pixels.xMin)-pixels.xMin) / Mathf.Max(1,pixels.width) + _settings.HandScreenMargin;
+            var right = (Mathf.Min(safe.xMax,pixels.xMax)-pixels.xMin) / Mathf.Max(1,pixels.width) - _settings.HandScreenMargin;
             var viewport = _camera.WorldToViewportPoint(point);
             var leftEdge = _camera.ViewportToWorldPoint(new Vector3(left, viewport.y, viewport.z));
             var rightEdge = _camera.ViewportToWorldPoint(new Vector3(right, viewport.y, viewport.z));

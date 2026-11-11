@@ -145,9 +145,13 @@ namespace Game.Presentation.Table
 
         private Rect AllowedViewport()
         {
-            var width = Mathf.Max(1, Screen.width);
-            var height = Mathf.Max(1, Screen.height);
+            var width = Mathf.Max(1f, Screen.width);
+            var height = Mathf.Max(1f, Screen.height);
             var safe = Screen.safeArea;
+            var pixels=_camera.pixelRect;
+            safe=Rect.MinMaxRect(Mathf.Max(safe.xMin,pixels.xMin),Mathf.Max(safe.yMin,pixels.yMin),Mathf.Min(safe.xMax,pixels.xMax),Mathf.Min(safe.yMax,pixels.yMax));
+            width=Mathf.Max(1,pixels.width);height=Mathf.Max(1,pixels.height);
+            safe.position-=pixels.position;
             var top = Mathf.Min(safe.yMax / height, 1f - _topBarShare);
             return Rect.MinMaxRect(
                 safe.xMin / width + _screenMargin,

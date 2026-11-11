@@ -15,6 +15,7 @@ namespace Game.Presentation.Match
         private readonly PlayerNames _names;
         private readonly CardNameLookup _lookup;
         private readonly UiTexts _texts;
+        private readonly TacticalHudView _tactical;
 
         public StatusPresenter(
             TopBarView topBar,
@@ -22,7 +23,7 @@ namespace Game.Presentation.Match
             TextPanelView ruleBadge,
             PlayerNames names,
             CardNameLookup lookup,
-            UiTexts texts)
+            UiTexts texts,TacticalHudView tactical=null)
         {
             _topBar = topBar;
             _battlePanel = battlePanel;
@@ -30,6 +31,7 @@ namespace Game.Presentation.Match
             _names = names;
             _lookup = lookup;
             _texts = texts;
+            _tactical=tactical;
         }
 
         /// <param name="power">The engine's current count of the battle, for the comparison rule badge; null outside a battle.</param>
@@ -43,6 +45,11 @@ namespace Game.Presentation.Match
                 view.Wins(PlayerId.Player2));
             var turn = view.AwaitingPlayer == null ? "" : _texts.Format(UiTextKeys.Turn, _names.Of(view.AwaitingPlayer));
             _topBar.Show(score, turn);
+            if(_tactical!=null){
+                _battlePanel.Hide();_tactical.Show(view,power);
+                if(view.Battle!=null)ShowRule(power?.Rule??ComparisonRule.HigherPowerWins);else _ruleBadge.Hide();
+                return;
+            }
 
             if (view.Battle == null)
             {
@@ -66,6 +73,7 @@ namespace Game.Presentation.Match
 
         public void Hide()
         {
+            _tactical?.HideInfo();
             _battlePanel.Hide();
             _ruleBadge.Hide();
         }

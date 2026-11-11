@@ -11,6 +11,18 @@ namespace Game.Presentation.Ui
         [SerializeField] private Button _ready;
         [SerializeField] private Button _openField;
         [SerializeField] private Button _cancel;
+        public void Reflow(Game.Presentation.Menu.CollectionUi ui, RectTransform sidebar)
+        {
+            TacticalHudView.Place((RectTransform)transform,sidebar,.05f,.015f,.90f,.215f);
+            var layout=GetComponent<UnityEngine.UI.VerticalLayoutGroup>();
+            layout.spacing=5;layout.childControlHeight=true;layout.childControlWidth=true;layout.childForceExpandHeight=false;layout.childForceExpandWidth=true;
+            foreach(var button in GetComponentsInChildren<Button>(true)){
+                ui.Decorate(button,22);
+                var element=button.GetComponent<UnityEngine.UI.LayoutElement>();if(element==null)element=button.gameObject.AddComponent<UnityEngine.UI.LayoutElement>();
+                element.minHeight=40;element.preferredHeight=48;element.flexibleHeight=0;
+            }
+            ui.Select(_ready,true);
+        }
 
         public void Init(string endTurn, string ready, string openField, string cancel)
         {

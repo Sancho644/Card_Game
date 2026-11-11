@@ -89,6 +89,9 @@ namespace Game.Presentation.Table
                     var pose = field.IsRemoved
                         ? _layout.Pile(side, PileKind.RemovedFields, removed++, known)
                         : _layout.Field(side, active++, activeCount, known);
+                    var focused=_layout.TacticalBattle&&view.Battle!=null&&field.Id==view.Battle.FieldId;
+                    if(_layout.TacticalBattle&&view.Battle!=null&&field.IsActive)
+                        pose=focused?_layout.BattleField(known):_layout.ParkedField(known);
                     // The owner sees the face of a closed field, darkened; the opponent sees its back.
                     var brightness = known && !field.IsOpen && !field.IsRemoved ? _visual.ClosedFieldBrightness : 1f;
                     Move(new CardRef(field.Id, field.CardId), side, pose, StatusOf(field), brightness);
@@ -97,7 +100,7 @@ namespace Game.Presentation.Table
                     {
                         var creature = field.Occupant(occupantOwner);
                         if (creature != null)
-                            Move(creature, SideOf(occupantOwner, view.Viewer), _layout.Creature(pose, SideOf(occupantOwner, view.Viewer)));
+                            Move(creature, SideOf(occupantOwner, view.Viewer), focused?_layout.BattleCreature(SideOf(occupantOwner,view.Viewer)):_layout.Creature(pose, SideOf(occupantOwner, view.Viewer)));
                     }
                 }
 

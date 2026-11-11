@@ -123,6 +123,8 @@ namespace Game.Presentation.Interaction
             var cameraTransform = _camera.transform;
             var depth = Vector3.Dot(card.transform.position - cameraTransform.position, cameraTransform.forward) - TowardCamera;
             var safe = Screen.safeArea;
+            var pixels=_camera.pixelRect;
+            safe=Rect.MinMaxRect(Mathf.Max(safe.xMin,pixels.xMin),Mathf.Max(safe.yMin,pixels.yMin),Mathf.Min(safe.xMax,pixels.xMax),Mathf.Min(safe.yMax,pixels.yMax));
             var margin = Margin * Screen.height;
             var share = Mathf.Min(_animation.HandFocusHeight, (safe.height - 2f * margin) / (Screen.height * OutlineHeight));
             var worldHeight = 2f * depth * Mathf.Tan(_camera.fieldOfView * 0.5f * Mathf.Deg2Rad) * share;

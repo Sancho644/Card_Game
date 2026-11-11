@@ -381,3 +381,37 @@ MonoBehaviour:
     Text: ...
   - Key: menu.settings
     Text: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"
+  - Key: hud.goal
+    Text: "\u0414\u043E {0} \u043F\u043E\u0431\u0435\u0434"
+  - Key: hud.battle
+    Text: "\u0411\u0438\u0442\u0432\u0430"
+  - Key: hud.turn
+    Text: "\u041E\u0441\u043D\u043E\u0432\u043D\u043E\u0439 \u0445\u043E\u0434"
+  - Key: hud.closed
+    Text: "\u041F\u043E\u043B\u0435 \u0437\u0430\u043A\u0440\u044B\u0442\u043E"
+  - Key: hud.open
+    Text: "\u041F\u043E\u043B\u0435 \u043E\u0442\u043A\u0440\u044B\u0442\u043E"
+  - Key: hud.cancelled
+    Text: "\u0423\u0441\u043B\u043E\u0432\u0438\u0435 \u043E\u0442\u043C\u0435\u043D\u0435\u043D\u043E"
+  - Key: hud.base
+    Text: "\u0411\u0430\u0437\u043E\u0432\u0430\u044F \u0441\u0438\u043B\u0430: {0}"
+  - Key: hud.fieldValue
+    Text: "\u0411\u043E\u043D\u0443\u0441 \u043F\u043E\u043B\u044F: {0}"
+  - Key: hud.effect
+    Text: "\u042D\u0444\u0444\u0435\u043A\u0442"
+  - Key: hud.total
+    Text: "\u0418\u0442\u043E\u0433\u043E\u0432\u0430\u044F \u0441\u0438\u043B\u0430: {0}"
+  - Key: hud.log
+    Text: "\u0416\u0443\u0440\u043D\u0430\u043B"
+  - Key: hud.pile.Discard
+    Text: "\u0421\u0431\u0440\u043E\u0441"
+  - Key: hud.pile.OutOfGame
+    Text: "\u0412\u044B\u0431\u044B\u0432\u0448\u0438\u0435"
+  - Key: hud.pile.RemovedFields
+    Text: "\u0423\u0431\u0440\u0430\u043D\u043D\u044B\u0435 \u043F\u043E\u043B\u044F"
+  - Key: hud.choice
+    Text: "\u0412\u044B\u0431\u043E\u0440 \u043A\u0430\u0440\u0442\u044B"
+  - Key: hud.coin
+    Text: "\u041F\u043E\u0440\u044F\u0434\u043E\u043A \u0445\u043E\u0434\u0430"
+  - Key: hud.ended
+    Text: "\u041F\u0430\u0440\u0442\u0438\u044F \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043D\u0430"

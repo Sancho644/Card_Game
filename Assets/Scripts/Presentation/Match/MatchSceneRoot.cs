@@ -24,6 +24,7 @@ namespace Game.Presentation.Match
         [SerializeField] private VisualSettings _visual;
         [SerializeField] private TablePresentationSettings _settings;
         [SerializeField] private AnimationSettings _animation;
+        [SerializeField] private TacticalHudSettings _hudSettings;
         [SerializeField, Tooltip("Loaded when this scene is opened directly in the editor")] private string _bootstrapScene = "Bootstrap";
 
         [Header("Table")]
@@ -77,6 +78,7 @@ namespace Game.Presentation.Match
         {
             var texts = _app.Texts;
             _layout.Configure(_settings, _camera);
+            _layout.ConfigureTactical(_hudSettings);
             var framer = _camera.GetComponent<CameraFramer>();
             framer.Configure(_settings, _layout.FramingPoints);
             _pointer.Configure(_settings.LongPressSeconds, _settings.DragThresholdPixels);
@@ -100,9 +102,15 @@ namespace Game.Presentation.Match
             names.Use(_launch.Mode);
             var lookup = new CardNameLookup(faces);
             var viewer = new HotSeatDirector { Viewer = _launch.LocalPlayers.First() };
+            TacticalHudView tactical=null;
+            if(_hudSettings!=null){
+                tactical=gameObject.AddComponent<TacticalHudView>();
+                tactical.Initialize(_hudSettings,_camera,_layout,_topBar,_actionBar,_ruleBadge,_prompt,_log,_breakdown,faces,names,texts,_app.Rules.WinsToWin);
+                framer.Refit();
+            }
             var selector = new ActionSelector();
             var humans = _launch.LocalPlayers.Select(player => new LocalHumanController(player)).ToList();
-            var status = new StatusPresenter(_topBar, _battlePanel, _ruleBadge, names, lookup, texts);
+            var status = new StatusPresenter(_topBar, _battlePanel, _ruleBadge, names, lookup, texts,tactical);
             var power = new BattlePowerPresenter(
                 registry, new FloatingTextSpawner(_cardRoot, _camera), new PowerDiff(lookup), _visual, _animation, _app.Sound);
 

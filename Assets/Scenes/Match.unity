@@ -2633,10 +2633,10 @@ RectTransform:
   - {fileID: 1845511989}
   m_Father: {fileID: 339374776}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 40}
-  m_SizeDelta: {x: 900, y: 170}
+  m_AnchorMin: {x: 0.03, y: 0.4}
+  m_AnchorMax: {x: 0.72, y: 0.6}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &561068266
 MonoBehaviour:
@@ -6878,6 +6878,7 @@ MonoBehaviour:
   _visual: {fileID: 11400000, guid: 4b431b96e06cb79428ba9dc5aeb25e2c, type: 2}
   _settings: {fileID: 11400000, guid: f6605da4e29eab94c8f33eb8ee550f6c, type: 2}
   _animation: {fileID: 11400000, guid: a088a35bde887bf4a87482316f7530b7, type: 2}
+  _hudSettings: {fileID: 11400000, guid: 372b7bede498ac94ea443b1b71f30f0c, type: 2}
   _bootstrapScene: Bootstrap
   _camera: {fileID: 967686874}
   _layout: {fileID: 1391235504}

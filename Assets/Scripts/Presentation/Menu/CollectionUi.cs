@@ -41,6 +41,13 @@ namespace Game.Presentation.Menu
             outline.effectColor=new Color(1,.65f,.15f,.8f);outline.effectDistance=new Vector2(2,-2);outline.enabled=selected;
         }
         public TMP_FontAsset Font => _font;
+        public void Decorate(UnityEngine.UI.Button button, float size)
+        {
+            var image=button.GetComponent<UnityEngine.UI.Image>();
+            if(image!=null){Apply(image,_button);image.color=Color.white;button.targetGraphic=image;}
+            var label=button.GetComponentInChildren<TMP_Text>(true);
+            if(label!=null){label.font=_font;label.color=_style.Text;label.enableAutoSizing=true;label.fontSizeMin=12;label.fontSizeMax=size;label.textWrappingMode=TextWrappingModes.NoWrap;}
+        }
         public RectTransform Rect(Transform parent, string name, float x, float y, float w, float h)
         {
             var rect = new GameObject(name, typeof(RectTransform)).GetComponent<RectTransform>();
