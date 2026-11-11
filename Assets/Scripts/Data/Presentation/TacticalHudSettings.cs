@@ -5,7 +5,7 @@ namespace Game.Data.Presentation
     public sealed class TacticalHudSettings : ScriptableObject
     {
         [SerializeField] private CollectionSettings _style;
-        [SerializeField] private float _fieldHorizontalOffset=-2f;
+        [SerializeField] private float _fieldHorizontalOffset=0f;
         [SerializeField,Min(0)] private float _creatureGap=.22f;
         [SerializeField,Min(2)] private float _opponentHandDistance=4.8f;
         public CollectionSettings Style=>_style;

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: TacticalHud
   m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.TacticalHudSettings
   _style: {fileID: 11400000, guid: 5a8467d43e5ea3b40bc2be7b09163bd8, type: 2}
-  _fieldHorizontalOffset: -2
+  _fieldHorizontalOffset: 0
   _creatureGap: 0.22
   _opponentHandDistance: 4.8

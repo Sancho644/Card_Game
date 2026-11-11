@@ -7,7 +7,7 @@ namespace Game.Presentation.Table
 {
     /// <summary>
     /// Card places on the table, in world space. Fields of both players in the centre, the viewer's row
-    /// nearer to the camera; creatures have permanent parallel slots to the right of each field.
+    /// nearer to the camera; creatures stand to the right of each field from their owner's seat.
     /// The viewer's hand faces the camera and squeezes so the whole fan
     /// fits the safe area; the opponent's hand of backs lies at the far edge, partly off screen.
     /// </summary>
@@ -72,14 +72,14 @@ namespace Game.Presentation.Table
                 Face(faceUp),
                 _settings.FieldScale);
 
-        /// <summary>Fixed right-hand slots: viewer first, opponent second, even before a battle exists.</summary>
+        /// <summary>Permanent opposite slots: viewer on the right, opponent on the left.</summary>
         public CardPose Creature(CardPose field, TableSide owner)
         {
             var scale = _settings.CreatureOnFieldScale;
             var gap = _tactical != null ? _tactical.CreatureGap : .22f;
             var offset = _cardSize.x * (field.Scale + scale) / 2f + gap;
             if (owner == TableSide.Top)
-                offset += _cardSize.x * scale + gap;
+                offset = -offset;
             // The prefab has depth on both sides; the hand's small layer step is not enough
             // to clear a face-down field's back, especially when the field is enlarged.
             var lift = _settings.CreatureOnFieldLift * Mathf.Max(field.Scale, scale);
