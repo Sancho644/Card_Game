@@ -28,6 +28,7 @@ MonoBehaviour:
   _creatureOnFieldScale: 1.8
   _creatureOnFieldLift: 0.1
   _creatureOverlap: 0.55
+  _handDepthStep: 0.08
   _tableScreenPadding: 0.75
   _topBarShare: 0.14
   _logLines: 60

@@ -19,7 +19,7 @@ namespace Game.Presentation.Cards
                 _block=new MaterialPropertyBlock();
             }
             _line.sharedMaterial=settings.Material;_line.widthMultiplier=settings.Width;
-            var w=.70f+settings.Padding;var h=1f+settings.Padding;const float c=.065f;const float z=-.08f;
+            var w=.70f+settings.Padding;var h=1f+settings.Padding;const float c=.065f;const float z=-.015f;
             _line.positionCount=8;_line.SetPositions(new[]{new Vector3(-w+c,-h,z),new Vector3(w-c,-h,z),new Vector3(w,-h+c,z),new Vector3(w,h-c,z),new Vector3(w-c,h,z),new Vector3(-w+c,h,z),new Vector3(-w,h-c,z),new Vector3(-w,-h+c,z)});
             _block.SetVector(Periods,new Vector4(settings.PulseSeconds,settings.TravelSeconds,0,0));
             SetColor(null);

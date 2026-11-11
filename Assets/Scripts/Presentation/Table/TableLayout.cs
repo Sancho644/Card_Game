@@ -90,14 +90,16 @@ namespace Game.Presentation.Table
         {
             var x = RowX(index, count, HandSpacing(side, count));
             var centre = (count - 1) / 2f;
-            var lift = _handLift + index * _layerLift;
             if (side == TableSide.Top)
-                return new CardPose(new Vector3(x, index * _layerLift, _tactical!=null?_tactical.OpponentHandDistance:_opponentHandDistance), Face(faceUp));
-            var position = new Vector3(x, lift, -_handDistance);
+                return new CardPose(new Vector3(x, index * _layerLift, OpponentHandZ), Face(faceUp));
+            var position = new Vector3(x, _handLift, -_handDistance);
 
             // The whole fan keeps the same arc however many cards there are, so the outer ones never sink off screen.
             var bend = Bend(count);
             var tilt = FacingCamera;
+            // Stack along the face normal, not world Y: each whole card, including its glow,
+            // must sit in front of the previous card at every point of the fan.
+            position += tilt * Vector3.forward * ((count - 1 - index) * _settings.HandDepthStep);
             var fan = Quaternion.AngleAxis((index - centre) * _settings.HandFanDegrees * bend, tilt * Vector3.back);
             return new CardPose(position + tilt * Vector3.down * (Mathf.Abs(index - centre) * _settings.HandEdgeDrop * bend), fan * tilt, _settings.HandCardScale);
         }
@@ -110,7 +112,7 @@ namespace Game.Presentation.Table
 
         /// <summary>Where a card appears from when it shows up on this side without a view yet.</summary>
         public CardPose Spawn(TableSide side) =>
-            new CardPose(new Vector3(0f, _handLift, side == TableSide.Bottom ? -_handDistance - 2.5f : _opponentHandDistance + 2.5f), FaceDown);
+            new CardPose(new Vector3(0f, _handLift, side == TableSide.Bottom ? -_handDistance - 2.5f : OpponentHandZ + 2.5f), FaceDown);
 
         /// <summary>Above the table in front of the camera: where a played ability is shown, at the given size.</summary>
         public CardPose BattleFocus(float scale) =>
@@ -129,7 +131,8 @@ namespace Game.Presentation.Table
             var farField = Field(TableSide.Top, 0, 1, true);
             var farCreature = Creature(farField, TableSide.Top);
             yield return farCreature.Position + new Vector3(0f, 0f, halfHeight * farCreature.Scale);
-            yield return Hand(TableSide.Top, 0, 1, false).Position + new Vector3(0f, 0f, halfHeight);
+            // Keep the raised opponent hand from pushing the camera away and undoing its visual offset.
+            yield return new Vector3(0f, 0f, (_tactical != null ? _tactical.OpponentHandDistance : _opponentHandDistance) + halfHeight);
             foreach (var x in new[] { _outOfGameX + halfWidth, _removedFieldsX - halfWidth })
             {
                 yield return new Vector3(x, 0f, -_pileDistance - halfHeight);
@@ -143,13 +146,14 @@ namespace Game.Presentation.Table
         /// </summary>
         private float HandSpacing(TableSide side, int count)
         {
-            var spacing = _settings.HandSpacing;
+            var spacing = side == TableSide.Top && _tactical != null
+                ? _tactical.OpponentHandSpacing : _settings.HandSpacing;
             if (count < 2 || _camera == null)
                 return spacing;
 
             if (side == TableSide.Top)
             {
-                var top = new Vector3(0f, 0f, _tactical!=null?_tactical.OpponentHandDistance:_opponentHandDistance);
+                var top = new Vector3(0f, 0f, OpponentHandZ);
                 return Mathf.Clamp(2f * (VisibleHalfWidth(top) - _cardSize.x / 2f) / (count - 1), _minHandSpacing, spacing);
             }
 
@@ -182,6 +186,9 @@ namespace Game.Presentation.Table
 
         /// <summary>A card turned to face the camera, so it reads without perspective.</summary>
         private Quaternion FacingCamera => Quaternion.Euler(_settings.CameraPitch, 0f, 0f);
+
+        private float OpponentHandZ => _tactical != null
+            ? _tactical.OpponentHandDistance + _tactical.OpponentHandRaise : _opponentHandDistance;
 
         private static Quaternion Face(bool faceUp) => faceUp ? FaceUp : FaceDown;
 

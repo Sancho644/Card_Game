@@ -39,6 +39,9 @@ namespace Game.Data.Presentation
         [Tooltip("How much of the field's edge a creature covers, in world units.")]
         [SerializeField, Min(0f)] private float _creatureOverlap = 0.3f;
 
+        [Tooltip("Distance towards the camera between adjacent hand cards; keeps faces and glow behind the next card.")]
+        [SerializeField, Min(.01f)] private float _handDepthStep = .08f;
+
         [Header("Screen")]
         [Tooltip("Extra table surface beyond the camera's visible corners, in world units.")]
         [SerializeField, Min(0f)] private float _tableScreenPadding = .75f;
@@ -66,6 +69,7 @@ namespace Game.Data.Presentation
         public float CreatureOverlap => _creatureOverlap;
         public float TopBarShare => _topBarShare;
         public float TableScreenPadding => _tableScreenPadding;
+        public float HandDepthStep => _handDepthStep;
         public int LogLines => _logLines;
     }
 }

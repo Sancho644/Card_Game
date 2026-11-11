@@ -16,3 +16,5 @@ MonoBehaviour:
   _fieldHorizontalOffset: 0
   _creatureGap: 0.22
   _opponentHandDistance: 5.2
+  _opponentHandSpacing: 0.95
+  _opponentHandRaise: 1
