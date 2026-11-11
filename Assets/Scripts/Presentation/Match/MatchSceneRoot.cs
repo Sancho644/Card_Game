@@ -105,7 +105,7 @@ namespace Game.Presentation.Match
             TacticalHudView tactical=null;
             if(_hudSettings!=null){
                 tactical=gameObject.AddComponent<TacticalHudView>();
-                tactical.Initialize(_hudSettings,_camera,_layout,_topBar,_actionBar,_ruleBadge,_prompt,_log,_breakdown,faces,names,texts,_app.Rules.WinsToWin);
+                tactical.Initialize(_hudSettings,_camera,_layout,_topBar,_actionBar,_ruleBadge,_prompt,_log,names,texts,_app.Rules.WinsToWin);
                 framer.Refit();
             }
             var selector = new ActionSelector();
@@ -128,7 +128,7 @@ namespace Game.Presentation.Match
                 new AbilityPlayedPresenter(_layout, registry, _animation, _app.Sound),
                 new CardSoundPresenter(_app.Sound),
 
-                new BattleStartedPresenter(registry, _banner, lookup, texts, _animation, _app.Sound),
+                new BattleStartedPresenter(_banner, lookup, texts, _animation, _app.Sound),
                 new BattleResolvedPresenter(new BattleSummaryBuilder(texts, names, lookup), details, _banner, registry, _animation, _visual, _app.Sound, texts),
                 new TurnBannerPresenter(_banner, details, _launch.Mode, texts, _animation, _app.Sound),
                 new ScoutedPresenter(_breakdown, faces, texts),

@@ -46,7 +46,7 @@ namespace Game.Presentation.Match
             var turn = view.AwaitingPlayer == null ? "" : _texts.Format(UiTextKeys.Turn, _names.Of(view.AwaitingPlayer));
             _topBar.Show(score, turn);
             if(_tactical!=null){
-                _battlePanel.Hide();_tactical.Show(view,power);
+                _battlePanel.Hide();_tactical.Show(view);
                 if(view.Battle!=null)ShowRule(power?.Rule??ComparisonRule.HigherPowerWins);else _ruleBadge.Hide();
                 return;
             }

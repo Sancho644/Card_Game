@@ -34,6 +34,13 @@ namespace Game.Presentation.Menu
             var rect=Panel(parent,name,x,y,w,h,_panel==null?_style.Panel:Color.white);
             Apply(rect.GetComponent<UnityEngine.UI.Image>(),_panel);return rect;
         }
+        public RectTransform Plaque(Transform parent,string name,float x,float y,float w,float h)
+        {
+            var rect=Panel(parent,name,x,y,w,h,_button==null?_style.Panel:Color.white);
+            var image=rect.GetComponent<UnityEngine.UI.Image>();
+            Apply(image,_button);image.raycastTarget=false;
+            return rect;
+        }
         public void Select(UnityEngine.UI.Button button,bool selected)
         {
             button.GetComponent<UnityEngine.UI.Image>().color=selected?new Color(1,.85f,.5f):Color.white;

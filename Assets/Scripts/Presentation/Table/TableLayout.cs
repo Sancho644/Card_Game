@@ -7,8 +7,8 @@ namespace Game.Presentation.Table
 {
     /// <summary>
     /// Card places on the table, in world space. Fields of both players in the centre, the viewer's row
-    /// nearer to the camera; creatures stand at the edge of the field facing their owner, so the field's
-    /// numbers and condition stay visible. The viewer's hand faces the camera and squeezes so the whole fan
+    /// nearer to the camera; creatures have permanent parallel slots to the right of each field.
+    /// The viewer's hand faces the camera and squeezes so the whole fan
     /// fits the safe area; the opponent's hand of backs lies at the far edge, partly off screen.
     /// </summary>
     public sealed class TableLayout : MonoBehaviour
@@ -46,11 +46,7 @@ namespace Game.Presentation.Table
         private TablePresentationSettings _settings;
         private Camera _camera;
         private TacticalHudSettings _tactical;
-        public bool TacticalBattle=>_tactical!=null;
         public void ConfigureTactical(TacticalHudSettings settings)=>_tactical=settings;
-        public CardPose BattleField(bool faceUp)=>new CardPose(new Vector3(0,.05f,0),Face(faceUp),_tactical.BattleFieldScale);
-        public CardPose BattleCreature(TableSide owner)=>new CardPose(new Vector3(owner==TableSide.Bottom?-_tactical.BattleSpacing:_tactical.BattleSpacing,.3f,0),FacingCamera,_tactical.BattleCreatureScale);
-        public CardPose ParkedField(bool faceUp)=>new CardPose(new Vector3(-4.6f,0,3.8f),Face(faceUp),.85f);
 
         /// <summary>Size of a card at scale 1, in world units.</summary>
         public Vector2 CardSize => _cardSize;
@@ -72,19 +68,22 @@ namespace Game.Presentation.Table
 
         public CardPose Field(TableSide side, int index, int count, bool faceUp) =>
             new CardPose(
-                new Vector3(RowX(index, count, _fieldSpacing), 0f, Sign(side) * _fieldRowDistance),
+                new Vector3(RowX(index, count, _fieldSpacing) + (_tactical != null ? _tactical.FieldHorizontalOffset : 0f), 0f, Sign(side) * _fieldRowDistance),
                 Face(faceUp),
                 _settings.FieldScale);
 
-        /// <summary>A creature on a field: at the field's edge that faces its owner, covering only a strip of it.</summary>
+        /// <summary>Fixed right-hand slots: viewer first, opponent second, even before a battle exists.</summary>
         public CardPose Creature(CardPose field, TableSide owner)
         {
             var scale = _settings.CreatureOnFieldScale;
-            var offset = _cardSize.y * (field.Scale + scale) / 2f - _settings.CreatureOverlap;
+            var gap = _tactical != null ? _tactical.CreatureGap : .22f;
+            var offset = _cardSize.x * (field.Scale + scale) / 2f + gap;
+            if (owner == TableSide.Top)
+                offset += _cardSize.x * scale + gap;
             // The prefab has depth on both sides; the hand's small layer step is not enough
             // to clear a face-down field's back, especially when the field is enlarged.
             var lift = _settings.CreatureOnFieldLift * Mathf.Max(field.Scale, scale);
-            return new CardPose(field.Position + new Vector3(0f, lift, Sign(owner) * offset), FaceUp, scale);
+            return new CardPose(field.Position + new Vector3(offset, lift, 0f), FaceUp, scale);
         }
 
         public CardPose Hand(TableSide side, int index, int count, bool faceUp)
@@ -130,6 +129,7 @@ namespace Game.Presentation.Table
             var farField = Field(TableSide.Top, 0, 1, true);
             var farCreature = Creature(farField, TableSide.Top);
             yield return farCreature.Position + new Vector3(0f, 0f, halfHeight * farCreature.Scale);
+            yield return Hand(TableSide.Top, 0, 1, false).Position + new Vector3(0f, 0f, halfHeight);
             foreach (var x in new[] { _outOfGameX + halfWidth, _removedFieldsX - halfWidth })
             {
                 yield return new Vector3(x, 0f, -_pileDistance - halfHeight);

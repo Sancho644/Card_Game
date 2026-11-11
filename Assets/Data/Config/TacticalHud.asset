@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: TacticalHud
   m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.TacticalHudSettings
   _style: {fileID: 11400000, guid: 5a8467d43e5ea3b40bc2be7b09163bd8, type: 2}
-  _sidebarShare: 0.25
-  _battleFieldScale: 1.7
-  _battleCreatureScale: 1.8
-  _battleSpacing: 3.1
+  _fieldHorizontalOffset: -2
+  _creatureGap: 0.22
   _opponentHandDistance: 4.8
