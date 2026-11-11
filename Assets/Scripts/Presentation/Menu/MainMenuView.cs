@@ -15,6 +15,22 @@ namespace Game.Presentation.Menu
         [SerializeField] private Button _deck;
         [SerializeField] private Button _difficulty;
         [SerializeField] private Button _fastAnimations;
+        private MainMenuLayout _layout;
+        private string _collectionLabel;
+
+        public void Initialize(Game.Data.Presentation.CollectionSettings style, Game.Data.Presentation.MainMenuSettings settings,
+            Game.Presentation.App.AppServices app, Action chooseDeck)
+        {
+            var font = _title.font;
+            foreach (Transform child in transform) child.gameObject.SetActive(false);
+            _layout = new MainMenuLayout(transform, font, style, settings, app, chooseDeck);
+            _collectionLabel = app.Texts.Get("library.collection");
+            _title = _layout.Title; _versusAi = _layout.VersusAi; _hotSeat = _layout.HotSeat;
+            _deck = _layout.Collection; _difficulty = _layout.Difficulty; _fastAnimations = _layout.FastAnimations;
+        }
+
+        public void OpenSettings() => _layout?.OpenSettings();
+        private void OnDestroy() => _layout?.Dispose();
 
         public void Show(
             string title,
@@ -34,15 +50,16 @@ namespace Game.Presentation.Menu
             UiButtons.Bind(_versusAi, versusAi);
             UiButtons.SetLabel(_hotSeat, hotSeatLabel);
             UiButtons.Bind(_hotSeat, hotSeat);
-            UiButtons.SetLabel(_deck, deckLabel);
+            UiButtons.SetLabel(_deck, _layout == null ? deckLabel : _collectionLabel);
             UiButtons.Bind(_deck, chooseDeck);
             UiButtons.SetLabel(_difficulty, difficultyLabel);
             UiButtons.Bind(_difficulty, chooseDifficulty);
             UiButtons.SetLabel(_fastAnimations, fastAnimationsLabel);
             UiButtons.Bind(_fastAnimations, toggleFastAnimations);
+            _layout?.RefreshDeck();
             gameObject.SetActive(true);
         }
 
-        public void Hide() => gameObject.SetActive(false);
+        public void Hide() { _layout?.CloseModals(); gameObject.SetActive(false); }
     }
 }

@@ -24,6 +24,7 @@ namespace Game.Presentation.Menu
         [SerializeField, Tooltip("Loaded when this scene is opened directly in the editor")] private string _bootstrapScene = "Bootstrap";
 
         [SerializeField] private CollectionSettings _collectionSettings;
+        [SerializeField] private MainMenuSettings _menuSettings;
         private CollectionScreen _collection;
         private AppServices _app;
         private bool _searchingForMatch;
@@ -45,6 +46,7 @@ namespace Game.Presentation.Menu
             _app.DeckIndex = Mathf.Clamp(_app.DeckIndex, 0, Mathf.Max(0, _app.Decks.Count - 1));
             _collection = new CollectionScreen(_menu.transform.parent, _menu.GetComponentInChildren<TMPro.TMP_Text>(true).font,
                 _collectionSettings, _app, ShowMenu, PlayVersusAi);
+            _menu.Initialize(_collectionSettings, _menuSettings, _app, ChooseDeck);
             ShowMenu();
         }
 
@@ -92,9 +94,10 @@ namespace Game.Presentation.Menu
                 {
                     _app.Difficulty = profiles[index].Id;
                     ShowMenu();
+                    _menu.OpenSettings();
                 },
                 Texts.Get(UiTextKeys.Cancel),
-                ShowMenu);
+                () => { ShowMenu(); _menu.OpenSettings(); });
         }
 
         private void PlayVersusAi()
