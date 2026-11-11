@@ -52,6 +52,7 @@ namespace Game.Presentation.Cards
         private CardFace _face;
         private CardSkin _skin;
         private float _dimming = 1f;
+        private CardPlayableGlow _playableGlow;
 
         /// <summary>Match-local card instance id; negative for anonymous backs of hidden cards.</summary>
         public int InstanceId { get; private set; }
@@ -86,6 +87,10 @@ namespace Game.Presentation.Cards
 
             _face = face;
             _skin = skin;
+            if(skin.HighlightSettings!=null&&skin.HighlightSettings.Material!=null){
+                if(_playableGlow==null){var effect=new GameObject("PlayableGlow");effect.transform.SetParent(Visual,false);_playableGlow=effect.AddComponent<CardPlayableGlow>();}
+                _playableGlow.Configure(skin.HighlightSettings);
+            }
             ResetVisual();
             SetVisible(true);
             _dimming = 1f;
@@ -127,7 +132,11 @@ namespace Game.Presentation.Cards
             ApplyFace();
         }
 
-        public void SetHighlight(Color? color) => SetGlow(_highlight, color);
+        public void SetHighlight(Color? color)
+        {
+            SetGlow(_highlight,_playableGlow==null?color:null);
+            if(_playableGlow!=null)_playableGlow.SetColor(color);
+        }
 
         public void SetBattle(Color? color) => SetGlow(_battleGlow, color);
 

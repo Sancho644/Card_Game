@@ -44,6 +44,7 @@ namespace Game.Data.Presentation
         };
 
         [Header("Highlights")]
+        [SerializeField] private CardHighlightSettings _highlightSettings;
         [SerializeField] private Color _selectable = new Color(0.30f, 0.90f, 0.40f);
         [SerializeField] private Color _selected = new Color(1.00f, 0.90f, 0.20f);
         [SerializeField] private Color _target = new Color(0.25f, 0.85f, 1.00f);
@@ -59,6 +60,7 @@ namespace Game.Data.Presentation
         [SerializeField] private Color _opponentAction = new Color(1f, 0.75f, 0.2f);
 
         public CreatureCardStyle CreatureStyle => _creatureStyle;
+        public CardHighlightSettings HighlightSettings=>_highlightSettings;
         public Color OpponentAction => _opponentAction;
         public Color AbilityFrame => _abilityFrame;
         public Color NeutralFrame => _neutralFrame;

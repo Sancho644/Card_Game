@@ -25,6 +25,7 @@ namespace Game.Data.Presentation
         [SerializeField] private float _handFanDegrees = 5f;
         [Tooltip("Free space between the hand and the edges of the safe area, in fractions of the screen width.")]
         [SerializeField, Range(0f, 0.2f)] private float _handScreenMargin = 0.03f;
+        [SerializeField,Min(0)] private float _handEdgeDrop=.07f;
 
         [Header("Field placement outline")]
         [SerializeField, Min(0.01f)] private float _fieldOutlineWidth = 0.05f;
@@ -52,6 +53,7 @@ namespace Game.Data.Presentation
         public float HandCardScale => _handCardScale;
         public float HandSpacing => _handSpacing;
         public float HandFanDegrees => _handFanDegrees;
+        public float HandEdgeDrop=>_handEdgeDrop;
         public float CameraPitch => _cameraPitch;
         public float CameraHeight => _cameraHeight;
         public float CameraFieldOfView => _cameraFieldOfView;

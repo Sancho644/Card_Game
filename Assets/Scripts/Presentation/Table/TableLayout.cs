@@ -39,7 +39,6 @@ namespace Game.Presentation.Table
 
         /// <summary>The fan bends as for this many gaps between cards at most.</summary>
         private const float MaxFanSteps = 5f;
-        private const float FanDroop = 0.05f;
 
         private static readonly Quaternion FaceUp = Quaternion.Euler(90f, 0f, 0f);
         private static readonly Quaternion FaceDown = Quaternion.Euler(-90f, 0f, 0f);
@@ -100,8 +99,8 @@ namespace Game.Presentation.Table
             // The whole fan keeps the same arc however many cards there are, so the outer ones never sink off screen.
             var bend = Bend(count);
             var tilt = FacingCamera;
-            var fan = Quaternion.AngleAxis((centre - index) * _settings.HandFanDegrees * bend, tilt * Vector3.back);
-            return new CardPose(position + Vector3.down * Mathf.Abs(index - centre) * FanDroop * bend, fan * tilt, _settings.HandCardScale);
+            var fan = Quaternion.AngleAxis((index - centre) * _settings.HandFanDegrees * bend, tilt * Vector3.back);
+            return new CardPose(position + tilt * Vector3.down * (Mathf.Abs(index - centre) * _settings.HandEdgeDrop * bend), fan * tilt, _settings.HandCardScale);
         }
 
         public CardPose Pile(TableSide side, PileKind pile, int index, bool faceUp)
@@ -163,7 +162,7 @@ namespace Game.Presentation.Table
 
         /// <summary>The middle of the lower edge of the viewer's fan, with the outer cards' corners hanging a little lower.</summary>
         private Vector3 HandLowerEdge() =>
-            new Vector3(0f, _handLift, -_handDistance) + FacingCamera * new Vector3(0f, -_cardSize.y / 2f * _settings.HandCardScale * 1.15f, 0f);
+            new Vector3(0f, _handLift, -_handDistance) + FacingCamera * new Vector3(0f, -_cardSize.y / 2f * _settings.HandCardScale * 1.15f - MaxFanSteps*.5f*_settings.HandEdgeDrop, 0f);
 
         /// <summary>How much of the full fan angle a hand of this size uses.</summary>
         private static float Bend(int count) => count > 1 ? Mathf.Min(1f, MaxFanSteps / (count - 1)) : 1f;
