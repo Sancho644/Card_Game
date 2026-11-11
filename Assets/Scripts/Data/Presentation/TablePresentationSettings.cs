@@ -40,6 +40,8 @@ namespace Game.Data.Presentation
         [SerializeField, Min(0f)] private float _creatureOverlap = 0.3f;
 
         [Header("Screen")]
+        [Tooltip("Extra table surface beyond the camera's visible corners, in world units.")]
+        [SerializeField, Min(0f)] private float _tableScreenPadding = .75f;
         [Tooltip("Top part of the screen covered by the top bar, in fractions of the screen height.")]
         [SerializeField, Range(0f, 0.3f)] private float _topBarShare = 0.08f;
 
@@ -63,6 +65,7 @@ namespace Game.Data.Presentation
         public float CreatureOnFieldLift => _creatureOnFieldLift;
         public float CreatureOverlap => _creatureOverlap;
         public float TopBarShare => _topBarShare;
+        public float TableScreenPadding => _tableScreenPadding;
         public int LogLines => _logLines;
     }
 }

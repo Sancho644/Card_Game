@@ -520,7 +520,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &99308046
 Transform:
   m_ObjectHideFlags: 0
@@ -731,7 +731,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &190872749
 Transform:
   m_ObjectHideFlags: 0
@@ -3874,7 +3874,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &711948820
 Transform:
   m_ObjectHideFlags: 0
@@ -5959,6 +5959,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1050018424}
+  - component: {fileID: 1050018425}
   m_Layer: 0
   m_Name: TableEnvironment
   m_TagString: Untagged
@@ -5987,6 +5988,22 @@ Transform:
   - {fileID: 616483052}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1050018425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1050018423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 375b6c76fb181ae4992802a454e6f453, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Table.TableSurfaceFitter
+  _camera: {fileID: 967686874}
+  _settings: {fileID: 11400000, guid: f6605da4e29eab94c8f33eb8ee550f6c, type: 2}
+  _surface: {fileID: 501485416}
+  _sides: {fileID: 1202758032}
 --- !u!1 &1053930427
 GameObject:
   m_ObjectHideFlags: 0
@@ -8782,7 +8799,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1472211916
 Transform:
   m_ObjectHideFlags: 0
