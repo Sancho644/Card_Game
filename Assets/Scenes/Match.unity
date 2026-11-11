@@ -8006,7 +8006,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Table.TableLayout
   _cardSize: {x: 1.4, y: 2}
   _fieldSpacing: 2.3
-  _fieldRowDistance: 1.55
+  _fieldRowDistance: 1.95
   _handDistance: 6.6
   _opponentHandDistance: 7.6
   _handLift: 1
