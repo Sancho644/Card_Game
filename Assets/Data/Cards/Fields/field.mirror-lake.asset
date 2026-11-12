@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayName: "\u0417\u0435\u0440\u043A\u0430\u043B\u044C\u043D\u043E\u0435 \u043E\u0437\u0435\u0440\u043E"
   _description: "\u0423\u0434\u0432\u043E\u0435\u043D\u0438\u0435: \u0431\u043E\u043D\u0443\u0441\u044B \u0438 \u0448\u0442\u0440\u0430\u0444\u044B \u044D\u0442\u043E\u0439 \u043A\u0430\u0440\u0442\u044B \u0443\u0434\u0432\u0430\u0438\u0432\u0430\u044E\u0442\u0441\u044F."
   _rarity: 1
-  _art: {fileID: 0}
+  _art: {fileID: 21300000, guid: 1e9f8e74d611e6740911be5e5fd16ab8, type: 3}
   _frame: {fileID: 0}
   _modifiers:
   - Element: 3
