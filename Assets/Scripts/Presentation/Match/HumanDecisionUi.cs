@@ -129,8 +129,8 @@ namespace Game.Presentation.Match
             var first = order.FirstOrDefault(choice => choice.GoFirst);
             var second = order.FirstOrDefault(choice => !choice.GoFirst);
             _turnOrder.Show(
-                _texts.Format(UiTextKeys.CoinResult, _names.Of(view.CoinTossWinner)),
-                null,
+                _texts.Get("window.coinWinner"),
+                _texts.Get("window.chooseOrder"),
                 _texts.Get(UiTextKeys.GoFirst),
                 first == null ? (Action)null : () => Submit(first),
                 _texts.Get(UiTextKeys.GoSecond),
@@ -162,9 +162,10 @@ namespace Game.Presentation.Match
                 .Select(value => value == ActionPath.NoOption ? _texts.Get(UiTextKeys.NoAbility) : _lookup.NameOf(value))
                 .ToList();
             var canCancel = _selector.Source != null;
-            _options.Show(
+            _options.ShowCards(
                 _texts.Get(title),
                 labels,
+                values.Select(value => value == ActionPath.NoOption ? null : _lookup.CardIdOf(value)).ToList(),
                 index => _selector.ChooseOption(values[index]),
                 canCancel ? _texts.Get(UiTextKeys.Cancel) : null,
                 canCancel ? _selector.Cancel : (Action)null);

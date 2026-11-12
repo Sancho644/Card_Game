@@ -23,6 +23,7 @@ namespace Game.Presentation.Match
         }
 
         public string Title => _texts.Get(UiTextKeys.BreakdownTitle);
+        public string PlayerName(PlayerId player) => _names.Of(player);
 
         /// <summary>The result in a few lines: both powers, the rule if unusual, the winner and the consequences.</summary>
         /// <param name="consequences">The events that followed the result in the same batch.</param>

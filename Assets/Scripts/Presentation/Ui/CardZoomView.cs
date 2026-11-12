@@ -41,6 +41,32 @@ namespace Game.Presentation.Ui
         private Rect _from;
         private Action _closed;
         private Sequence _tween;
+        private RectTransform _closeIcon;
+        private readonly Vector3[] _corners = new Vector3[4];
+
+        public void Configure(BattleWindowSkin skin)
+        {
+            _dimAlpha = skin.Settings.Scrim.a;
+            var icon = skin.Icon(transform, "ClosePreview", BattleEmblem.Close, .5f, .5f, 0, 0);
+            icon.raycastTarget = true;
+            _closeIcon = icon.rectTransform; _closeIcon.sizeDelta = new Vector2(68, 68);
+            var button = icon.gameObject.AddComponent<Button>(); button.targetGraphic = icon;
+            button.onClick.AddListener(Hide);
+        }
+
+        private void LateUpdate()
+        {
+            if (_closeIcon == null) return;
+            _card.GetWorldCorners(_corners);
+            var point = (Vector2)transform.InverseTransformPoint(_corners[2]);
+            var area = (RectTransform)transform;
+            var canvas = GetComponentInParent<Canvas>().rootCanvas;
+            var camera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(area, Screen.safeArea.min, camera, out var min);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(area, Screen.safeArea.max, camera, out var max);
+            _closeIcon.anchoredPosition = new Vector2(Mathf.Clamp(point.x + 16, min.x + 40, max.x - 40),
+                Mathf.Clamp(point.y - 16, min.y + 40, max.y - 40));
+        }
 
         public bool IsOpen => gameObject.activeSelf;
 
@@ -67,7 +93,7 @@ namespace Game.Presentation.Ui
         /// <summary>Flies back to the card's place and closes.</summary>
         public void Hide()
         {
-            if (!IsOpen)
+            if (!IsOpen || !_close.interactable)
                 return;
             _close.interactable = false;
             Fly(opening: false);

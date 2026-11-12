@@ -15,12 +15,20 @@ namespace Game.Presentation.Ui
         private int _maxLines = 60;
         private string _headerLabel;
         private RectTransform _drawer;
+        private BattleWindowSkin _skin;
+        public void Configure(BattleWindowSkin skin) => _skin = skin;
 
         public void Init(int maxLines) => _maxLines = maxLines;
         public void Reflow(Game.Presentation.Menu.CollectionUi ui,RectTransform safe)
         {
-            _drawer=ui.Frame(safe,"LogDrawer",.015f,.09f,.30f,.30f);
-            TacticalHudView.Place((RectTransform)transform,_drawer,.035f,.07f,.93f,.86f);
+            _drawer=_skin != null ? _skin.Frame(safe,"LogDrawer",.015f,.078f,.34f,.40f) : ui.Frame(safe,"LogDrawer",.015f,.078f,.34f,.40f);
+            TacticalHudView.Place((RectTransform)transform,_drawer,.045f,.06f,.91f,.74f);
+            if (_skin != null)
+            {
+                _skin.Icon(_drawer,"JournalEmblem",BattleEmblem.Journal,.035f,.81f,.14f,.17f);
+                var title=ui.Text(_drawer,"JournalTitle",_headerLabel,.19f,.83f,.72f,.12f);
+                _skin.Label(title,30,TextAlignmentOptions.Left);title.color=_skin.Settings.Gold;
+            }
             UnityEngine.UI.Button header=null;
             header=ui.Button(safe,"LogHeader",_headerLabel,.015f,.02f,.17f,.065f,()=>{
                 var expanded=!_drawer.gameObject.activeSelf;

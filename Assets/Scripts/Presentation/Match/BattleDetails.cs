@@ -12,6 +12,7 @@ namespace Game.Presentation.Match
         private readonly UiTexts _texts;
         private string _body;
         private bool _ownsDialog;
+        private System.Action _showCards;
 
         public BattleDetails(Button button, DialogView dialog, UiTexts texts)
         {
@@ -25,12 +26,22 @@ namespace Game.Presentation.Match
         public void Remember(string body)
         {
             _body = body;
+            _showCards = null;
             UiButtons.Bind(_button, Show);
+        }
+
+        public void RememberCards(string body, string hostCard, string guestCard, string hostName, string guestName,
+            Game.Core.Battle.PowerBreakdown host, Game.Core.Battle.PowerBreakdown guest)
+        {
+            Remember(body);
+            _showCards = () => _dialog.ShowBreakdown(_texts.Get(UiTextKeys.BreakdownTitle), body,
+                _texts.Get(UiTextKeys.Close), () => _ownsDialog = false, hostCard, guestCard, hostName, guestName, host, guest);
         }
 
         public void Clear()
         {
             _body = null;
+            _showCards = null;
             UiButtons.Bind(_button, null);
             if (_ownsDialog) _dialog.Hide();
             _ownsDialog = false;
@@ -39,6 +50,7 @@ namespace Game.Presentation.Match
         private void Show()
         {
             _ownsDialog = true;
+            if (_showCards != null) { _showCards(); return; }
             _dialog.Show(_texts.Get(UiTextKeys.BreakdownTitle), _body,
                 _texts.Get(UiTextKeys.Close), () => _ownsDialog = false);
         }

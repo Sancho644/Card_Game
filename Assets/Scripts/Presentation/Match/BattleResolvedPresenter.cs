@@ -47,7 +47,13 @@ namespace Game.Presentation.Match
             if (field.IsOpen && !battle.IsConditionCancelled) sources.Insert(0, field.CardId);
             var sourceText = _summary.Sources(sources);
             if (!string.IsNullOrEmpty(sourceText)) details += "\n" + sourceText;
-            context.Enqueue(() => { _details.Remember(details); _banner.Show(_summary.Title, shortText); });
+            context.Enqueue(() =>
+            {
+                if (result == null) _details.Remember(details);
+                else _details.RememberCards(details, field.Occupant(battle.Host).CardId,
+                    field.Occupant(battle.Guest).CardId, _summary.PlayerName(battle.Host), _summary.PlayerName(battle.Guest), result.Host, result.Guest);
+                _banner.Show(_summary.Title, shortText);
+            });
             context.Enqueue(new TweenStep(() =>
             {
                 var sequence = DOTween.Sequence();

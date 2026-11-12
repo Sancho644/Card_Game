@@ -219,8 +219,8 @@ namespace Game.Presentation.Match
                 HandoffStarted?.Invoke();
                 _status.Hide();
                 _handoff.Show(
-                    _texts.Format(UiTextKeys.HandoffTitle, _names.Of(next)),
-                    _texts.Format(UiTextKeys.HandoffHint, _names.Of(next)),
+                    _texts.Get("window.handoffTitle"),
+                    _texts.Format("window.handoffBody", _names.Of(next)),
                     _texts.Get(UiTextKeys.HandoffReady),
                     () =>
                     {

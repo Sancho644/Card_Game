@@ -31,7 +31,8 @@ namespace Game.Presentation.Match
             if (scouted.Field != null)
                 body += "\n" + _texts.Format(UiTextKeys.ScoutField, _faces.NameOf(scouted.Field.CardId));
             context.Enqueue(new WaitForPlayerStep(done =>
-                _dialog.Show(_texts.Get(UiTextKeys.ScoutTitle), body, _texts.Get(UiTextKeys.Continue), done)));
+                _dialog.ShowScout(_texts.Get(UiTextKeys.ScoutTitle), body, _texts.Get(UiTextKeys.Continue), done,
+                    scouted.OpponentAbilities.Select(card => card.CardId).ToArray(), scouted.Field?.CardId)));
         }
     }
 }

@@ -6905,6 +6905,7 @@ MonoBehaviour:
   _settings: {fileID: 11400000, guid: f6605da4e29eab94c8f33eb8ee550f6c, type: 2}
   _animation: {fileID: 11400000, guid: a088a35bde887bf4a87482316f7530b7, type: 2}
   _hudSettings: {fileID: 11400000, guid: 372b7bede498ac94ea443b1b71f30f0c, type: 2}
+  _windowSettings: {fileID: 11400000, guid: fdb1c5d96d0bbde4e9b2c28f368c1e2e, type: 2}
   _bootstrapScene: Bootstrap
   _camera: {fileID: 967686874}
   _layout: {fileID: 1391235504}

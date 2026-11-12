@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17086195fba9e9c489c0d3246ea94866, type: 3}
+  m_Name: BattleWindows
+  m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.BattleWindowSettings
+  _style: {fileID: 11400000, guid: 5a8467d43e5ea3b40bc2be7b09163bd8, type: 2}
+  _emblems: {fileID: 2800000, guid: 301cde1c376846841af7f999385b9e72, type: 3}
+  _scrim: {r: 0.005, g: 0.018, b: 0.02, a: 0.82}
+  _opaque: {r: 0.012, g: 0.045, b: 0.044, a: 1}
+  _ink: {r: 1, g: 0.94, b: 0.77, a: 1}
+  _gold: {r: 1, g: 0.76, b: 0.36, a: 1}
+  _teal: {r: 0.37, g: 0.92, b: 0.84, a: 1}
+  _titleSize: 38
+  _bodySize: 25

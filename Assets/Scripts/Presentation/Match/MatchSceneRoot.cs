@@ -25,6 +25,7 @@ namespace Game.Presentation.Match
         [SerializeField] private TablePresentationSettings _settings;
         [SerializeField] private AnimationSettings _animation;
         [SerializeField] private TacticalHudSettings _hudSettings;
+        [SerializeField] private BattleWindowSettings _windowSettings;
         [SerializeField, Tooltip("Loaded when this scene is opened directly in the editor")] private string _bootstrapScene = "Bootstrap";
 
         [Header("Table")]
@@ -57,6 +58,7 @@ namespace Game.Presentation.Match
         private HumanDecisionUi _decisions;
         private AnimationQueue _queue;
         private AnimationSpeed _speed;
+        private BattleWindowSkin _windowSkin;
 
         public void Enter(AppServices app) => _app = app;
 
@@ -100,6 +102,18 @@ namespace Game.Presentation.Match
             var sync = new TableSync(_layout, registry, _animation, _visual, texts, _app.Sound);
             var names = new PlayerNames(texts);
             names.Use(_launch.Mode);
+            if (_windowSettings != null)
+            {
+                _windowSkin = new BattleWindowSkin(_windowSettings, _topBar.GetComponentInChildren<TMPro.TMP_Text>(true).font, faces, skin, texts);
+                _turnOrder.Configure(_windowSkin, BattleEmblem.Coin, true);
+                _handoff.Configure(_windowSkin, BattleEmblem.Handoff, true, true);
+                _breakdown.Configure(_windowSkin, BattleEmblem.Battle);
+                _options.Configure(_windowSkin);
+                _matchEnd.Configure(_windowSkin);
+                _banner.Configure(_windowSkin);
+                _zoom.Configure(_windowSkin);
+                _log.Configure(_windowSkin);
+            }
             var lookup = new CardNameLookup(faces);
             var viewer = new HotSeatDirector { Viewer = _launch.LocalPlayers.First() };
             TacticalHudView tactical=null;
@@ -179,6 +193,7 @@ namespace Game.Presentation.Match
             _presenter?.Dispose();
             _launch?.Opponent?.Dispose();
             _speed?.Dispose();
+            _windowSkin?.Dispose();
         }
     }
 }
