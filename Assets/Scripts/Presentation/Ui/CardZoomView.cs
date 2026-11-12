@@ -33,6 +33,7 @@ namespace Game.Presentation.Ui
         [SerializeField] private Button _close;
 
         private CreatureCardFaceView _creatureFace;
+        private FieldCardFaceView _fieldFace;
         private CardSkin _skin;
         private AnimationSettings _animation;
         private float _dimAlpha;
@@ -130,7 +131,14 @@ namespace Game.Presentation.Ui
         {
             foreach(Transform child in _card) if(_creatureFace==null||child!=_creatureFace.transform)child.gameObject.SetActive(true);
             if(_creatureFace!=null)_creatureFace.gameObject.SetActive(false);
+            if(_fieldFace!=null)_fieldFace.gameObject.SetActive(false);
             _frame.enabled=true;
+            if(face.IsField&&_skin.FieldStyle!=null)
+            {
+                if(_fieldFace==null)_fieldFace=FieldCardFaceView.Create(_card);
+                foreach(Transform child in _card)if(child!=_fieldFace.transform)child.gameObject.SetActive(false);
+                _frame.enabled=false;_fieldFace.Bind(face,_skin,_title.font);return;
+            }
             if(face.Power.HasValue&&_skin.CreatureStyle!=null)
             {
                 if(_creatureFace==null)_creatureFace=CreatureCardFaceView.Create(_card);

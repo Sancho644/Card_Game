@@ -46,7 +46,8 @@ namespace Game.Presentation.Cards
                 card.Art,
                 card is CreatureDef creature ? creature.Power : (int?)null,
                 card is FieldDef field && field.Conditions.Count > 0, _texts.Get("collection.type." + card.Type),
-                card is CreatureDef c ? _visual.CreatureFrameOf(c.Element) : null);
+                card is CreatureDef c ? _visual.CreatureFrameOf(c.Element) : null,
+                card is FieldDef f ? f.Modifiers.Select(m=>new FieldBonusFace(ElementName(m.Element),m.Value,_visual.IconOf(m.Element))).ToArray() : null);
         }
 
         public string NameOf(string cardId)

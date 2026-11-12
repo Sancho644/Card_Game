@@ -9,6 +9,8 @@ namespace Game.Data.Presentation
     public sealed class VisualSettings : ScriptableObject
     {
         [SerializeField] private CreatureCardStyle _creatureStyle;
+        [SerializeField] private FieldCardStyle _fieldStyle;
+        public FieldCardStyle FieldStyle => _fieldStyle;
 
         [Header("Card frames")]
         [SerializeField] private List<ElementColor> _elements = new List<ElementColor>

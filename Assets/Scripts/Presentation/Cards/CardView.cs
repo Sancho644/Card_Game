@@ -45,6 +45,8 @@ namespace Game.Presentation.Cards
         [SerializeField] private Collider _collider;
 
         private CreatureCardFaceView _creatureFace;
+        private FieldCardFaceView _fieldFace;
+        private ConditionMark _conditionMark;
         private MaterialPropertyBlock _block;
         private Tween _move;
         private Tween _powerFlash;
@@ -116,6 +118,7 @@ namespace Game.Presentation.Cards
         /// <summary>Strikes through cancelled condition text instead of showing a separate badge.</summary>
         public void SetCondition(ConditionMark mark)
         {
+            _conditionMark=mark;
             var cancelled = mark == ConditionMark.Cancelled && _face != null && _face.HasCondition;
             if (_conditionBadge != null)
                 _conditionBadge.SetActive(false);
@@ -124,6 +127,7 @@ namespace Game.Presentation.Cards
             if (_text != null)
                 _text.fontStyle = cancelled ? _text.fontStyle | FontStyles.Strikethrough
                     : _text.fontStyle & ~FontStyles.Strikethrough;
+            if(_fieldFace!=null)_fieldFace.SetCancelled(cancelled);
         }
 
         /// <summary>Darkens the face, e.g. the owner's own closed field. 1 is the normal face.</summary>
@@ -323,6 +327,7 @@ namespace Game.Presentation.Cards
         {
             foreach (var item in LegacyFace()) if(item != null && item != _powerBadge && item != _basePower) item.SetActive(true);
             if (_creatureFace != null) _creatureFace.gameObject.SetActive(false);
+            if (_fieldFace != null) _fieldFace.gameObject.SetActive(false);
             var text = Dim(_skin.Text);
             SetColor(_frame, Dim(_face.FrameColor));
             SetColor(_body, Dim(_skin.Body));
@@ -358,7 +363,20 @@ namespace Game.Presentation.Cards
                 SetColor(_basePowerBackground, Dim(_skin.PowerBadge));
                 SetText(_basePowerText, _face.Power.Value.ToString(), text);
             }
-            if(_face.Power.HasValue && _skin.CreatureStyle != null)
+            if(_face.IsField && _skin.FieldStyle!=null)
+            {
+                if(_fieldFace==null){
+                    _fieldFace=FieldCardFaceView.Create(Visual);
+                    var canvas=_fieldFace.gameObject.AddComponent<UnityEngine.Canvas>();canvas.renderMode=RenderMode.WorldSpace;
+                    var rect=(RectTransform)_fieldFace.transform;rect.anchorMin=rect.anchorMax=new Vector2(.5f,.5f);
+                    rect.sizeDelta=new Vector2(700,1000);rect.localScale=Vector3.one*(_skin.FieldStyle.WorldSize.y/1000);
+                    rect.localPosition=new Vector3(0,0,_skin.FieldStyle.FaceDepth);
+                }
+                _fieldFace.Bind(_face,_skin,_title.font);_fieldFace.SetDimming(_dimming);
+                _fieldFace.SetCancelled(_conditionMark==ConditionMark.Cancelled);
+                foreach(var item in LegacyFace())if(item!=null)item.SetActive(_frame!=null&&item==_frame.gameObject);
+            }
+            else if(_face.Power.HasValue && _skin.CreatureStyle != null)
             {
                 if(_creatureFace==null)
                 {

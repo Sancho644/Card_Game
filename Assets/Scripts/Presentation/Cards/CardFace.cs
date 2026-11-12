@@ -17,9 +17,11 @@ namespace Game.Presentation.Cards
             Sprite elementIcon,
             Sprite art,
             int? power,
-            bool hasCondition = false, string typeLabel = "", Sprite creatureFrame = null)
+            bool hasCondition = false, string typeLabel = "", Sprite creatureFrame = null,
+            System.Collections.Generic.IReadOnlyList<FieldBonusFace> fieldBonuses = null)
         {
             CreatureFrame = creatureFrame;
+            FieldBonuses = fieldBonuses;
             TypeLabel = typeLabel;
             Title = title;
             Stats = stats;
@@ -36,6 +38,8 @@ namespace Game.Presentation.Cards
         }
 
         public Sprite CreatureFrame { get; }
+        public System.Collections.Generic.IReadOnlyList<FieldBonusFace> FieldBonuses { get; }
+        public bool IsField => FieldBonuses != null;
         public string TypeLabel { get; }
         public string Title { get; }
 

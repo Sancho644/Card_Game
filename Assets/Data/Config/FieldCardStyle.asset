@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 758b53ad4a62d0a47a2ceb60709ed8b9, type: 3}
+  m_Name: FieldCardStyle
+  m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.FieldCardStyle
+  _frame: {fileID: 21300000, guid: b15099719f3dfa447bccb68b6745494a, type: 3}
+  _bonusPanel: {fileID: 21300000, guid: 4f99b3ffd6bd9524eb64fccb25545023, type: 3}
+  _ink: {r: 1, g: 0.94, b: 0.8, a: 1}
+  _art:
+    serializedVersion: 2
+    x: 0.035
+    y: 0.4
+    width: 0.93
+    height: 0.57
+  _bonusRail:
+    serializedVersion: 2
+    x: 0.045
+    y: 0.43
+    width: 0.19
+    height: 0.48
+  _title:
+    serializedVersion: 2
+    x: 0.1
+    y: 0.325
+    width: 0.8
+    height: 0.065
+  _conditionTitle:
+    serializedVersion: 2
+    x: 0.16
+    y: 0.245
+    width: 0.68
+    height: 0.05
+  _rules:
+    serializedVersion: 2
+    x: 0.08
+    y: 0.115
+    width: 0.84
+    height: 0.125
+  _type:
+    serializedVersion: 2
+    x: 0.12
+    y: 0.04
+    width: 0.33
+    height: 0.035
+  _rarity:
+    serializedVersion: 2
+    x: 0.56
+    y: 0.04
+    width: 0.33
+    height: 0.035
+  _rarityIcon:
+    serializedVersion: 2
+    x: 0.9
+    y: 0.935
+    width: 0.07
+    height: 0.05
+  _worldSize: {x: 1.4, y: 2}
+  _faceDepth: -0.03

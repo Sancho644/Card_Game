@@ -10,6 +10,33 @@ namespace Game.Presentation.Tests
 {
     public sealed class CardFeedbackTests
     {
+        [Test]
+        public void FieldFaces_KeepEveryCatalogModifier_AndHideUnknownCardData()
+        {
+            var visual = AssetDatabase.LoadAssetAtPath<VisualSettings>("Assets/Data/Config/VisualSettings.asset");
+            var database = AssetDatabase.LoadAssetAtPath<Game.Data.Cards.CardDatabase>("Assets/Data/CardDatabase.asset");
+            var texts = AssetDatabase.LoadAssetAtPath<UiTexts>("Assets/Data/Config/UiTexts.asset");
+            var builder = new CardFaceBuilder(database, visual, texts);
+            var fields = 0;
+            foreach (var definition in database.Cards)
+            {
+                if (!(definition is Game.Data.Cards.FieldDef field)) continue;
+                fields++;
+                var face = builder.Build(field.Id);
+                Assert.IsTrue(face.IsField, field.Id);
+                Assert.AreEqual(field.Modifiers.Count, face.FieldBonuses.Count, field.Id);
+                for (var i = 0; i < field.Modifiers.Count; i++)
+                {
+                    Assert.AreEqual(field.Modifiers[i].Value, face.FieldBonuses[i].Value, field.Id);
+                    Assert.AreEqual(builder.ElementName(field.Modifiers[i].Element), face.FieldBonuses[i].Element, field.Id);
+                    Assert.AreSame(visual.IconOf(field.Modifiers[i].Element), face.FieldBonuses[i].Icon, field.Id);
+                }
+            }
+            Assert.Greater(fields, 0);
+            Assert.IsFalse(builder.Build(null).IsField, "A hidden field must not reveal its elements or bonuses.");
+            Assert.IsNull(builder.Build(null).FieldBonuses);
+        }
+
         [TestCase(-1)]
         [TestCase(0)]
         public void PreviewRotation_DragDoesNotClick_AndReleaseReturnsToFront(int pointerId)
