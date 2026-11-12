@@ -1,4 +1,6 @@
 using System.Linq;
+using System;
+using Game.Data.Effects;
 using Game.Core.Cards;
 using Game.Data.Cards;
 using Game.Data.Presentation;
@@ -47,7 +49,8 @@ namespace Game.Presentation.Cards
                 card is CreatureDef creature ? creature.Power : (int?)null,
                 card is FieldDef field && field.Conditions.Count > 0, _texts.Get("collection.type." + card.Type),
                 card is CreatureDef c ? _visual.CreatureFrameOf(c.Element) : null,
-                card is FieldDef f ? f.Modifiers.Select(m=>new FieldBonusFace(ElementName(m.Element),m.Value,_visual.IconOf(m.Element))).ToArray() : null);
+                card is FieldDef f ? f.Modifiers.Select(m=>new FieldBonusFace(ElementName(m.Element),m.Value,_visual.IconOf(m.Element))).ToArray() : null,
+                card is AbilityDef ability ? BuildAbility(ability) : null);
         }
 
         public string NameOf(string cardId)
@@ -57,6 +60,28 @@ namespace Game.Presentation.Cards
         }
 
         public string ElementName(Element element) => _texts.Get(UiTextKeys.ElementPrefix + element);
+
+        private AbilityFace BuildAbility(AbilityDef ability)
+        {
+            var effects = ability.Effects.OfType<PowerBonusData>().ToArray();
+            int? bonus = effects.Length == 1 && effects[0].Amount != 0 ? effects[0].Amount : (int?)null;
+            var rules = ability.Description ?? "";
+            if (bonus.HasValue)
+            {
+                // Remove only a duplicated numeric prefix with punctuation; retain every condition and other effect.
+                var prefix = (bonus.Value > 0 ? "+" : "") + bonus.Value;
+                if (rules.StartsWith(prefix + ".", StringComparison.Ordinal)
+                    || rules.StartsWith(prefix + ",", StringComparison.Ordinal))
+                {
+                    rules = rules.Substring(prefix.Length + 1).TrimStart();
+                    if (rules.Length > 0) rules = char.ToUpperInvariant(rules[0]) + rules.Substring(1);
+                }
+            }
+            var timing = string.Join(" · ", Enum.GetValues(typeof(AbilityTiming)).Cast<AbilityTiming>()
+                .Where(t => t != AbilityTiming.None && (ability.Timing & t) == t)
+                .Select(t => _texts.Get("card.ability.timing." + t)));
+            return new AbilityFace(bonus, _texts.Get("card.ability.bonusSuffix"), timing, rules);
+        }
 
         /// <summary>The creature's element, or the element of the field's largest bonus; null for abilities.</summary>
         private static Element? ElementOf(CardDef card)

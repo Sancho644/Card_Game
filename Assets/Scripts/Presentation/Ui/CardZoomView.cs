@@ -34,6 +34,7 @@ namespace Game.Presentation.Ui
 
         private CreatureCardFaceView _creatureFace;
         private FieldCardFaceView _fieldFace;
+        private AbilityCardFaceView _abilityFace;
         private CardSkin _skin;
         private AnimationSettings _animation;
         private float _dimAlpha;
@@ -132,7 +133,14 @@ namespace Game.Presentation.Ui
             foreach(Transform child in _card) if(_creatureFace==null||child!=_creatureFace.transform)child.gameObject.SetActive(true);
             if(_creatureFace!=null)_creatureFace.gameObject.SetActive(false);
             if(_fieldFace!=null)_fieldFace.gameObject.SetActive(false);
+            if(_abilityFace!=null)_abilityFace.gameObject.SetActive(false);
             _frame.enabled=true;
+            if (face.Ability != null && _skin.AbilityStyle != null)
+            {
+                if (_abilityFace == null) _abilityFace = AbilityCardFaceView.Create(_card);
+                foreach (Transform child in _card) if (child != _abilityFace.transform) child.gameObject.SetActive(false);
+                _frame.enabled = false; _abilityFace.Bind(face, _skin, _title.font); return;
+            }
             if(face.IsField&&_skin.FieldStyle!=null)
             {
                 if(_fieldFace==null)_fieldFace=FieldCardFaceView.Create(_card);

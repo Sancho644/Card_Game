@@ -18,10 +18,11 @@ namespace Game.Presentation.Cards
             Sprite art,
             int? power,
             bool hasCondition = false, string typeLabel = "", Sprite creatureFrame = null,
-            System.Collections.Generic.IReadOnlyList<FieldBonusFace> fieldBonuses = null)
+            System.Collections.Generic.IReadOnlyList<FieldBonusFace> fieldBonuses = null, AbilityFace ability = null)
         {
             CreatureFrame = creatureFrame;
             FieldBonuses = fieldBonuses;
+            Ability = ability;
             TypeLabel = typeLabel;
             Title = title;
             Stats = stats;
@@ -40,6 +41,7 @@ namespace Game.Presentation.Cards
         public Sprite CreatureFrame { get; }
         public System.Collections.Generic.IReadOnlyList<FieldBonusFace> FieldBonuses { get; }
         public bool IsField => FieldBonuses != null;
+        public AbilityFace Ability { get; }
         public string TypeLabel { get; }
         public string Title { get; }
 

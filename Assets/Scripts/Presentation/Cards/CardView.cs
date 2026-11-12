@@ -46,6 +46,7 @@ namespace Game.Presentation.Cards
 
         private CreatureCardFaceView _creatureFace;
         private FieldCardFaceView _fieldFace;
+        private AbilityCardFaceView _abilityFace;
         private ConditionMark _conditionMark;
         private MaterialPropertyBlock _block;
         private Tween _move;
@@ -328,6 +329,7 @@ namespace Game.Presentation.Cards
             foreach (var item in LegacyFace()) if(item != null && item != _powerBadge && item != _basePower) item.SetActive(true);
             if (_creatureFace != null) _creatureFace.gameObject.SetActive(false);
             if (_fieldFace != null) _fieldFace.gameObject.SetActive(false);
+            if (_abilityFace != null) _abilityFace.gameObject.SetActive(false);
             var text = Dim(_skin.Text);
             SetColor(_frame, Dim(_face.FrameColor));
             SetColor(_body, Dim(_skin.Body));
@@ -363,7 +365,21 @@ namespace Game.Presentation.Cards
                 SetColor(_basePowerBackground, Dim(_skin.PowerBadge));
                 SetText(_basePowerText, _face.Power.Value.ToString(), text);
             }
-            if(_face.IsField && _skin.FieldStyle!=null)
+            if (_face.Ability != null && _skin.AbilityStyle != null)
+            {
+                if (_abilityFace == null)
+                {
+                    _abilityFace = AbilityCardFaceView.Create(Visual);
+                    var canvas = _abilityFace.gameObject.AddComponent<Canvas>(); canvas.renderMode = RenderMode.WorldSpace;
+                    var rect = (RectTransform)_abilityFace.transform; rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
+                    rect.sizeDelta = new Vector2(700, 1000); rect.localScale = Vector3.one * (_skin.AbilityStyle.WorldSize.y / 1000);
+                    rect.localPosition = new Vector3(0, 0, _skin.AbilityStyle.FaceDepth);
+                }
+                _abilityFace.Bind(_face, _skin, _title.font); _abilityFace.SetDimming(_dimming);
+                // The same opaque plate as creature/field faces prevents transparent canvases crossing neighbours.
+                foreach (var item in LegacyFace()) if (item != null) item.SetActive(_frame != null && item == _frame.gameObject);
+            }
+            else if(_face.IsField && _skin.FieldStyle!=null)
             {
                 if(_fieldFace==null){
                     _fieldFace=FieldCardFaceView.Create(Visual);

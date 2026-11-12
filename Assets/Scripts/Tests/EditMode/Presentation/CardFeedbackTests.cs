@@ -10,6 +10,70 @@ namespace Game.Presentation.Tests
 {
     public sealed class CardFeedbackTests
     {
+        [Test]
+        public void AbilityFaces_SeparateConditionalBonusFromBasePower_AndKeepRules()
+        {
+            var visual = AssetDatabase.LoadAssetAtPath<VisualSettings>("Assets/Data/Config/VisualSettings.asset");
+            var database = AssetDatabase.LoadAssetAtPath<Game.Data.Cards.CardDatabase>("Assets/Data/CardDatabase.asset");
+            var texts = AssetDatabase.LoadAssetAtPath<UiTexts>("Assets/Data/Config/UiTexts.asset");
+            var builder = new CardFaceBuilder(database, visual, texts);
+            foreach (var card in database.Cards)
+            {
+                var face = builder.Build(card.Id);
+                if (!(card is Game.Data.Cards.AbilityDef)) { Assert.IsNull(face.Ability); continue; }
+                Assert.IsNotNull(face.Ability, card.Id);
+                Assert.IsNull(face.Power, "An ability bonus must not become creature base power.");
+                Assert.AreEqual(card.Description, face.Body, "The source rules must be retained.");
+                StringAssert.DoesNotContain("[card.ability.", face.Ability.Timing, card.Id);
+                Assert.IsNotEmpty(face.Ability.Timing, card.Id);
+            }
+            Assert.IsNull(builder.Build(null).Ability, "Unknown cards must not expose type, timing or bonus.");
+            var intercept = builder.Build("ability.intercept");
+            Assert.AreEqual(40, intercept.Ability.Bonus);
+            Assert.AreEqual(database.Find("ability.intercept").Description.Substring(5), intercept.Ability.Rules);
+            var conditional = builder.Build("ability.field-blessing").Ability;
+            Assert.AreEqual(50, conditional.Bonus);
+            StringAssert.StartsWith("Если", conditional.Rules);
+            StringAssert.Contains("открыта", conditional.Rules);
+            Assert.IsNull(builder.Build("ability.maneuver").Ability.Bonus);
+            var signature = builder.Build("ability.forge-flame").Ability;
+            Assert.AreEqual(80, signature.Bonus);
+            StringAssert.Contains("−20", signature.Rules, "The opponent penalty must not be removed.");
+        }
+
+        [TestCase(160)]
+        [TestCase(800)]
+        public void AbilityTemplate_ShowsBonusAndCompleteLongRules(int height)
+        {
+            var canvas = new GameObject("AbilityCanvas", typeof(RectTransform), typeof(Canvas));
+            try
+            {
+                var visual = AssetDatabase.LoadAssetAtPath<VisualSettings>("Assets/Data/Config/VisualSettings.asset");
+                var database = AssetDatabase.LoadAssetAtPath<Game.Data.Cards.CardDatabase>("Assets/Data/CardDatabase.asset");
+                var texts = AssetDatabase.LoadAssetAtPath<UiTexts>("Assets/Data/Config/UiTexts.asset");
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Card3D.prefab");
+                var font = prefab.GetComponentInChildren<TMPro.TMP_Text>(true).font;
+                var builder = new CardFaceBuilder(database, visual, texts);
+                foreach (var id in new[] { "ability.intercept", "ability.retreat", "ability.forge-flame" })
+                {
+                    var holder = new GameObject(id, typeof(RectTransform)).GetComponent<RectTransform>();
+                    holder.SetParent(canvas.transform, false); holder.sizeDelta = new Vector2(height * .7f, height);
+                    var face = builder.Build(id);
+                    var view = AbilityCardFaceView.Create(holder);
+                    view.Bind(face, new CardSkin(visual), font); Canvas.ForceUpdateCanvases();
+                    Assert.AreEqual(face.Ability.Bonus.HasValue, view.transform.Find("Bonus") != null);
+                    foreach (var text in view.GetComponentsInChildren<TMPro.TMP_Text>())
+                    {
+                        text.ForceMeshUpdate();
+                        Assert.IsFalse(text.isTextTruncated, id + " " + text.name);
+                    }
+                    if (face.Ability.Bonus.HasValue)
+                        Assert.AreEqual("+" + face.Ability.Bonus.Value, view.transform.Find("Bonus/Value").GetComponent<TMPro.TMP_Text>().text);
+                }
+            }
+            finally { Object.DestroyImmediate(canvas); }
+        }
+
         [TestCase(160)]
         [TestCase(800)]
         public void FourFieldBonuses_ShowEverySignedNumberAtCardAndPreviewSize(int height)

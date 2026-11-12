@@ -10,7 +10,9 @@ namespace Game.Data.Presentation
     {
         [SerializeField] private CreatureCardStyle _creatureStyle;
         [SerializeField] private FieldCardStyle _fieldStyle;
+        [SerializeField] private AbilityCardStyle _abilityStyle;
         public FieldCardStyle FieldStyle => _fieldStyle;
+        public AbilityCardStyle AbilityStyle => _abilityStyle;
 
         [Header("Card frames")]
         [SerializeField] private List<ElementColor> _elements = new List<ElementColor>

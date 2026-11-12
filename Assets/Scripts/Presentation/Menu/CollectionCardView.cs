@@ -31,6 +31,14 @@ namespace Game.Presentation.Menu
             var outline = button.gameObject.AddComponent<UnityEngine.UI.Outline>();
             outline.effectColor = selected ? new Color(1f,.7f,.2f) : new Color(.5f,.65f,.6f,.3f);
             outline.effectDistance = new Vector2(selected ? 4 : 1, selected ? -4 : -1);
+            if (face.Ability != null && _style.CardVisuals.AbilityStyle != null)
+            {
+                var view = AbilityCardFaceView.Create(button.transform); view.Bind(face, new CardSkin(_style.CardVisuals), _ui.Font);
+                outline.enabled = false; button.GetComponent<UnityEngine.UI.Image>().color = Color.clear;
+                if (selected) { var selectedOutline = view.transform.Find("Frame").gameObject.AddComponent<UnityEngine.UI.Outline>(); selectedOutline.effectColor = new Color(1, .65f, .15f); selectedOutline.effectDistance = new Vector2(2, -2); }
+                if (inDeck) Text(button.transform, "InDeck", inDeckText, .32f, .92f, .36f, .05f, _style.SmallSize * .6f).alignment = TextAlignmentOptions.Center;
+                return button;
+            }
             if(face.IsField && _style.CardVisuals.FieldStyle!=null)
             {
                 var view=FieldCardFaceView.Create(button.transform);view.Bind(face,new CardSkin(_style.CardVisuals),_ui.Font);

@@ -12,6 +12,7 @@ namespace Game.Presentation.Cards
         {
             CreatureStyle = visual.CreatureStyle;
             FieldStyle = visual.FieldStyle;
+            AbilityStyle = visual.AbilityStyle;
             HighlightSettings=visual.HighlightSettings;
             Body = visual.CardBody;
             Back = visual.CardBack;
@@ -24,6 +25,7 @@ namespace Game.Presentation.Cards
 
         public CreatureCardStyle CreatureStyle { get; }
         public FieldCardStyle FieldStyle { get; }
+        public AbilityCardStyle AbilityStyle { get; }
         public CardHighlightSettings HighlightSettings { get; }
         public Color Body { get; }
         public Color Back { get; }

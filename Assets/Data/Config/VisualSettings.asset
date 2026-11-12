@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.VisualSettings
   _creatureStyle: {fileID: 11400000, guid: 69ac59fe50ba70445a22cbfbe8fb4d24, type: 2}
   _fieldStyle: {fileID: 11400000, guid: 47495f169b63e6d4987688e6734599c2, type: 2}
+  _abilityStyle: {fileID: 11400000, guid: 939e242a748786a4492ba77f183c2776, type: 2}
   _elements:
   - Element: 0
     Color: {r: 0.95, g: 0.85, b: 0.45, a: 1}
