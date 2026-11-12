@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Game.Core;
 using Game.Core.Commands;
+using Game.Core.Cards;
+using Game.Core.Effects;
 using Game.Core.Forecast;
 using Game.Core.Randomness;
 using Game.Core.State;
@@ -54,10 +56,14 @@ namespace Game.AI
             return scores;
         }
 
-        /// <summary>The value of the position after the action and, if considered, the opponent's answer; null if rejected.</summary>
+        /// <summary>The value after the action and opponent's answer; null if rejected or a power-only card has no effect.</summary>
         private double? Outcome(Func<MatchEngine> build, GameCommand action, PlayerId me)
         {
             var engine = build();
+            // Ready must remain preferable to wasting a conditional buff, even with difficulty noise.
+            // The engine still permits the card: this is an AI choice, not a new play restriction.
+            if (IsPowerOnlyWithoutEffect(engine, action))
+                return null;
             if (!engine.Execute(action).IsAccepted)
                 return null;
             if (!_considersReplies)
@@ -84,6 +90,21 @@ namespace Game.AI
             }
 
             return worst ?? _evaluator.Evaluate(engine, me);
+        }
+
+        private static bool IsPowerOnlyWithoutEffect(MatchEngine engine, GameCommand action)
+        {
+            if (engine.State.Battle == null || !(action is PlayAbility play))
+                return false;
+            var card = engine.State.Player(play.Player).FindInHand(play.AbilityId);
+            if (!(card?.Definition is AbilityCard ability) || ability.Effects.Count == 0
+                || ability.Effects.Any(effect => !(effect is PowerBonusEffect)))
+                return false;
+
+            var before = engine.GetBattlePower();
+            var after = engine.PreviewPowerWithAbility(play.Player, play.AbilityId);
+            return before.HostPower.FinalPower == after.HostPower.FinalPower
+                   && before.GuestPower.FinalPower == after.GuestPower.FinalPower;
         }
 
         /// <summary>

@@ -17,6 +17,69 @@ namespace Game.AI.Tests
         private const PlayerId P1 = PlayerId.Player1;
         private const PlayerId P2 = PlayerId.Player2;
 
+        [TestCase(false, true, false)]
+        [TestCase(false, true, true)]
+        [TestCase(true, false, false)]
+        [TestCase(true, false, true)]
+        public void FieldBlessing_WithoutCurrentBonus_IsKeptEvenWithDifficultyNoise(bool open, bool bonus, bool easy)
+        {
+            var cards = new FirstCardSet();
+            var engine = FieldBlessingBattle(cards, open, bonus);
+            var blessing = engine.State.Player(P1).Hand.First(c => c.Definition.Id == "ability.field-blessing").Id;
+            var actions = engine.GetLegalActions(P1).Where(c => c is Ready || c is OpenField
+                || c is PlayAbility play && play.AbilityId == blessing).ToList();
+            Assert.IsTrue(actions.OfType<PlayAbility>().Any(), "The card remains legal for a human to play.");
+            Assert.AreEqual(engine.GetBattlePower().Of(P1).FinalPower,
+                engine.PreviewPowerWithAbility(P1, blessing).Of(P1).FinalPower);
+            for (ulong seed = 1; seed <= 20; seed++)
+            {
+                var brain = new AiBrain(P1, easy ? cards.Easy : cards.Normal, cards.Catalog, cards.Rules, new XorShiftRandom(seed));
+                Assert.IsFalse(brain.Decide(engine.GetView(P1), actions) is PlayAbility,
+                    $"The AI wasted a zero-effect blessing, seed {seed}.");
+            }
+        }
+
+        [Test]
+        public void FieldBlessing_WithUsefulOpenFieldBonus_IsStillPlayed()
+        {
+            var cards = new FirstCardSet();
+            var engine = FieldBlessingBattle(cards, open: true, bonus: true);
+            var blessing = engine.State.Player(P1).Hand.First(c => c.Definition.Id == "ability.field-blessing").Id;
+            var actions = engine.GetLegalActions(P1).Where(c => c is Ready
+                || c is PlayAbility play && play.AbilityId == blessing).ToList();
+            var profile = cards.Easy;
+            profile.Noise = 0;
+            var brain = new AiBrain(P1, profile, cards.Catalog, cards.Rules, new XorShiftRandom(5));
+            var chosen = brain.Decide(engine.GetView(P1), actions) as PlayAbility;
+            Assert.IsNotNull(chosen);
+            Assert.AreEqual(blessing, chosen.AbilityId);
+            Assert.IsTrue(engine.Execute(chosen).IsAccepted);
+            Assert.AreEqual(150 + 40 + 50, engine.GetBattlePower().Of(P1).FinalPower);
+        }
+
+        private static MatchEngine FieldBlessingBattle(FirstCardSet cards, bool open, bool bonus)
+        {
+            var deck = new DeckList(new[]
+            {
+                "field.warm-hearth", "field.forge", "field.eternal-beacon",
+                "creature.spark-fox", "creature.whirlwind-griffin", "creature.lord-of-crimson-forge",
+                "ability.field-blessing", "ability.intercept", "ability.return-of-power",
+            });
+            var engine = new MatchEngine(new MatchSetup(deck, deck), cards.Catalog, cards.Rules, new XorShiftRandom(3));
+            engine.Start();
+            void Do(GameCommand command) => Assert.IsTrue(engine.Execute(command).IsAccepted, command.GetType().Name);
+            foreach (var player in PlayerIds.All)
+                Do(new ChooseCard(player, engine.State.Fields.First(f => f.Owner == player && f.Definition.Id == "field.warm-hearth").Id));
+            Do(new ChooseTurnOrder(engine.State.CoinTossWinner.Value, engine.State.CoinTossWinner == P1));
+            int Card(PlayerId player, string id) => engine.State.Player(player).Hand.First(c => c.Definition.Id == id).Id;
+            var field = engine.State.Fields.First(f => f.Owner == P1 && f.Definition.Id == "field.warm-hearth").Id;
+            Do(new PlaceCreature(P1, Card(P1, bonus ? "creature.spark-fox" : "creature.whirlwind-griffin"), field));
+            Do(new EndTurn(P1));
+            Do(new PlaceCreature(P2, Card(P2, bonus ? "creature.whirlwind-griffin" : "creature.spark-fox"), field));
+            if (open) Do(new OpenField(P1));
+            return engine;
+        }
+
         [Test]
         public void Ai_SubmitsOnlyOfferedActions_EngineAcceptsThem_MatchesEnd()
         {

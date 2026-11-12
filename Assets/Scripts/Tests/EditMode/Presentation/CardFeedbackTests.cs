@@ -10,6 +10,41 @@ namespace Game.Presentation.Tests
 {
     public sealed class CardFeedbackTests
     {
+        [TestCase(160)]
+        [TestCase(800)]
+        public void FourFieldBonuses_ShowEverySignedNumberAtCardAndPreviewSize(int height)
+        {
+            var canvas = new GameObject("BonusCanvas", typeof(RectTransform), typeof(Canvas));
+            var holder = new GameObject("BonusCard", typeof(RectTransform));
+            try
+            {
+                holder.transform.SetParent(canvas.transform, false);
+                ((RectTransform)holder.transform).sizeDelta = new Vector2(height * .7f, height);
+                var visual = AssetDatabase.LoadAssetAtPath<VisualSettings>("Assets/Data/Config/VisualSettings.asset");
+                var database = AssetDatabase.LoadAssetAtPath<Game.Data.Cards.CardDatabase>("Assets/Data/CardDatabase.asset");
+                var texts = AssetDatabase.LoadAssetAtPath<UiTexts>("Assets/Data/Config/UiTexts.asset");
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Card3D.prefab");
+                var font = prefab.GetComponentInChildren<TMPro.TMP_Text>(true).font;
+                var face = new CardFaceBuilder(database, visual, texts).Build("field.sacrificial-altar");
+                var view = FieldCardFaceView.Create(holder.transform);
+                view.Bind(face, new CardSkin(visual), font);
+                Canvas.ForceUpdateCanvases();
+                for (var i = 0; i < face.FieldBonuses.Count; i++)
+                {
+                    var panel = view.transform.Find("Bonuses/Bonus" + i);
+                    var number = panel.Find("Value").GetComponent<TMPro.TMP_Text>();
+                    var element = panel.Find("Element").GetComponent<TMPro.TMP_Text>();
+                    number.ForceMeshUpdate(); element.ForceMeshUpdate();
+                    var value = face.FieldBonuses[i].Value;
+                    Assert.AreEqual((value > 0 ? "+" : "") + value, number.text);
+                    Assert.IsFalse(number.isTextTruncated, number.text);
+                    Assert.IsFalse(element.isTextTruncated, element.text);
+                    Assert.Greater(number.rectTransform.rect.height, 0);
+                }
+            }
+            finally { Object.DestroyImmediate(holder); Object.DestroyImmediate(canvas); }
+        }
+
         [Test]
         public void FieldFaces_KeepEveryCatalogModifier_AndHideUnknownCardData()
         {

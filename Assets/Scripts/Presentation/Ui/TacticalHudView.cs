@@ -38,9 +38,13 @@ namespace Game.Presentation.Ui
             var hint=prompt.GetComponentInChildren<TMP_Text>(true);hint.fontSize=18;hint.enableAutoSizing=true;hint.fontSizeMin=12;hint.fontSizeMax=18;
             Place(hint.rectTransform,prompt.transform,.03f,.08f,.94f,.84f);hint.alignment=TextAlignmentOptions.Midline;hint.textWrappingMode=TextWrappingModes.Normal;
             actions.Reflow(_ui,_safe);
+            // Pile names belong to the table: world-space UI obeys card depth, including a lifted hand card.
+            var pileCanvas=new GameObject("PileLabels",typeof(RectTransform),typeof(Canvas));
+            pileCanvas.transform.SetParent(transform,false);
+            var canvas=pileCanvas.GetComponent<Canvas>();canvas.renderMode=RenderMode.WorldSpace;canvas.worldCamera=camera;
             _pileLabels=new TMP_Text[6];
             for(var i=0;i<6;i++){
-                var label=_ui.Text(_safe,"PileLabel"+i,"",0,0,0,0,14);label.alignment=TextAlignmentOptions.Midline;
+                var label=_ui.Text(pileCanvas.transform,"PileLabel"+i,"",0,0,0,0,14);label.alignment=TextAlignmentOptions.Midline;
                 label.rectTransform.anchorMin=label.rectTransform.anchorMax=new Vector2(.5f,.5f);label.rectTransform.sizeDelta=new Vector2(150,24);
                 _pileLabels[i]=label;
             }
@@ -62,8 +66,13 @@ namespace Game.Presentation.Ui
                 var side=i<3?TableSide.Bottom:TableSide.Top;var owner=i<3?_view.Viewer:_view.Viewer.Opponent();var kind=(PileKind)(i%3);
                 var count=kind==PileKind.Discard?_view.Discard(owner).Count:kind==PileKind.OutOfGame?_view.OutOfGame(owner).Count:_view.Fields.Count(f=>f.Owner==owner&&f.IsRemoved);
                 _pileLabels[i].text=_texts.Get("hud.pile."+kind)+" · "+count;
-                var pose=_layout.Pile(side,kind,0,true);var point=_camera.WorldToScreenPoint(pose.Position+new Vector3(0,0,-1.3f));
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(_safe,point,null,out var local);_pileLabels[i].rectTransform.anchoredPosition=local;
+                var pose=_layout.Pile(side,kind,0,true);var position=pose.Position+new Vector3(0,0,-1.3f);
+                var depth=Vector3.Dot(position-_camera.transform.position,_camera.transform.forward);
+                var screenHeight=_camera.orthographic?2*_camera.orthographicSize:2*depth*Mathf.Tan(_camera.fieldOfView*Mathf.Deg2Rad*.5f);
+                var pixelsPerUnit=_safe.GetComponentInParent<Canvas>().rootCanvas.scaleFactor;
+                var rect=_pileLabels[i].rectTransform;
+                rect.SetPositionAndRotation(position,_camera.transform.rotation);
+                rect.localScale=Vector3.one*(screenHeight/Mathf.Max(1,_camera.pixelHeight)*pixelsPerUnit);
             }
         }
         private void OnDestroy()=>_ui?.Dispose();

@@ -48,8 +48,10 @@ namespace Game.Presentation.Cards
                 var bonus=face.FieldBonuses[i];var height=1f/face.FieldBonuses.Count;
                 var panel=Node("Bonus"+i,new Rect(0,1-(i+1)*height,1,height*.96f),rail);
                 Image("Panel",new Rect(0,0,1,1),style.BonusPanel,Color.white,panel);
-                Image("Icon",new Rect(.20f,.48f,.60f,.44f),bonus.Icon,Color.white,panel);
-                Text("Value",new Rect(.05f,.08f,.90f,.37f),bonus.Element+"\n"+(bonus.Value>0?"+":"")+bonus.Value,style.Ink,panel);
+                Image("Icon",new Rect(.20f,.53f,.60f,.39f),bonus.Icon,Color.white,panel);
+                var element=Text("Element",new Rect(.05f,.29f,.90f,.22f),bonus.Element,style.Ink,panel);
+                var value=Text("Value",new Rect(.05f,.06f,.90f,.23f),(bonus.Value>0?"+":"")+bonus.Value,style.Ink,panel);
+                element.textWrappingMode=value.textWrappingMode=TextWrappingModes.NoWrap;
             }
             Text("Title",style.Title,face.Title,style.Ink);
             var colon=(face.Body??"").IndexOf(':');var hasTitle=colon>0&&colon<45;
