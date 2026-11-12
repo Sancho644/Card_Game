@@ -30,6 +30,9 @@ MonoBehaviour:
     height: 0.58
   _sliceDensity: 3
   _buttonSliceDensity: 8
+  _previewHeight: 0.82
+  _previewOpenSeconds: 0.22
+  _previewCloseSeconds: 0.18
   _background: {r: 0.018, g: 0.05, b: 0.05, a: 1}
   _panel: {r: 0.09, g: 0.12, b: 0.17, a: 1}
   _button: {r: 0.15, g: 0.21, b: 0.28, a: 1}

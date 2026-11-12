@@ -9,6 +9,7 @@ using Game.Presentation.App;
 using Game.Services.Collection;
 using TMPro;
 using UnityEngine;
+using DG.Tweening;
 namespace Game.Presentation.Menu
 {
     /// <summary>Owns library/editor navigation; card rules and persistence remain in their services.</summary>
@@ -37,6 +38,12 @@ namespace Game.Presentation.Menu
         private Rarity? _rarity;
         private Element? _element;
         private CardDef _focused;
+        private Sequence _previewTween;
+        private RectTransform _previewCard;
+        private RectTransform _previewActions;
+        private CanvasGroup _previewOrigin;
+        private Vector2 _previewStart;
+        private float _previewStartScale;
         private string _search="",_deckSearch="";
         public CollectionScreen(Transform parent,TMP_FontAsset font,CollectionSettings style,AppServices app,Action closed,Action playAi)
         {
@@ -69,18 +76,18 @@ namespace Game.Presentation.Menu
             _modal.gameObject.SetActive(false);_root.gameObject.SetActive(false);
         }
         public void Show(){_root.gameObject.SetActive(true);OpenEditor(_app.Collection.SelectedIndex);}
-        public void Dispose(){if(_root!=null)UnityEngine.Object.Destroy(_root.gameObject);_ui.Dispose();}
+        public void Dispose(){_previewTween?.Kill();if(_root!=null)UnityEngine.Object.Destroy(_root.gameObject);_ui.Dispose();}
         private string T(string key)=>_app.Texts.Get("collection."+key);
         private string L(string key)=>_app.Texts.Get("library."+key);
         private string DeckName(int index){var deck=_app.Collection.Get(index);return !string.IsNullOrEmpty(deck.Name)?deck.Name:deck.Cards.Count==0?T("emptyPreset"):L("unnamed");}
         private void OpenEditor(int index)
         {
             _editing=index;_browseCollection=false;_type=null;_rarity=null;_element=null;_focused=null;_search="";_page=0;
-            _editor.Search.SetTextWithoutNotify("");_editor.Root.gameObject.SetActive(true);_library.Root.gameObject.SetActive(false);CloseModal();RefreshEditor();
+            _editor.Search.SetTextWithoutNotify("");_editor.Root.gameObject.SetActive(true);_library.Root.gameObject.SetActive(false);HideModalInstantly();RefreshEditor();
         }
-        private void ShowLibrary(){_editor.Root.gameObject.SetActive(false);_library.Root.gameObject.SetActive(true);CloseModal();RefreshLibrary();}
+        private void ShowLibrary(){_editor.Root.gameObject.SetActive(false);_library.Root.gameObject.SetActive(true);HideModalInstantly();RefreshLibrary();}
         private void Browse(bool collection){_browseCollection=collection;_type=null;_rarity=null;_element=null;_search="";_focused=null;_page=0;_editor.Search.SetTextWithoutNotify("");RefreshEditor();}
-        private void Close(){CloseModal();_root.gameObject.SetActive(false);_closed();}
+        private void Close(){HideModalInstantly();_root.gameObject.SetActive(false);_closed();}
         private void Rename(string name)
         {
             if(!string.IsNullOrWhiteSpace(name))_app.Collection.Rename(_editing,name);
@@ -122,10 +129,11 @@ namespace Game.Presentation.Menu
             }
             var visible=list.Skip(_page*PageSize).Take(PageSize).ToList();
             for(var i=0;i<visible.Count;i++){
-                var card=visible[i];var button=_cardView.Create(_editor.Grid,card,i,preset.Cards.Contains(card.Id),_focused==card,T("inDeck"),()=>{_focused=card;RefreshEditor();});
+                var card=visible[i];UnityEngine.UI.Button button=null;
+                button=_cardView.Create(_editor.Grid,card,i,preset.Cards.Contains(card.Id),_focused==card,T("inDeck"),()=>Preview(card,(RectTransform)button.transform));
                 _cards.Add(button.transform.parent.parent.parent.gameObject);
             }
-            _editorDeck.Refresh(preset,_focused,ChooseSlot);
+            _editorDeck.Refresh(preset,_focused,(type,rarity,card,origin)=>{if(card!=null)Preview(card,origin);else ChooseSlot(type,rarity,null);});
             _editor.Focused.text=_focused==null?T("inspect"):_focused.DisplayName;
             if(_focused is CreatureDef creature)_editor.Focused.text+=" · "+_app.Texts.Get(UiTextKeys.ElementPrefix+creature.Element)+" · "+creature.Power;
             var inDeck=_focused!=null&&preset.Cards.Contains(_focused.Id);
@@ -136,6 +144,7 @@ namespace Game.Presentation.Menu
         }
         private void ChooseSlot(CardType type,Rarity rarity,CardDef card)
         {
+            if(card!=null){Preview(card,FindCardOrigin(card));return;}
             _type=type;_rarity=rarity;_element=null;_search="";_page=0;_focused=card;_browseCollection=true;
             _editor.Search.SetTextWithoutNotify("");RefreshEditor();
         }
@@ -178,7 +187,7 @@ namespace Game.Presentation.Menu
                 var label=_ui.Text(_library.Content,"NoDecks",L("noResults"),0,0,1,1);
                 label.gameObject.AddComponent<UnityEngine.UI.LayoutElement>().preferredHeight=80;_deckRows.Add(label.gameObject);
             }
-            _libraryDeck.Refresh(_app.Collection.Get(_editing),null,(type,rarity,card)=>{OpenEditor(_editing);ChooseSlot(type,rarity,card);});
+            _libraryDeck.Refresh(_app.Collection.Get(_editing),null,(type,rarity,card,origin)=>{if(card!=null)Preview(card,origin);else{OpenEditor(_editing);ChooseSlot(type,rarity,null);}});
             _library.Status.text=_app.Collection.Get(_editing).Cards.Count+" / 9 · "+ValidationText();
             var valid=_app.Collection.Validate(_editing).IsValid;_library.Use.interactable=_library.Play.interactable=valid;
             UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(_library.Content);
@@ -187,9 +196,32 @@ namespace Game.Presentation.Menu
         private void Remove(){if(_focused==null)return;_app.Collection.Remove(_editing,_focused.Id);_focused=null;RefreshEditor();}
         private void Use(){if(!_app.Collection.Select(_editing))return;Close();}
         private void Play(){if(!_app.Collection.Select(_editing))return;_root.gameObject.SetActive(false);_playAi();}
-        private void CloseModal(){if(_modal!=null)_modal.gameObject.SetActive(false);}
+        private void CloseModal()
+        {
+            if(_previewCard==null){HideModalInstantly();return;}
+            _previewTween?.Kill();_previewActions.gameObject.SetActive(false);
+            _previewTween=DOTween.Sequence().SetUpdate(true).SetTarget(this)
+                .Join(_previewCard.DOAnchorPos(_previewStart,_style.PreviewCloseSeconds).SetEase(Ease.InCubic))
+                .Join(_previewCard.DOScale(_previewStartScale,_style.PreviewCloseSeconds).SetEase(Ease.InCubic))
+                .Join(_modal.GetComponent<UnityEngine.UI.Image>().DOFade(0,_style.PreviewCloseSeconds))
+                .OnComplete(()=>{HideModalInstantly();Refresh();});
+        }
+        private void HideModalInstantly()
+        {
+            _previewTween?.Kill();_previewTween=null;
+            if(_previewOrigin!=null)_previewOrigin.alpha=1;
+            _previewOrigin=null;_previewCard=null;_previewActions=null;
+            if(_modal!=null)_modal.gameObject.SetActive(false);
+        }
+        private RectTransform FindCardOrigin(CardDef card) => _root.GetComponentsInChildren<UnityEngine.UI.Button>()
+            .Where(b=>b.name=="Card_"+card.Id).Select(b=>(RectTransform)b.transform).FirstOrDefault();
+        private void Preview(CardDef card,RectTransform origin)
+        {
+            _focused=card;ShowDetails(origin);
+        }
         private RectTransform ModalFrame(string name,float x,float y,float w,float h)
         {
+            HideModalInstantly();_modal.GetComponent<UnityEngine.UI.Image>().color=new Color(0,0,0,.90f);
             CollectionDeckGrid.Clear(_modalContent);_modal.gameObject.SetActive(true);_modal.SetAsLastSibling();
             var frame=_ui.Frame(_modal,name,x,y,w,h);_modalContent.Add(frame.gameObject);return frame;
         }
@@ -201,14 +233,44 @@ namespace Game.Presentation.Menu
         }
         private void ShowDetails()
         {
+            ShowDetails(_focused==null?null:FindCardOrigin(_focused));
+        }
+        private void ShowDetails(RectTransform origin)
+        {
             if(_focused==null)return;
-            var frame=ModalFrame("CardDetails",.08f,.06f,.84f,.88f);
-            var holder=_ui.Rect(frame,"Card",.025f,.055f,.40f,.89f);
-            _cardView.Create(holder,_focused,0,false,false,"",()=>{},1,1);
-            var face=new Game.Presentation.Cards.CardFaceBuilder(_app.Database,_style.CardVisuals,_app.Texts).Build(_focused.Id);
-            var text=_ui.Text(frame,"Description",face.Title+"\n\n"+face.TypeLabel+" · "+face.Rarity+"\n\n"+face.Stats+"\n\n"+face.Body,.46f,.15f,.48f,.68f,30);
-            text.enableAutoSizing=true;text.fontSizeMin=18;text.fontSizeMax=30;text.alignment=TextAlignmentOptions.TopLeft;
-            _ui.Button(frame,"CloseDetails",L("close"),.66f,.04f,.28f,.08f,CloseModal);
+            HideModalInstantly();CollectionDeckGrid.Clear(_modalContent);_modal.gameObject.SetActive(true);_modal.SetAsLastSibling();
+            Canvas.ForceUpdateCanvases();
+            var safe=Screen.safeArea;var area=_modal.rect;
+            var safeWidth=area.width*safe.width/Mathf.Max(1,Screen.width);
+            var safeHeight=area.height*safe.height/Mathf.Max(1,Screen.height);
+            var height=Mathf.Min(safeHeight*_style.PreviewHeight,safeWidth*.92f/.7f);
+            _previewCard=_ui.Rect(_modal,"CardPreview",.5f,.5f,0,0);_previewCard.sizeDelta=new Vector2(height*.7f,height);
+            _modalContent.Add(_previewCard.gameObject);
+            _cardView.Create(_previewCard,_focused,0,false,false,"",CloseModal,1,1);
+            foreach(var text in _previewCard.GetComponentsInChildren<TMP_Text>()){
+                text.fontSizeMin=10;text.fontSizeMax=Mathf.Max(30,text.fontSizeMax);text.overflowMode=TextOverflowModes.Ellipsis;
+            }
+            var end=area.min+new Vector2(area.width*safe.center.x/Mathf.Max(1,Screen.width),area.height*safe.center.y/Mathf.Max(1,Screen.height));
+            _previewStart=end;_previewStartScale=.65f;
+            if(origin!=null){
+                var corners=new Vector3[4];origin.GetWorldCorners(corners);
+                _previewStart=_modal.InverseTransformPoint(origin.TransformPoint(origin.rect.center));
+                var sourceHeight=Vector3.Distance(_modal.InverseTransformPoint(corners[0]),_modal.InverseTransformPoint(corners[1]));
+                _previewStartScale=Mathf.Max(.05f,sourceHeight/(height*.89f));
+                _previewOrigin=origin.GetComponent<CanvasGroup>();
+                if(_previewOrigin==null)_previewOrigin=origin.gameObject.AddComponent<CanvasGroup>();
+                _previewOrigin.alpha=0;
+            }
+            _previewCard.anchoredPosition=_previewStart;_previewCard.localScale=Vector3.one*_previewStartScale;
+            _previewActions=_ui.Rect(_modal,"PreviewActions",.30f,.035f,.40f,.065f);_modalContent.Add(_previewActions.gameObject);
+            var inDeck=_app.Collection.Get(_editing).Cards.Contains(_focused.Id);
+            _ui.Button(_previewActions,"PreviewDeckAction",inDeck?L("removeCard"):T("replace"),0,0,.64f,1,()=>{HideModalInstantly();if(inDeck)Remove();else Add();Refresh();});
+            _ui.Button(_previewActions,"CloseDetails",L("close"),.68f,0,.32f,1,CloseModal);
+            var dim=_modal.GetComponent<UnityEngine.UI.Image>();dim.color=new Color(0,0,0,0);
+            _previewTween=DOTween.Sequence().SetUpdate(true).SetTarget(this)
+                .Join(_previewCard.DOAnchorPos(end,_style.PreviewOpenSeconds).SetEase(Ease.OutCubic))
+                .Join(_previewCard.DOScale(1,_style.PreviewOpenSeconds).SetEase(Ease.OutCubic))
+                .Join(dim.DOFade(.90f,_style.PreviewOpenSeconds));
         }
     }
 }
