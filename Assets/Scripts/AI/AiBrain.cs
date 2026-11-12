@@ -63,7 +63,7 @@ namespace Game.AI
                 return turnOrder;
 
             var scores = Score(view, legalActions);
-            return legalActions[IndexOfBest(scores)];
+            return legalActions[IndexOfBest(scores, legalActions, view)];
         }
 
         /// <summary>An optional action on the opponent's turn, or null to let it pass.</summary>
@@ -106,12 +106,17 @@ namespace Game.AI
             return reveals ? model.UnknownCardCount * _profile.Weights.InformationPerCard : 0;
         }
 
-        private static int IndexOfBest(IReadOnlyList<double> scores)
+        private static int IndexOfBest(IReadOnlyList<double> scores,
+            IReadOnlyList<GameCommand> actions = null, PlayerView view = null)
         {
             var best = 0;
+            var deployment = view?.ChoicePurpose == ChoicePurpose.InitialField || view?.ChoicePurpose == ChoicePurpose.ReplacementField;
             for (var i = 1; i < scores.Count; i++)
             {
-                if (scores[i] > scores[best])
+                var stableFieldTie = deployment && scores[i] == scores[best]
+                    && string.CompareOrdinal(view.Field(((ChooseCard)actions[i]).CardId).CardId,
+                        view.Field(((ChooseCard)actions[best]).CardId).CardId) < 0;
+                if (scores[i] > scores[best] || stableFieldTie)
                     best = i;
             }
 

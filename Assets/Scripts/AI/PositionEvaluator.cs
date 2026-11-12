@@ -25,7 +25,7 @@ namespace Game.AI
             _battle = battle;
         }
 
-        public double Evaluate(MatchEngine engine, PlayerId me)
+        public double Evaluate(MatchEngine engine, PlayerId me, bool considerOpening = true)
         {
             var state = engine.State;
             if (state.Phase == MatchPhase.Ended)
@@ -35,7 +35,7 @@ namespace Game.AI
             }
 
             var value = Side(state, me) - Side(state, me.Opponent());
-            return value + (state.Battle != null ? _battle.Expectation(engine, me) : _score.Value(state, me));
+            return value + (state.Battle != null ? _battle.Expectation(engine, me, considerOpening) : _score.Value(state, me));
         }
 
         private double Side(MatchState state, PlayerId player)

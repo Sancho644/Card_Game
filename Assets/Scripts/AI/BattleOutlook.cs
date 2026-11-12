@@ -33,18 +33,19 @@ namespace Game.AI
 
         private AiWeights Weights => _profile.Weights;
 
-        public double Expectation(MatchEngine engine, PlayerId me)
+        public double Expectation(MatchEngine engine, PlayerId me, bool considerOpening = true)
         {
-            var winChance = WinChance(engine, me);
+            var winChance = WinChance(engine, me, considerOpening);
             var ifWin = OutcomeValue(engine, engine.PreviewConsequences(me), me);
             var ifLose = OutcomeValue(engine, engine.PreviewConsequences(me.Opponent()), me);
             return winChance * ifWin + (1 - winChance) * ifLose;
         }
 
-        public double WinChance(MatchEngine engine, PlayerId me)
+        public double WinChance(MatchEngine engine, PlayerId me, bool considerOpening = true)
         {
             var current = engine.GetBattlePower();
-            var margin = Margin(current, me) + EqualPowerEdge(current, me) + OpenOption(engine, current, me)
+            var margin = Margin(current, me) + EqualPowerEdge(current, me)
+                         + (considerOpening ? OpenOption(engine, current, me) : 0)
                          + Weights.OwnReserveShare * Reserve(engine, current, me);
             if (_profile.ExpectsOpponentResponse)
                 margin -= Weights.OpponentReserveShare * Reserve(engine, current, me.Opponent());

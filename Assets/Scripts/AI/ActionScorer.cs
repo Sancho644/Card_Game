@@ -24,12 +24,14 @@ namespace Game.AI
 
         private readonly ForecastBuilder _forecasts;
         private readonly PositionEvaluator _evaluator;
+        private readonly FieldDeploymentScorer _fields;
         private readonly bool _considersReplies;
 
         public ActionScorer(ForecastBuilder forecasts, PositionEvaluator evaluator, bool considersReplies)
         {
             _forecasts = forecasts;
             _evaluator = evaluator;
+            _fields = new FieldDeploymentScorer(evaluator);
             _considersReplies = considersReplies;
         }
 
@@ -46,7 +48,10 @@ namespace Game.AI
                 var baseline = _evaluator.Evaluate(Build(), me);
                 for (var i = 0; i < actions.Count; i++)
                 {
-                    var outcome = Outcome(Build, actions[i], me);
+                    var deployment = view.ChoicePurpose == ChoicePurpose.InitialField || view.ChoicePurpose == ChoicePurpose.ReplacementField;
+                    var outcome = deployment && actions[i] is ChooseCard choice
+                        ? _fields.Score(Build, choice, me)
+                        : Outcome(Build, actions[i], me);
                     scores[i] += outcome.HasValue ? outcome.Value - baseline : RejectedInForecast;
                 }
             }
