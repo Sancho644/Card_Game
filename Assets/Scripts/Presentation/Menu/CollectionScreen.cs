@@ -41,6 +41,7 @@ namespace Game.Presentation.Menu
         private Sequence _previewTween;
         private RectTransform _previewCard;
         private RectTransform _previewActions;
+        private CardPreviewRotation _previewRotation;
         private CanvasGroup _previewOrigin;
         private Vector2 _previewStart;
         private float _previewStartScale;
@@ -76,7 +77,7 @@ namespace Game.Presentation.Menu
             _modal.gameObject.SetActive(false);_root.gameObject.SetActive(false);
         }
         public void Show(){_root.gameObject.SetActive(true);OpenEditor(_app.Collection.SelectedIndex);}
-        public void Dispose(){_previewTween?.Kill();if(_root!=null)UnityEngine.Object.Destroy(_root.gameObject);_ui.Dispose();}
+        public void Dispose(){if(_previewRotation!=null)_previewRotation.Stop();_previewTween?.Kill();if(_root!=null)UnityEngine.Object.Destroy(_root.gameObject);_ui.Dispose();}
         private string T(string key)=>_app.Texts.Get("collection."+key);
         private string L(string key)=>_app.Texts.Get("library."+key);
         private string DeckName(int index){var deck=_app.Collection.Get(index);return !string.IsNullOrEmpty(deck.Name)?deck.Name:deck.Cards.Count==0?T("emptyPreset"):L("unnamed");}
@@ -199,16 +200,19 @@ namespace Game.Presentation.Menu
         private void CloseModal()
         {
             if(_previewCard==null){HideModalInstantly();return;}
+            if(_previewRotation!=null)_previewRotation.Stop();
             _previewTween?.Kill();_previewActions.gameObject.SetActive(false);
             _previewTween=DOTween.Sequence().SetUpdate(true).SetTarget(this)
                 .Join(_previewCard.DOAnchorPos(_previewStart,_style.PreviewCloseSeconds).SetEase(Ease.InCubic))
                 .Join(_previewCard.DOScale(_previewStartScale,_style.PreviewCloseSeconds).SetEase(Ease.InCubic))
+                .Join(_previewCard.DOLocalRotateQuaternion(Quaternion.identity,_style.PreviewCloseSeconds).SetEase(Ease.InCubic))
                 .Join(_modal.GetComponent<UnityEngine.UI.Image>().DOFade(0,_style.PreviewCloseSeconds))
                 .OnComplete(()=>{HideModalInstantly();Refresh();});
         }
         private void HideModalInstantly()
         {
             _previewTween?.Kill();_previewTween=null;
+            if(_previewRotation!=null)_previewRotation.Stop();_previewRotation=null;
             if(_previewOrigin!=null)_previewOrigin.alpha=1;
             _previewOrigin=null;_previewCard=null;_previewActions=null;
             if(_modal!=null)_modal.gameObject.SetActive(false);
@@ -246,7 +250,10 @@ namespace Game.Presentation.Menu
             var height=Mathf.Min(safeHeight*_style.PreviewHeight,safeWidth*.92f/.7f);
             _previewCard=_ui.Rect(_modal,"CardPreview",.5f,.5f,0,0);_previewCard.sizeDelta=new Vector2(height*.7f,height);
             _modalContent.Add(_previewCard.gameObject);
-            _cardView.Create(_previewCard,_focused,0,false,false,"",CloseModal,1,1);
+            var previewButton=_cardView.Create(_previewCard,_focused,0,false,false,"",()=>{},1,1);
+            previewButton.transition=UnityEngine.UI.Selectable.Transition.None;
+            var rotation=previewButton.gameObject.AddComponent<CardPreviewRotation>();
+            rotation.Configure(_previewCard,_style,CloseModal);_previewRotation=rotation;
             foreach(var text in _previewCard.GetComponentsInChildren<TMP_Text>()){
                 text.fontSizeMin=10;text.fontSizeMax=Mathf.Max(30,text.fontSizeMax);text.overflowMode=TextOverflowModes.Ellipsis;
             }
@@ -270,7 +277,8 @@ namespace Game.Presentation.Menu
             _previewTween=DOTween.Sequence().SetUpdate(true).SetTarget(this)
                 .Join(_previewCard.DOAnchorPos(end,_style.PreviewOpenSeconds).SetEase(Ease.OutCubic))
                 .Join(_previewCard.DOScale(1,_style.PreviewOpenSeconds).SetEase(Ease.OutCubic))
-                .Join(dim.DOFade(.90f,_style.PreviewOpenSeconds));
+                .Join(dim.DOFade(.90f,_style.PreviewOpenSeconds))
+                .OnComplete(()=>{if(rotation!=null)rotation.Interactable=true;});
         }
     }
 }

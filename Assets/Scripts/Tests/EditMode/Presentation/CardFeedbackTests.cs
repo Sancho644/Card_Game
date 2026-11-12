@@ -10,6 +10,43 @@ namespace Game.Presentation.Tests
 {
     public sealed class CardFeedbackTests
     {
+        [TestCase(-1)]
+        [TestCase(0)]
+        public void PreviewRotation_DragDoesNotClick_AndReleaseReturnsToFront(int pointerId)
+        {
+            var activeBefore = DOTween.TotalActiveTweens();
+            var canvasGo = new GameObject("PreviewCanvas", typeof(RectTransform), typeof(Canvas));
+            var cardGo = new GameObject("PreviewCard", typeof(RectTransform));
+            var rotation = cardGo.AddComponent<Game.Presentation.Menu.CardPreviewRotation>();
+            try
+            {
+                cardGo.transform.SetParent(canvasGo.transform, false);
+                var rect = (RectTransform)cardGo.transform; rect.sizeDelta = new Vector2(400, 600);
+                var settings = AssetDatabase.LoadAssetAtPath<CollectionSettings>("Assets/Data/Config/Collection.asset");
+                var clicks = 0;
+                rotation.Configure(rect, settings, () => clicks++); rotation.Interactable = true;
+                var data = new UnityEngine.EventSystems.PointerEventData(null) { pointerId = pointerId, position = Vector2.zero };
+                rotation.OnPointerDown(data); rotation.OnBeginDrag(data);
+                data.position = new Vector2(2000, 2000); rotation.OnDrag(data);
+                Assert.Greater(Quaternion.Angle(Quaternion.identity, rect.localRotation), 1);
+                Assert.LessOrEqual(Mathf.Abs(Mathf.DeltaAngle(0, rect.localEulerAngles.x)), settings.PreviewTiltDegrees + .01f);
+                Assert.LessOrEqual(Mathf.Abs(Mathf.DeltaAngle(0, rect.localEulerAngles.y)), settings.PreviewTiltDegrees + .01f);
+                var angle = rect.localRotation;
+                var second = new UnityEngine.EventSystems.PointerEventData(null) { pointerId = pointerId + 100, position = -data.position };
+                rotation.OnDrag(second); rotation.OnPointerUp(second);
+                Assert.Less(Quaternion.Angle(angle, rect.localRotation), .01f, "Another finger must not take over the gesture.");
+                rotation.OnPointerUp(data); rotation.OnEndDrag(data); rotation.OnPointerClick(data);
+                Assert.AreEqual(0, clicks, "Dragging must not close the preview.");
+                DOTween.Complete(rotation);
+                Assert.Less(Quaternion.Angle(Quaternion.identity, rect.localRotation), .01f);
+                data.position = Vector2.zero;
+                rotation.OnPointerDown(data); rotation.OnPointerUp(data); rotation.OnPointerClick(data);
+                Assert.AreEqual(1, clicks, "A normal tap must still close the preview.");
+            }
+            finally { rotation.Stop(); Object.DestroyImmediate(cardGo); Object.DestroyImmediate(canvasGo); }
+            Assert.AreEqual(activeBefore, DOTween.TotalActiveTweens(), "Preview rotation must not leak animations after teardown.");
+        }
+
         [TestCase(6)]
         [TestCase(9)]
         public void HandCreatureFace_HasOpaqueFrontBackingBehindItsArt(int count)

@@ -25,9 +25,13 @@ namespace Game.Data.Presentation
         [SerializeField, Range(.4f,.9f)] private float _previewHeight = .82f;
         [SerializeField, Min(0)] private float _previewOpenSeconds = .22f;
         [SerializeField, Min(0)] private float _previewCloseSeconds = .18f;
+        [SerializeField, Range(5,60)] private float _previewTiltDegrees = 28f;
+        [SerializeField, Min(0)] private float _previewTiltReturnSeconds = .25f;
         public float PreviewHeight => _previewHeight;
         public float PreviewOpenSeconds => _previewOpenSeconds;
         public float PreviewCloseSeconds => _previewCloseSeconds;
+        public float PreviewTiltDegrees => _previewTiltDegrees;
+        public float PreviewTiltReturnSeconds => _previewTiltReturnSeconds;
         [SerializeField] private Color _background = new Color(0.055f, 0.075f, 0.11f, 1f);
         [SerializeField] private Color _panel = new Color(0.09f, 0.12f, 0.17f, 1f);
         [SerializeField] private Color _button = new Color(0.15f, 0.21f, 0.28f, 1f);
