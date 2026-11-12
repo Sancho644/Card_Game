@@ -72,7 +72,7 @@ namespace Game.Core.Tests
         }
 
         [Test]
-        public void SignatureWithPlacement_OfferedOnlyWhereBattleStarts()
+        public void SignatureWithPlacement_IsNeverOffered()
         {
             var d = Begin(P1, player2Deck: Deck(legendaryAbility: StormRush));
             d.Place(P1, Fire180, P1, Forge);
@@ -82,9 +82,7 @@ namespace Game.Core.Tests
                 .OfType<PlaceCreature>()
                 .Where(action => action.SignatureAbilityId != null)
                 .ToList();
-            Assert.AreEqual(1, withSignature.Count);
-            Assert.AreEqual(d.Id(P2, Earth250), withSignature[0].CreatureId);
-            Assert.AreEqual(d.Field(P1, Forge).Id, withSignature[0].FieldId);
+            Assert.IsEmpty(withSignature);
         }
 
         [Test]

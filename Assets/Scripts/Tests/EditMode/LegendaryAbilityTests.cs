@@ -327,21 +327,16 @@ namespace Game.Core.Tests
         // ---- Signature abilities ----
 
         [Test]
-        public void SignatureWithPlacement_PlayedBeforeBattle_TakesFirstTurn()
+        public void SignatureWithPlacement_IsRejectedWithoutSpendingCards()
         {
             var d = Begin(P1, player2Deck: Deck(legendaryAbility: StormRush));
             d.Place(P1, Fire180, P1, Forge);
             d.EndTurn(P1);
-            d.Ok(new PlaceCreature(P2, d.Id(P2, Earth250), d.Field(P1, Forge).Id, signatureAbilityId: d.Id(P2, StormRush)));
-
-            var abilityIndex = d.Log.ToList().FindLastIndex(e => e is AbilityPlayed);
-            var battleIndex = d.Log.ToList().FindLastIndex(e => e is BattleStarted);
-            Assert.Less(abilityIndex, battleIndex, "The signature ability is played before the battle starts.");
-            Assert.AreEqual(P2, d.Last<BattleStarted>().FirstActor);
-
-            d.Ready(P2);
-            d.Ready(P1);
-            Assert.AreEqual(250 + 70, d.Last<BattleResolved>().GuestPower);
+            d.Rejected(new PlaceCreature(P2, d.Id(P2, Earth250), d.Field(P1, Forge).Id,
+                signatureAbilityId: d.Id(P2, StormRush)), RejectReason.TimingNotAllowed);
+            Assert.IsTrue(d.InHand(P2, Earth250));
+            Assert.IsTrue(d.InHand(P2, StormRush));
+            Assert.IsNull(d.State.Battle);
         }
 
         [Test]
@@ -361,15 +356,19 @@ namespace Game.Core.Tests
             d.EndTurn(P1);
 
             d.Rejected(new PlaceCreature(P2, d.Id(P2, Water200), d.Field(P1, Forge).Id, signatureAbilityId: d.Id(P2, StormRush)),
-                RejectReason.SignatureCreatureNotInBattle);
+                RejectReason.TimingNotAllowed);
         }
 
         [Test]
-        public void BeforeBattleOnlySignature_InBattle_Rejected()
+        public void StormRush_InBattle_AddsOnlyFiftyAndPassesTurn()
         {
             var d = BattleOnP1Forge(Earth250, Fire180, player1Deck: Deck(legendaryAbility: StormRush));
 
-            d.Rejected(new PlayAbility(P1, d.Id(P1, StormRush)), RejectReason.TimingNotAllowed);
+            d.Play(P1, StormRush);
+            Assert.AreEqual(P2, d.State.Battle.CurrentActor);
+            d.Ready(P2);
+            d.Ready(P1);
+            Assert.AreEqual(250 + 50, d.Last<BattleResolved>().HostPower);
         }
 
         [Test]

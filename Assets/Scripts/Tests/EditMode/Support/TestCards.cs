@@ -138,12 +138,12 @@ namespace Game.Core.Tests
             Legendary(Scout, AbilityTiming.BeforeMainAction | AbilityTiming.AfterMainAction, new ScoutEffect()),
             Legendary(LockField, AbilityTiming.BeforeMainAction, new LockFieldEffect()),
 
-            Signature(ForgeFlame, AbilityTiming.BeforeBattle | AbilityTiming.InBattle,
+            Signature(ForgeFlame, AbilityTiming.InBattle,
                 new PowerBonusEffect(80), new OpponentPowerEffect(-20)),
-            Signature(StormRush, AbilityTiming.BeforeBattle, new PowerBonusEffect(70), new TakeFirstBattleTurnEffect()),
-            Signature(Dawn, AbilityTiming.BeforeBattle | AbilityTiming.InBattle,
+            Signature(StormRush, AbilityTiming.InBattle, new PowerBonusEffect(50)),
+            Signature(Dawn, AbilityTiming.InBattle,
                 new PowerBonusEffect(70), new IgnoreFieldPenaltiesEffect()),
-            Signature(DarkPrice, AbilityTiming.BeforeBattle | AbilityTiming.InBattle,
+            Signature(DarkPrice, AbilityTiming.InBattle,
                 new PowerBonusEffect(100), new DiscardOwnAbilityEffect()),
         });
 

@@ -103,11 +103,11 @@ namespace Game.Data.Tests
         }
 
         [Test]
-        public void SacrificialAltar_OnlyWinningGuestGoesOut()
+        public void SacrificialAltar_WinningGuestHoldsField()
         {
             var altar = (FieldDef)_database.Find("field.sacrificial-altar");
 
-            Assert.IsTrue(altar.Conditions.OfType<WinnerOutOfGameData>().Single().OnlyGuest);
+            Assert.IsInstanceOf<GuestWinnerStaysData>(altar.Conditions.Single());
         }
 
         [TestCase("ability.forge-flame", "creature.lord-of-crimson-forge")]
@@ -122,6 +122,7 @@ namespace Game.Data.Tests
 
             Assert.AreEqual(Rarity.Legendary, ability.Rarity);
             Assert.AreEqual(creatureId, ability.BoundCreatureId);
+            Assert.AreEqual(AbilityTiming.InBattle, ability.Timing);
         }
 
         [Test]

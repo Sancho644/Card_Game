@@ -40,6 +40,8 @@ namespace Game.Data.Cards
                 yield return "an effect has no type selected";
             if (_boundCreature != null && Rarity != Rarity.Legendary)
                 yield return "a signature ability must be legendary";
+            if (_boundCreature != null && _timing != AbilityTiming.InBattle)
+                yield return "a signature ability can only be played during its owner's battle turn";
         }
     }
 }

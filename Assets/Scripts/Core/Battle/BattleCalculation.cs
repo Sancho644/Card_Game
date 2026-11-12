@@ -49,8 +49,6 @@ namespace Game.Core.Battle
         /// <summary>«Перевес»: this player wins on equal final power, whoever was placed first.</summary>
         public PlayerId? TieWinner { get; set; }
 
-        // TODO(rules): «Штормовой натиск» gives the first battle turn to the creature placed later; equal power
-        // still goes to the creature placed earlier, as the rules word it. See docs/decisions.md.
         /// <summary>
         /// Who wins on equal final power (docs/rules.md §6): the creature placed on the field earlier, unless an
         /// ability («Перевес») gives the win to its owner. The only place of this rule.

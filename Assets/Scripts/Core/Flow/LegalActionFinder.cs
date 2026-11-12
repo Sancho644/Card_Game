@@ -47,17 +47,13 @@ namespace Game.Core.Flow
         private IEnumerable<GameCommand> MainActions(PlayerId player)
         {
             var hand = _state.Player(player).Hand;
-            var signatures = new int?[] { null }
-                .Concat(hand.Where(IsSignatureAbility).Select(card => (int?)card.Id))
-                .ToList();
             var fields = _state.Fields.Where(field => field.IsActive).ToList();
 
             foreach (var creature in hand.Where(card => card.Type == CardType.Creature))
             {
                 foreach (var field in fields)
                 {
-                    foreach (var signature in signatures)
-                        yield return new PlaceCreature(player, creature.Id, field.Id, signature);
+                    yield return new PlaceCreature(player, creature.Id, field.Id);
                 }
             }
 
@@ -65,8 +61,7 @@ namespace Game.Core.Flow
             {
                 foreach (var field in fields)
                 {
-                    foreach (var signature in signatures)
-                        yield return new Challenge(player, creature.Id, field.Id, signature);
+                    yield return new Challenge(player, creature.Id, field.Id);
                 }
             }
         }
@@ -118,7 +113,5 @@ namespace Game.Core.Flow
         private static IReadOnlyList<int?> Option(AbilityTargetKinds kinds, AbilityTargetKinds kind, Func<IEnumerable<int>> ids) =>
             (kinds & kind) == 0 ? new int?[] { null } : ids().Select(id => (int?)id).ToList();
 
-        private static bool IsSignatureAbility(CardInstance card) =>
-            card.Definition is AbilityCard ability && ability.IsSignature;
     }
 }

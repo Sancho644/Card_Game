@@ -4,7 +4,7 @@ namespace Game.Core.Commands
 {
     /// <summary>
     /// Main action: put a creature from hand on any field where you have no creature yet.
-    /// If this starts a battle, the creature's signature ability may be played with it, before the battle.
+    /// Signature abilities are played separately, after the battle starts.
     /// </summary>
     public sealed class PlaceCreature : GameCommand
     {
@@ -18,6 +18,7 @@ namespace Game.Core.Commands
 
         public int CreatureId { get; }
         public int FieldId { get; }
+        /// <summary>Legacy command payload; a non-null value is rejected under current rules.</summary>
         public int? SignatureAbilityId { get; }
     }
 }

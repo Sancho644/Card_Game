@@ -16,7 +16,7 @@ namespace Game.Core.Commands
         public int CreatureId { get; }
         public int TargetFieldId { get; }
 
-        /// <summary>The moved creature's signature ability, played before the battle.</summary>
+        /// <summary>Legacy command payload; a non-null value is rejected under current rules.</summary>
         public int? SignatureAbilityId { get; }
     }
 }

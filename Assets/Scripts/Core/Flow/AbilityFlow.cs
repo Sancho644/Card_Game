@@ -50,6 +50,8 @@ namespace Game.Core.Flow
                 return RejectReason.CardNotInHand;
             if (!(card.Definition is AbilityCard ability))
                 return RejectReason.NotAnAbility;
+            if (ability.IsSignature && (isBeforeBattle || battle == null || moments != AbilityTiming.InBattle))
+                return moments == AbilityTiming.InBattleOnOpponentTurn ? RejectReason.NotYourTurn : RejectReason.TimingNotAllowed;
             if (!ability.CanBePlayedAt(moments))
                 return moments == AbilityTiming.InBattleOnOpponentTurn ? RejectReason.NotYourTurn : RejectReason.TimingNotAllowed;
             if (ability.Rarity == Rarity.Legendary &&
@@ -82,8 +84,7 @@ namespace Game.Core.Flow
         }
 
         /// <summary>
-        /// Checks a signature ability played together with placing (or moving) its creature on the field.
-        /// The placement must start a battle; the creature is not on the field yet.
+        /// Validates legacy placement commands carrying a signature id. Current rules reject this timing.
         /// </summary>
         public RejectReason ValidateWithPlacement(PlayerId player, int abilityId, FieldSlot field, CardInstance creature)
         {
