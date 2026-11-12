@@ -19,7 +19,6 @@ namespace Game.Presentation.Table
         private readonly CardViewRegistry _registry;
         private readonly AnimationSettings _animation;
         private readonly VisualSettings _visual;
-        private readonly UiTexts _texts;
         private readonly ISoundPlayer _sound;
 
         public TableSync(
@@ -34,7 +33,6 @@ namespace Game.Presentation.Table
             _registry = registry;
             _animation = animation;
             _visual = visual;
-            _texts = texts;
             _sound = sound;
         }
 
@@ -64,12 +62,13 @@ namespace Game.Presentation.Table
                 sequence.InsertCallback(start, () => _sound.Play(SoundCue.CardDeal));
             }
 
-            void Move(CardRef card, TableSide owner, CardPose pose, string status = null, float brightness = 1f, bool inHand = false)
+            void Move(CardRef card, TableSide owner, CardPose pose, float brightness = 1f, bool inHand = false,
+                bool fieldClosed = false, bool fieldLocked = false)
             {
                 visible.Add(card.InstanceId);
                 var isNew = _registry.Find(card.InstanceId) == null;
                 var cardView = _registry.GetOrCreate(card.InstanceId, card.CardId, _layout.Spawn(owner));
-                cardView.SetStatus(status);
+                cardView.SetFieldState(fieldClosed,fieldLocked);
                 cardView.SetDimming(brightness);
                 cardView.SetInHand(inHand);
                 Add(cardView.MoveTo(pose, duration), isNew);
@@ -91,7 +90,9 @@ namespace Game.Presentation.Table
                         : _layout.Field(side, active++, activeCount, known);
                     // The owner sees the face of a closed field, darkened; the opponent sees its back.
                     var brightness = known && !field.IsOpen && !field.IsRemoved ? _visual.ClosedFieldBrightness : 1f;
-                    Move(new CardRef(field.Id, field.CardId), side, pose, StatusOf(field), brightness);
+                    Move(new CardRef(field.Id, field.CardId), side, pose, brightness,
+                        fieldClosed: known && !field.IsRemoved && !field.IsOpen,
+                        fieldLocked: known && !field.IsRemoved && field.IsLocked);
 
                     foreach (var occupantOwner in PlayerIds.All)
                     {
@@ -150,15 +151,6 @@ namespace Game.Presentation.Table
             field.SetBattle(_visual.Battle);
             if (view.Field(battle.FieldId).IsOpen)
                 field.SetCondition(battle.IsConditionCancelled ? ConditionMark.Cancelled : ConditionMark.Active);
-        }
-
-        private string StatusOf(FieldView field)
-        {
-            if (field.IsRemoved)
-                return null;
-            if (field.IsLocked)
-                return _texts.Get(UiTextKeys.FieldLocked);
-            return field.IsOpen ? null : _texts.Get(UiTextKeys.FieldClosed);
         }
 
         private static TableSide SideOf(PlayerId player, PlayerId viewer) =>

@@ -14,6 +14,7 @@ namespace Game.Presentation.Cards
         private TMP_FontAsset _font;
         private TMP_Text _conditionTitle;
         private TMP_Text _rules;
+        private UnityEngine.UI.Image _stateIcon;
         public static FieldCardFaceView Create(Transform parent)
         {
             var go=new GameObject("FieldFace",typeof(RectTransform));
@@ -59,6 +60,16 @@ namespace Game.Presentation.Cards
             _rules=Text("Rules",style.Rules,hasTitle?face.Body.Substring(colon+1).Trim():face.Body,style.Ink);
             Text("Type",style.Type,face.TypeLabel,style.Ink);
             Text("Rarity",style.Rarity,face.Rarity,style.Ink);
+            // State stays bright while the closed field itself is dimmed.
+            _stateIcon=Node("FieldState",style.StateBadge).gameObject.AddComponent<UnityEngine.UI.Image>();
+            _stateIcon.raycastTarget=false;_stateIcon.preserveAspect=true;
+            _stateIcon.gameObject.SetActive(false);
+        }
+        public void SetState(bool closed,bool locked)
+        {
+            if(_stateIcon==null)return;
+            _stateIcon.sprite=locked?_skin.FieldStyle.LockedIcon:closed?_skin.FieldStyle.ClosedIcon:null;
+            _stateIcon.gameObject.SetActive(_stateIcon.sprite!=null);
         }
         public void SetCancelled(bool cancelled)
         {

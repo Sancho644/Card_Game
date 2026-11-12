@@ -6,6 +6,10 @@ namespace Game.Data.Presentation
     {
         [SerializeField] private Sprite _frame;
         [SerializeField] private Sprite _bonusPanel;
+        [Header("Field state")]
+        [SerializeField] private Sprite _closedIcon;
+        [SerializeField] private Sprite _lockedIcon;
+        [SerializeField] private Rect _stateBadge=new Rect(.69f,.405f,.25f,.175f);
         [SerializeField] private Color _ink=new Color(1,.94f,.8f);
         [SerializeField] private Rect _art=new Rect(.035f,.40f,.93f,.57f);
         [SerializeField] private Rect _bonusRail=new Rect(.045f,.43f,.19f,.48f);
@@ -19,6 +23,9 @@ namespace Game.Data.Presentation
         [SerializeField] private float _faceDepth=-.03f;
         public Sprite Frame=>_frame;
         public Sprite BonusPanel=>_bonusPanel;
+        public Sprite ClosedIcon=>_closedIcon;
+        public Sprite LockedIcon=>_lockedIcon;
+        public Rect StateBadge=>_stateBadge;
         public Color Ink=>_ink;
         public Rect Art=>_art;
         public Rect BonusRail=>_bonusRail;

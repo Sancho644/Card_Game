@@ -35,6 +35,7 @@ namespace Game.Presentation.Match
                 if (card == null)
                     return null;
 
+                card.SetFieldState(false,false);
                 _sound.Play(SoundCue.FieldFlip);
                 if (card.IsKnown)
                 {

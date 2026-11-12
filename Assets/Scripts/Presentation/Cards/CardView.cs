@@ -56,6 +56,8 @@ namespace Game.Presentation.Cards
         private CardSkin _skin;
         private float _dimming = 1f;
         private CardPlayableGlow _playableGlow;
+        private bool _fieldClosed;
+        private bool _fieldLocked;
 
         /// <summary>Match-local card instance id; negative for anonymous backs of hidden cards.</summary>
         public int InstanceId { get; private set; }
@@ -101,19 +103,18 @@ namespace Game.Presentation.Cards
             SetColor(_powerBackground, skin.PowerBadge);
             ApplyFace();
             SetCondition(ConditionMark.None);
-            SetStatus(null);
+            SetFieldState(false,false);
             SetHighlight(null);
             SetBattle(null);
             SetPower(null);
         }
 
-        /// <summary>A short note on the card, e.g. that a field is closed. Null hides it.</summary>
-        public void SetStatus(string status)
+        /// <summary>Shows the field's state as a badge; a lock takes priority over the closed eye.</summary>
+        public void SetFieldState(bool closed,bool locked)
         {
-            if (_status == null)
-                return;
-            _status.text = status ?? "";
-            _status.gameObject.SetActive(!string.IsNullOrEmpty(status));
+            _fieldClosed=closed;_fieldLocked=locked;
+            if(_status!=null)_status.gameObject.SetActive(false);
+            if(_fieldFace!=null)_fieldFace.SetState(closed,locked);
         }
 
         /// <summary>Strikes through cancelled condition text instead of showing a separate badge.</summary>
@@ -389,6 +390,7 @@ namespace Game.Presentation.Cards
                     rect.localPosition=new Vector3(0,0,_skin.FieldStyle.FaceDepth);
                 }
                 _fieldFace.Bind(_face,_skin,_title.font);_fieldFace.SetDimming(_dimming);
+                _fieldFace.SetState(_fieldClosed,_fieldLocked);
                 _fieldFace.SetCancelled(_conditionMark==ConditionMark.Cancelled);
                 foreach(var item in LegacyFace())if(item!=null)item.SetActive(_frame!=null&&item==_frame.gameObject);
             }
