@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.TablePresentationSettings
   _longPressSeconds: 0.5
   _dragThresholdPixels: 14
-  _cameraPitch: 48
+  _cameraPitch: 70
   _cameraHeight: 19
   _cameraFieldOfView: 35
   _handCardScale: 1.5
@@ -23,6 +23,7 @@ MonoBehaviour:
   _handScreenMargin: 0.03
   _handEdgeDrop: 0.07
   _handTableClearance: 0.18
+  _handBottomMargin: 0.02
   _fieldOutlineWidth: 0.05
   _fieldOutlineLift: 0.04
   _fieldScale: 1.8

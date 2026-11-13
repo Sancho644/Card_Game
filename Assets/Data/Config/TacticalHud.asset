@@ -17,4 +17,4 @@ MonoBehaviour:
   _creatureGap: 0.22
   _opponentHandDistance: 5.2
   _opponentHandSpacing: 0.95
-  _opponentHandRaise: 1
+  _opponentHandRaise: 0.25

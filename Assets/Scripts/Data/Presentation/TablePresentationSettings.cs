@@ -28,6 +28,8 @@ namespace Game.Data.Presentation
         [SerializeField,Min(0)] private float _handEdgeDrop=.07f;
         [Tooltip("Minimum space above the table for every corner of a resting hand card, including its thickness.")]
         [SerializeField,Min(.02f)] private float _handTableClearance=.18f;
+        [Tooltip("Bottom gap of the hand within the screen safe area, as a fraction of its height.")]
+        [SerializeField,Range(.01f,.2f)] private float _handBottomMargin=.02f;
 
         [Header("Field placement outline")]
         [SerializeField, Min(0.01f)] private float _fieldOutlineWidth = 0.05f;
@@ -62,6 +64,7 @@ namespace Game.Data.Presentation
         public float HandFanDegrees => _handFanDegrees;
         public float HandEdgeDrop=>_handEdgeDrop;
         public float HandTableClearance=>_handTableClearance;
+        public float HandBottomMargin=>_handBottomMargin;
         public float CameraPitch => _cameraPitch;
         public float CameraHeight => _cameraHeight;
         public float CameraFieldOfView => _cameraFieldOfView;

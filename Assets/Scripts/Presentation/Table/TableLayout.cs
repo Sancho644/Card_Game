@@ -46,6 +46,12 @@ namespace Game.Presentation.Table
         private TablePresentationSettings _settings;
         private Camera _camera;
         private TacticalHudSettings _tactical;
+        private int _dropCount=-1;
+        private Matrix4x4 _dropCamera;
+        private Vector4 _dropStyle;
+        private Vector4 _dropLayout;
+        private Rect _dropSafe;
+        private float _handScreenShift;
         public void ConfigureTactical(TacticalHudSettings settings)=>_tactical=settings;
 
         /// <summary>Size of a card at scale 1, in world units.</summary>
@@ -91,7 +97,7 @@ namespace Game.Presentation.Table
             var centre = (count - 1) / 2f;
             if (side == TableSide.Top)
                 return new CardPose(new Vector3(x, index * _layerLift, OpponentHandZ), Face(faceUp));
-            var position = HandOrigin(count) + new Vector3(x,0,0);
+            var position = HandOrigin(count) + new Vector3(x,0,HandScreenShift(count));
 
             // The whole fan keeps the same arc however many cards there are, so the outer ones never sink off screen.
             var bend = Bend(count);
@@ -159,7 +165,7 @@ namespace Game.Presentation.Table
             var scale = _settings.HandCardScale;
             var turn = (count - 1) / 2f * _settings.HandFanDegrees * Bend(count) * Mathf.Deg2Rad;
             var halfCard = (_cardSize.x / 2f * Mathf.Cos(turn) + _cardSize.y / 2f * Mathf.Sin(turn)) * scale;
-            var room = VisibleHalfWidth(HandLowerEdge()) - halfCard;
+            var room = VisibleHalfWidth(HandLowerEdge()+new Vector3(0,0,HandScreenShift(count))) - halfCard;
             return Mathf.Clamp(2f * room / (count - 1), _minHandSpacing, spacing);
         }
 
@@ -187,6 +193,49 @@ namespace Game.Presentation.Table
             // Move towards the camera as the fan rises, retaining its screen height instead of covering the battle.
             var shift=(lift-_handLift)/Mathf.Tan(_settings.CameraPitch*Mathf.Deg2Rad);
             return new Vector3(0,lift,-_handDistance-shift);
+        }
+
+        private float HandScreenShift(int count)
+        {
+            if(_camera==null||count<1)return 0;
+            var matrix=_camera.projectionMatrix*_camera.worldToCameraMatrix;
+            var style=new Vector4(_settings.HandBottomMargin,_settings.HandCardScale,_settings.HandDepthStep,_settings.HandFanDegrees);
+            var layout=new Vector4(_settings.HandEdgeDrop,_settings.HandTableClearance,_handLift,_handDistance);
+            var safe=Screen.safeArea;
+            if(_dropCount==count&&_dropCamera==matrix&&_dropStyle==style&&_dropLayout==layout&&_dropSafe==safe)return _handScreenShift;
+            _dropCount=count;_dropCamera=matrix;_dropStyle=style;_dropLayout=layout;_dropSafe=safe;
+            var pixels=_camera.pixelRect;
+            var bottom=(Mathf.Max(safe.yMin,pixels.yMin)-pixels.yMin)/Mathf.Max(1,pixels.height);
+            var safeHeight=(Mathf.Min(safe.yMax,pixels.yMax)-Mathf.Max(safe.yMin,pixels.yMin))/Mathf.Max(1,pixels.height);
+            var target=bottom+_settings.HandBottomMargin*safeHeight;
+            var origin=HandOrigin(count);var centre=(count-1)*.5f;var bend=Bend(count);var tilt=FacingCamera;
+            var half=_cardSize*_settings.HandCardScale*.5f;
+            var corners=new List<Vector3>(count*8);
+            // Row X does not affect screen Y with this fixed, yaw-free camera.
+            for(var i=0;i<count;i++)
+            {
+                var rotation=Quaternion.AngleAxis((i-centre)*_settings.HandFanDegrees*bend,tilt*Vector3.back)*tilt;
+                var position=origin+tilt*Vector3.forward*((count-1-i)*_settings.HandDepthStep)
+                    +tilt*Vector3.down*(Mathf.Abs(i-centre)*_settings.HandEdgeDrop*bend);
+                for(var x=-1;x<=1;x+=2)for(var y=-1;y<=1;y+=2)for(var z=-1;z<=1;z+=2)
+                    corners.Add(position+rotation*new Vector3(x*half.x,y*half.y,z*.06f*_settings.HandCardScale));
+            }
+            float Lowest(float shift)
+            {
+                var lowest=float.MaxValue;
+                foreach(var corner in corners)lowest=Mathf.Min(lowest,_camera.WorldToViewportPoint(corner+Vector3.forward*shift).y);
+                return lowest;
+            }
+            _handScreenShift=0;
+            if(Lowest(0)<=target)return 0;
+            var near=-_settings.CameraHeight;var far=0f;
+            for(var i=0;i<18;i++)
+            {
+                var middle=(near+far)*.5f;
+                if(Lowest(middle)<target)near=middle;else far=middle;
+            }
+            // Only translate along the tabletop: world height and overlap order remain unchanged.
+            _handScreenShift=far;return _handScreenShift;
         }
 
         /// <summary>How much of the full fan angle a hand of this size uses.</summary>
