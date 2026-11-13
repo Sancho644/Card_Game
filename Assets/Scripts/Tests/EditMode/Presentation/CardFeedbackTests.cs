@@ -175,7 +175,7 @@ namespace Game.Presentation.Tests
 
         [TestCase(6)]
         [TestCase(9)]
-        public void HandCreatureFace_HasOpaqueFrontBackingBehindItsArt(int count)
+        public void HandCreatureFace_HasInvisibleDepthBackingBehindItsArt(int count)
         {
             var go = new GameObject("HandDepthTest");
             var cameraGo = new GameObject("HandDepthCamera");
@@ -196,7 +196,9 @@ namespace Game.Presentation.Tests
                 var back = (Renderer)typeof(CardView).GetField("_frame", flags).GetValue(card);
                 Assert.IsFalse(back.gameObject.activeSelf, "A placed creature must not show the legacy rectangle.");
                 card.SetInHand(true);
-                Assert.IsTrue(back.gameObject.activeInHierarchy && back.enabled, "A hand creature must retain the opaque front backing.");
+                Assert.IsTrue(back.gameObject.activeInHierarchy && back.enabled, "A hand creature must retain overlap protection.");
+                Assert.AreSame(visual.HandDepthMaterial, back.sharedMaterial);
+                Assert.AreEqual(0f, back.sharedMaterial.GetFloat("_ColorMask"), "The hand backing must not draw any color.");
                 Assert.Less(back.sharedMaterial.renderQueue, 2500, "The backing must occlude transparent creature canvases.");
                 Assert.AreEqual(1f, back.sharedMaterial.GetFloat("_ZWrite"));
                 var backOffset = instance.transform.InverseTransformPoint(back.transform.position);

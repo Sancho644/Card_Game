@@ -11,6 +11,8 @@ namespace Game.Data.Presentation
         [SerializeField] private CreatureCardStyle _creatureStyle;
         [SerializeField] private FieldCardStyle _fieldStyle;
         [SerializeField] private AbilityCardStyle _abilityStyle;
+        [Tooltip("Invisible depth-only material preserving the overlap of transparent hand card faces.")]
+        [SerializeField] private Material _handDepthMaterial;
         public FieldCardStyle FieldStyle => _fieldStyle;
         public AbilityCardStyle AbilityStyle => _abilityStyle;
 
@@ -64,6 +66,7 @@ namespace Game.Data.Presentation
         [SerializeField] private Color _opponentAction = new Color(1f, 0.75f, 0.2f);
 
         public CreatureCardStyle CreatureStyle => _creatureStyle;
+        public Material HandDepthMaterial => _handDepthMaterial;
         public CardHighlightSettings HighlightSettings=>_highlightSettings;
         public Color OpponentAction => _opponentAction;
         public Color AbilityFrame => _abilityFrame;

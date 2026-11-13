@@ -14,6 +14,7 @@ namespace Game.Presentation.Cards
             FieldStyle = visual.FieldStyle;
             AbilityStyle = visual.AbilityStyle;
             HighlightSettings=visual.HighlightSettings;
+            HandDepthMaterial=visual.HandDepthMaterial;
             Body = visual.CardBody;
             Back = visual.CardBack;
             BackArt = visual.CardBackArt;
@@ -27,6 +28,7 @@ namespace Game.Presentation.Cards
         public FieldCardStyle FieldStyle { get; }
         public AbilityCardStyle AbilityStyle { get; }
         public CardHighlightSettings HighlightSettings { get; }
+        public Material HandDepthMaterial { get; }
         public Color Body { get; }
         public Color Back { get; }
         public Sprite BackArt { get; }

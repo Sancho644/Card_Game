@@ -49,6 +49,7 @@ namespace Game.Presentation.Cards
         private AbilityCardFaceView _abilityFace;
         private ConditionMark _conditionMark;
         private MaterialPropertyBlock _block;
+        private Material _legacyFrameMaterial;
         private Tween _move;
         private Tween _powerFlash;
         private Tween _focus;
@@ -92,6 +93,7 @@ namespace Game.Presentation.Cards
 
             _face = face;
             _skin = skin;
+            if (_frame != null && _legacyFrameMaterial == null) _legacyFrameMaterial = _frame.sharedMaterial;
             if(skin.HighlightSettings!=null&&skin.HighlightSettings.Material!=null){
                 if(_playableGlow==null){var effect=new GameObject("PlayableGlow");effect.transform.SetParent(Visual,false);_playableGlow=effect.AddComponent<CardPlayableGlow>();}
                 _playableGlow.Configure(skin.HighlightSettings);
@@ -208,7 +210,10 @@ namespace Game.Presentation.Cards
             if (_frame != null && ((_creatureFace != null && _creatureFace.gameObject.activeSelf) ||
                 (_fieldFace != null && _fieldFace.gameObject.activeSelf) ||
                 (_abilityFace != null && _abilityFace.gameObject.activeSelf)))
-                _frame.gameObject.SetActive(inHand);
+            {
+                _frame.gameObject.SetActive(inHand && _skin.HandDepthMaterial != null);
+                if (inHand && _skin.HandDepthMaterial != null) _frame.sharedMaterial = _skin.HandDepthMaterial;
+            }
             if (!inHand && IsDisplaced)
                 ResetVisual();
         }
@@ -331,6 +336,7 @@ namespace Game.Presentation.Cards
 
         private void ApplyFace()
         {
+            if (_frame != null && _legacyFrameMaterial != null) _frame.sharedMaterial = _legacyFrameMaterial;
             foreach (var item in LegacyFace()) if(item != null && item != _powerBadge && item != _basePower) item.SetActive(true);
             if (_creatureFace != null) _creatureFace.gameObject.SetActive(false);
             if (_fieldFace != null) _fieldFace.gameObject.SetActive(false);
@@ -381,7 +387,7 @@ namespace Game.Presentation.Cards
                     rect.localPosition = new Vector3(0, 0, _skin.AbilityStyle.FaceDepth);
                 }
                 _abilityFace.Bind(_face, _skin, _title.font); _abilityFace.SetDimming(_dimming);
-                // Keep the sorting plate only in the overlapping hand, never under a placed card.
+                // Hand overlap uses invisible depth, never a visible legacy rectangle.
                 foreach (var item in LegacyFace()) if (item != null) item.SetActive(IsInHand && _frame != null && item == _frame.gameObject);
             }
             else if(_face.IsField && _skin.FieldStyle!=null)
@@ -409,10 +415,10 @@ namespace Game.Presentation.Cards
                     rect.localPosition=new Vector3(0,0,_skin.CreatureStyle.FaceDepth);
                 }
                 _creatureFace.Bind(_face,_skin,_title.font);_creatureFace.SetDimming(_dimming);
-                // In the hand the plate prevents a left card from drawing over its right neighbour.
-                // Placed cards use their illustrated face without the protruding legacy rectangle.
+                // Invisible hand depth prevents a left card from drawing over its right neighbour.
                 foreach(var item in LegacyFace())if(item!=null)item.SetActive(IsInHand && _frame != null && item == _frame.gameObject);
             }
+            SetInHand(IsInHand);
         }
 
         private GameObject[] LegacyFace() => new[] { _frame?.gameObject,_body?.gameObject,_rarityBadge?.gameObject,
