@@ -26,6 +26,8 @@ namespace Game.Data.Presentation
         [Tooltip("Free space between the hand and the edges of the safe area, in fractions of the screen width.")]
         [SerializeField, Range(0f, 0.2f)] private float _handScreenMargin = 0.03f;
         [SerializeField,Min(0)] private float _handEdgeDrop=.07f;
+        [Tooltip("Minimum space above the table for every corner of a resting hand card, including its thickness.")]
+        [SerializeField,Min(.02f)] private float _handTableClearance=.18f;
 
         [Header("Field placement outline")]
         [SerializeField, Min(0.01f)] private float _fieldOutlineWidth = 0.05f;
@@ -34,8 +36,8 @@ namespace Game.Data.Presentation
         [Header("Fields")]
         [SerializeField, Min(0.5f)] private float _fieldScale = 1.2f;
         [SerializeField, Min(0.3f)] private float _creatureOnFieldScale = 0.8f;
-        [Tooltip("Creature height above its field at scale 1. Scales with the larger card to keep faces, backs and highlights apart.")]
-        [SerializeField, Min(0.08f)] private float _creatureOnFieldLift = 0.1f;
+        [Tooltip("Optional extra elevation of a creature next to its field. Keep zero to align the cards on the table.")]
+        [SerializeField, Min(0f)] private float _creatureOnFieldLift = 0f;
         [Tooltip("How much of the field's edge a creature covers, in world units.")]
         [SerializeField, Min(0f)] private float _creatureOverlap = 0.3f;
 
@@ -59,6 +61,7 @@ namespace Game.Data.Presentation
         public float HandSpacing => _handSpacing;
         public float HandFanDegrees => _handFanDegrees;
         public float HandEdgeDrop=>_handEdgeDrop;
+        public float HandTableClearance=>_handTableClearance;
         public float CameraPitch => _cameraPitch;
         public float CameraHeight => _cameraHeight;
         public float CameraFieldOfView => _cameraFieldOfView;

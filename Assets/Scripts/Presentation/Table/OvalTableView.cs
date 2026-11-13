@@ -61,6 +61,12 @@ namespace Game.Presentation.Table
             var vertices=new List<Vector3>();var triangles=new[]{new List<int>(),new List<int>(),new List<int>()};
             Ring(vertices,triangles,radiusX,radiusZ,_settings.RimWidth,_settings.RimHeight);
             Ring(vertices,triangles,radiusX-_settings.InlayGap,radiusZ-_settings.InlayGap,_settings.RimWidth*.18f,_settings.RimHeight*.35f);
+            for(var i=0;i<8;i++)
+            {
+                var a=i*Mathf.PI/4;var p=new Vector3(radiusX*Mathf.Cos(a),_settings.SurfaceY+_settings.RimHeight+.005f,CentreZ+radiusZ*Mathf.Sin(a));
+                var s=_settings.GemSize*1.4f;
+                Quad(vertices,triangles[2],p+Vector3.left*s,p+Vector3.forward*s,p+Vector3.right*s,p+Vector3.back*s);
+            }
             var half=Mathf.Sqrt(Mathf.Max(0,1-CentreZ*CentreZ/(radiusZ*radiusZ)))*(radiusX-_settings.InlayGap);
             Quad(vertices,triangles[1],new Vector3(-half,_settings.SurfaceY, -_settings.DividerWidth/2),
                 new Vector3(-half,_settings.SurfaceY,_settings.DividerWidth/2),
@@ -71,7 +77,7 @@ namespace Game.Presentation.Table
             vertices.Clear();var gemTriangles=new List<int>();
             for(var i=0;i<8;i++)
             {
-                var a=i*Mathf.PI/4;var centre=new Vector3(radiusX*Mathf.Cos(a),_settings.SurfaceY+_settings.RimHeight+.005f,CentreZ+radiusZ*Mathf.Sin(a));
+                var a=i*Mathf.PI/4;var centre=new Vector3(radiusX*Mathf.Cos(a),_settings.SurfaceY+_settings.RimHeight+.02f,CentreZ+radiusZ*Mathf.Sin(a));
                 Diamond(vertices,gemTriangles,centre,_settings.GemSize);
             }
             Diamond(vertices,gemTriangles,new Vector3(0,_settings.SurfaceY+.008f,0),_settings.GemSize);
@@ -81,20 +87,24 @@ namespace Game.Presentation.Table
         private void Ring(List<Vector3> vertices,List<int>[] triangles,float rx,float rz,float width,float height)
         {
             var start=vertices.Count;var n=_settings.Segments;
+            const int profile=6;
             for(var i=0;i<=n;i++)
             {
                 var a=2*Mathf.PI*i/n;var x=Mathf.Cos(a);var z=Mathf.Sin(a);
                 var centre=new Vector3(rx*x,_settings.SurfaceY,CentreZ+rz*z);
                 var normal=new Vector3(x/rx,0,z/rz).normalized;
                 vertices.Add(centre-normal*width*.5f);
+                vertices.Add(centre-normal*width*.5f+Vector3.up*height*.5f);
                 vertices.Add(centre-normal*width*.3f+Vector3.up*height);
                 vertices.Add(centre+normal*width*.3f+Vector3.up*height);
+                vertices.Add(centre+normal*width*.5f+Vector3.up*height*.5f);
                 vertices.Add(centre+normal*width*.5f);
             }
-            for(var i=0;i<n;i++)for(var j=0;j<3;j++)
+            for(var i=0;i<n;i++)for(var j=0;j<profile-1;j++)
             {
-                var a=start+i*4+j;var b=a+4;
-                triangles[j].AddRange(new[]{a,b,a+1,a+1,b,b+1});
+                var a=start+i*profile+j;var b=a+profile;
+                var material=j==2?1:j==1||j==3?2:0;
+                triangles[material].AddRange(new[]{a,b,a+1,a+1,b,b+1});
             }
         }
 

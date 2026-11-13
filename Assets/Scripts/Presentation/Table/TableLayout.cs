@@ -80,8 +80,7 @@ namespace Game.Presentation.Table
             var offset = _cardSize.x * (field.Scale + scale) / 2f + gap;
             if (owner == TableSide.Top)
                 offset = -offset;
-            // The prefab has depth on both sides; the hand's small layer step is not enough
-            // to clear a face-down field's back, especially when the field is enlarged.
+            // These slots are side by side, so their roots normally share the field's elevation.
             var lift = _settings.CreatureOnFieldLift * Mathf.Max(field.Scale, scale);
             return new CardPose(field.Position + new Vector3(offset, lift, 0f), FaceUp, scale);
         }
@@ -92,7 +91,7 @@ namespace Game.Presentation.Table
             var centre = (count - 1) / 2f;
             if (side == TableSide.Top)
                 return new CardPose(new Vector3(x, index * _layerLift, OpponentHandZ), Face(faceUp));
-            var position = new Vector3(x, _handLift, -_handDistance);
+            var position = HandOrigin(count) + new Vector3(x,0,0);
 
             // The whole fan keeps the same arc however many cards there are, so the outer ones never sink off screen.
             var bend = Bend(count);
@@ -166,7 +165,29 @@ namespace Game.Presentation.Table
 
         /// <summary>The middle of the lower edge of the viewer's fan, with the outer cards' corners hanging a little lower.</summary>
         private Vector3 HandLowerEdge() =>
-            new Vector3(0f, _handLift, -_handDistance) + FacingCamera * new Vector3(0f, -_cardSize.y / 2f * _settings.HandCardScale * 1.15f - MaxFanSteps*.5f*_settings.HandEdgeDrop, 0f);
+            HandOrigin(1) + FacingCamera * new Vector3(0f, -_cardSize.y / 2f * _settings.HandCardScale * 1.15f - MaxFanSteps*.5f*_settings.HandEdgeDrop, 0f);
+
+        private Vector3 HandOrigin(int count)
+        {
+            var tilt=FacingCamera;var centre=(count-1)*.5f;var bend=Bend(count);
+            var half=_cardSize*_settings.HandCardScale*.5f;
+            var minimum=0f;
+            for(var i=0;i<count;i++)
+            {
+                var fan=Quaternion.AngleAxis((i-centre)*_settings.HandFanDegrees*bend,tilt*Vector3.back);
+                var rotation=fan*tilt;
+                var offset=tilt*Vector3.forward*((count-1-i)*_settings.HandDepthStep)
+                    +tilt*Vector3.down*(Mathf.Abs(i-centre)*_settings.HandEdgeDrop*bend);
+                var extent=Mathf.Abs((rotation*Vector3.right).y)*half.x
+                    +Mathf.Abs((rotation*Vector3.up).y)*half.y
+                    +Mathf.Abs((rotation*Vector3.forward).y)*.06f*_settings.HandCardScale;
+                minimum=Mathf.Min(minimum,offset.y-extent);
+            }
+            var lift=Mathf.Max(_handLift,_settings.HandTableClearance-minimum);
+            // Move towards the camera as the fan rises, retaining its screen height instead of covering the battle.
+            var shift=(lift-_handLift)/Mathf.Tan(_settings.CameraPitch*Mathf.Deg2Rad);
+            return new Vector3(0,lift,-_handDistance-shift);
+        }
 
         /// <summary>How much of the full fan angle a hand of this size uses.</summary>
         private static float Bend(int count) => count > 1 ? Mathf.Min(1f, MaxFanSteps / (count - 1)) : 1f;

@@ -379,5 +379,61 @@ namespace Game.Presentation.Tests
                 Assert.Less(line.widthMultiplier,.1f,"Contour must not become an opaque card-sized panel");
             }finally{Object.DestroyImmediate(go);}
         }
+        [TestCase(48,1)]
+        [TestCase(48,3)]
+        [TestCase(48,7)]
+        [TestCase(48,9)]
+        [TestCase(48,12)]
+        [TestCase(55,1)]
+        [TestCase(55,3)]
+        [TestCase(55,7)]
+        [TestCase(55,9)]
+        [TestCase(55,12)]
+        public void TiltedHand_AllCornersClearTheTable_AndKeepOverlapOrder(float pitch,int count)
+        {
+            var holder=new GameObject("Hand clearance test");
+            var settings=Object.Instantiate(AssetDatabase.LoadAssetAtPath<TablePresentationSettings>("Assets/Data/Config/TablePresentation.asset"));
+            try
+            {
+                var so=new SerializedObject(settings);so.FindProperty("_cameraPitch").floatValue=pitch;so.ApplyModifiedPropertiesWithoutUndo();
+                var layout=holder.AddComponent<TableLayout>();
+                var layoutSo=new SerializedObject(layout);layoutSo.FindProperty("_handLift").floatValue=1;layoutSo.ApplyModifiedPropertiesWithoutUndo();
+                layout.Configure(settings,null);
+                var normal=Quaternion.Euler(pitch,0,0)*Vector3.forward;
+                CardPose previous=default;
+                for(var i=0;i<count;i++)
+                {
+                    var pose=layout.Hand(TableSide.Bottom,i,count,true);
+                    foreach(var x in new[]{-1,1})foreach(var y in new[]{-1,1})foreach(var z in new[]{-1,1})
+                    {
+                        var corner=pose.Position+pose.Rotation*new Vector3(x*layout.CardSize.x*.5f,y*layout.CardSize.y*.5f,z*.06f)*pose.Scale;
+                        Assert.GreaterOrEqual(corner.y,settings.HandTableClearance-.0001f,"Card "+i+" crosses the table");
+                    }
+                    if(i>0)Assert.Greater(Vector3.Dot(previous.Position-pose.Position,normal),.001f,"Right card must remain in front of left card");
+                    previous=pose;
+                }
+            }
+            finally{Object.DestroyImmediate(holder);Object.DestroyImmediate(settings);}
+        }
+
+        [TestCase(TableSide.Bottom,true)]
+        [TestCase(TableSide.Bottom,false)]
+        [TestCase(TableSide.Top,true)]
+        [TestCase(TableSide.Top,false)]
+        public void SideBySideBattleCards_ShareTheFieldElevation(TableSide owner,bool faceUp)
+        {
+            var holder=new GameObject("Battle elevation test");
+            try
+            {
+                var settings=AssetDatabase.LoadAssetAtPath<TablePresentationSettings>("Assets/Data/Config/TablePresentation.asset");
+                var layout=holder.AddComponent<TableLayout>();layout.Configure(settings,null);
+                var field=layout.Field(TableSide.Bottom,0,1,faceUp);var creature=layout.Creature(field,owner);
+                Assert.AreEqual(field.Position.y,creature.Position.y,.0001f);
+                Assert.AreEqual(field.Position.z,creature.Position.z,.0001f);
+                Assert.AreEqual(field.Scale,creature.Scale,.0001f);
+                Assert.Greater(Mathf.Abs(creature.Position.x-field.Position.x),layout.CardSize.x*field.Scale);
+            }
+            finally{Object.DestroyImmediate(holder);}
+        }
     }
 }

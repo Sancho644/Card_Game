@@ -18,11 +18,11 @@ MonoBehaviour:
   _gem: {fileID: 2100000, guid: ebb4b0c675d0c8e41948157427ccf7f3, type: 2}
   _farEdge: 0.94
   _nearEdge: -0.16
-  _sideInset: 0.005
+  _sideInset: 0.018
   _segments: 160
-  _rimWidth: 0.18
-  _rimHeight: 0.045
-  _inlayGap: 0.24
+  _rimWidth: 0.32
+  _rimHeight: 0.14
+  _inlayGap: 0.3
   _dividerWidth: 0.018
-  _gemSize: 0.14
+  _gemSize: 0.19
   _surfaceY: -0.025
