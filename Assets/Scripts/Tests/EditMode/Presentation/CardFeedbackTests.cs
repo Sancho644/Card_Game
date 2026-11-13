@@ -194,7 +194,9 @@ namespace Game.Presentation.Tests
                 card.Bind(999, "creature.lord-of-crimson-forge", faces.Build("creature.lord-of-crimson-forge"), new CardSkin(visual));
                 var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
                 var back = (Renderer)typeof(CardView).GetField("_frame", flags).GetValue(card);
-                Assert.IsTrue(back.gameObject.activeInHierarchy && back.enabled, "Creature binding must retain the opaque front backing.");
+                Assert.IsFalse(back.gameObject.activeSelf, "A placed creature must not show the legacy rectangle.");
+                card.SetInHand(true);
+                Assert.IsTrue(back.gameObject.activeInHierarchy && back.enabled, "A hand creature must retain the opaque front backing.");
                 Assert.Less(back.sharedMaterial.renderQueue, 2500, "The backing must occlude transparent creature canvases.");
                 Assert.AreEqual(1f, back.sharedMaterial.GetFloat("_ZWrite"));
                 var backOffset = instance.transform.InverseTransformPoint(back.transform.position);
@@ -211,6 +213,11 @@ namespace Game.Presentation.Tests
                     Assert.Greater(Vector3.Dot(leftFace - rightBack, normal), .005f,
                         "The complete creature art must be behind its right neighbour, not only the glow or root transform.");
                 }
+                card.SetInHand(false);
+                card.SetDimming(.5f);
+                Assert.IsFalse(back.gameObject.activeSelf, "Redrawing a placed card must not restore its backing.");
+                card.SetInHand(true);
+                Assert.IsTrue(back.gameObject.activeSelf, "Returning to the hand must restore overlap protection.");
             }
             finally { if (instance != null) Object.DestroyImmediate(instance); Object.DestroyImmediate(go); Object.DestroyImmediate(cameraGo); }
         }

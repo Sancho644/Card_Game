@@ -205,6 +205,10 @@ namespace Game.Presentation.Cards
         public void SetInHand(bool inHand)
         {
             IsInHand = inHand;
+            if (_frame != null && ((_creatureFace != null && _creatureFace.gameObject.activeSelf) ||
+                (_fieldFace != null && _fieldFace.gameObject.activeSelf) ||
+                (_abilityFace != null && _abilityFace.gameObject.activeSelf)))
+                _frame.gameObject.SetActive(inHand);
             if (!inHand && IsDisplaced)
                 ResetVisual();
         }
@@ -377,8 +381,8 @@ namespace Game.Presentation.Cards
                     rect.localPosition = new Vector3(0, 0, _skin.AbilityStyle.FaceDepth);
                 }
                 _abilityFace.Bind(_face, _skin, _title.font); _abilityFace.SetDimming(_dimming);
-                // The same opaque plate as creature/field faces prevents transparent canvases crossing neighbours.
-                foreach (var item in LegacyFace()) if (item != null) item.SetActive(_frame != null && item == _frame.gameObject);
+                // Keep the sorting plate only in the overlapping hand, never under a placed card.
+                foreach (var item in LegacyFace()) if (item != null) item.SetActive(IsInHand && _frame != null && item == _frame.gameObject);
             }
             else if(_face.IsField && _skin.FieldStyle!=null)
             {
@@ -392,7 +396,7 @@ namespace Game.Presentation.Cards
                 _fieldFace.Bind(_face,_skin,_title.font);_fieldFace.SetDimming(_dimming);
                 _fieldFace.SetState(_fieldClosed,_fieldLocked);
                 _fieldFace.SetCancelled(_conditionMark==ConditionMark.Cancelled);
-                foreach(var item in LegacyFace())if(item!=null)item.SetActive(_frame!=null&&item==_frame.gameObject);
+                foreach(var item in LegacyFace())if(item!=null)item.SetActive(IsInHand&&_frame!=null&&item==_frame.gameObject);
             }
             else if(_face.Power.HasValue && _skin.CreatureStyle != null)
             {
@@ -405,10 +409,9 @@ namespace Game.Presentation.Cards
                     rect.localPosition=new Vector3(0,0,_skin.CreatureStyle.FaceDepth);
                 }
                 _creatureFace.Bind(_face,_skin,_title.font);_creatureFace.SetDimming(_dimming);
-                // Transparent world-space creature canvases need an opaque front-facing depth plate.
-                // The back is culled from this side; without the plate, canvas distance sorting can
-                // draw a left creature over its right neighbour after the hand is rearranged.
-                foreach(var item in LegacyFace())if(item!=null)item.SetActive(_frame != null && item == _frame.gameObject);
+                // In the hand the plate prevents a left card from drawing over its right neighbour.
+                // Placed cards use their illustrated face without the protruding legacy rectangle.
+                foreach(var item in LegacyFace())if(item!=null)item.SetActive(IsInHand && _frame != null && item == _frame.gameObject);
             }
         }
 

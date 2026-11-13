@@ -134,7 +134,7 @@ namespace Game.Presentation.Table
             return sequence;
         }
 
-        /// <summary>Lights the field of the current battle and shows whether its condition acts.</summary>
+        /// <summary>Shows whether the current field's condition acts, without a permanent battle outline.</summary>
         private void MarkBattle(PlayerView view)
         {
             foreach (var card in _registry.All)
@@ -148,7 +148,6 @@ namespace Game.Presentation.Table
             if (field == null)
                 return;
 
-            field.SetBattle(_visual.Battle);
             if (view.Field(battle.FieldId).IsOpen)
                 field.SetCondition(battle.IsConditionCancelled ? ConditionMark.Cancelled : ConditionMark.Active);
         }
