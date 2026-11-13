@@ -5,6 +5,8 @@ namespace Game.Data.Presentation
     public sealed class CreatureCardStyle : ScriptableObject
     {
         [SerializeField] private Sprite _frame;
+        [Tooltip("Frame drawing area compensating for transparent padding in the source sprites; the visible border fills the card.")]
+        [SerializeField] private Rect _frameArea = new Rect(-.0178f,-.0186f,1.0376f,1.0309f);
         [SerializeField] private Color _ink = new Color(1f, .94f, .80f);
         [SerializeField] private Rect _art = new Rect(.035f,.265f,.93f,.71f);
         [SerializeField] private Rect _power = new Rect(.055f,.77f,.29f,.18f);
@@ -17,6 +19,7 @@ namespace Game.Data.Presentation
         [SerializeField] private Vector2 _worldSize = new Vector2(1.4f,2f);
         [SerializeField] private float _faceDepth = -.03f;
         public Sprite Frame => _frame;
+        public Rect FrameArea => _frameArea;
         public Color Ink => _ink;
         public Rect Art => _art;
         public Rect Power => _power;

@@ -13,6 +13,12 @@ MonoBehaviour:
   m_Name: CreatureCardStyle
   m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.CreatureCardStyle
   _frame: {fileID: 21300000, guid: f03646f731bbd2f429333684fc2f4f5d, type: 3}
+  _frameArea:
+    serializedVersion: 2
+    x: -0.0178
+    y: -0.0186
+    width: 1.0376
+    height: 1.0309
   _ink: {r: 1, g: 0.94, b: 0.8, a: 1}
   _art:
     serializedVersion: 2
