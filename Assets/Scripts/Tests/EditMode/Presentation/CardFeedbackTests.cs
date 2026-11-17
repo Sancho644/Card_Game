@@ -10,6 +10,80 @@ namespace Game.Presentation.Tests
 {
     public sealed class CardFeedbackTests
     {
+        [TestCase("creature.shadow-imp", 270, 30)]
+        [TestCase("creature.mistress-of-tides", 255, 305)]
+        public void BattlePreview_TracksTablePowerIncludingAnimation_AndReturnsToBase(string cardId, int before, int after)
+        {
+            var canvas = new GameObject("PowerPreviewCanvas", typeof(RectTransform), typeof(Canvas));
+            GameObject instance = null;
+            try
+            {
+                var visual = AssetDatabase.LoadAssetAtPath<VisualSettings>("Assets/Data/Config/VisualSettings.asset");
+                var database = AssetDatabase.LoadAssetAtPath<Game.Data.Cards.CardDatabase>("Assets/Data/CardDatabase.asset");
+                var texts = AssetDatabase.LoadAssetAtPath<UiTexts>("Assets/Data/Config/UiTexts.asset");
+                var animation = AssetDatabase.LoadAssetAtPath<AnimationSettings>("Assets/Data/Config/AnimationSettings.asset");
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Prefabs/Card3D.prefab");
+                var face = new CardFaceBuilder(database, visual, texts).Build(cardId);
+                Assert.IsTrue(face.Power.HasValue, cardId);
+                instance = Object.Instantiate(prefab);
+                var card = instance.GetComponent<CardView>();
+                var skin = new CardSkin(visual);
+                card.Bind(1, cardId, face, skin);
+                card.SetPower(before);
+
+                var zoom = new GameObject("PowerPreview", typeof(RectTransform)).AddComponent<Game.Presentation.Ui.CardZoomView>();
+                zoom.transform.SetParent(canvas.transform, false);
+                var area = new GameObject("Card", typeof(RectTransform)).GetComponent<RectTransform>();
+                area.SetParent(zoom.transform, false); area.sizeDelta = new Vector2(700, 1000);
+                var dim = new GameObject("Dim", typeof(RectTransform), typeof(UnityEngine.UI.Image)).GetComponent<UnityEngine.UI.Image>();
+                dim.transform.SetParent(zoom.transform, false);
+                var frame = new GameObject("Frame", typeof(RectTransform), typeof(UnityEngine.UI.Image)).GetComponent<UnityEngine.UI.Image>();
+                frame.transform.SetParent(area, false);
+                var title = new GameObject("Title", typeof(RectTransform), typeof(TMPro.TextMeshProUGUI)).GetComponent<TMPro.TMP_Text>();
+                title.transform.SetParent(area, false); title.font = prefab.GetComponentInChildren<TMPro.TMP_Text>(true).font;
+                var close = new GameObject("Close", typeof(RectTransform), typeof(UnityEngine.UI.Button)).GetComponent<UnityEngine.UI.Button>();
+                close.transform.SetParent(zoom.transform, false);
+                var serialized = new SerializedObject(zoom);
+                serialized.FindProperty("_card").objectReferenceValue = area;
+                serialized.FindProperty("_dim").objectReferenceValue = dim;
+                serialized.FindProperty("_frame").objectReferenceValue = frame;
+                serialized.FindProperty("_title").objectReferenceValue = title;
+                serialized.FindProperty("_close").objectReferenceValue = close;
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+                zoom.Init(skin, animation);
+                var origin = new Rect(0, 0, 140, 200);
+                var tick = typeof(Game.Presentation.Ui.CardZoomView).GetMethod("LateUpdate", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                zoom.Show(face, origin, null, () => card != null ? card.DisplayedPower : null);
+                var previewPower = area.GetComponentInChildren<CreatureCardFaceView>().PowerText;
+                var tablePower = instance.GetComponentInChildren<CreatureCardFaceView>().PowerText;
+                Assert.AreEqual(before.ToString(), previewPower.text, "Opening must use battle power, not catalog power.");
+
+                var count = card.CountPower(before, after, 1f);
+                count.Goto(.5f);
+                tick.Invoke(zoom, null);
+                Assert.AreEqual(tablePower.text, previewPower.text, "The open preview must track the animated counter.");
+                count.Complete();
+                tick.Invoke(zoom, null);
+                Assert.AreEqual(after.ToString(), tablePower.text);
+                Assert.AreEqual(tablePower.text, previewPower.text);
+                card.SetPower(0); tick.Invoke(zoom, null);
+                Assert.AreEqual("0", previewPower.text, "Zero is a valid battle power.");
+                card.SetPower(null); tick.Invoke(zoom, null);
+                Assert.AreEqual(face.Power.Value.ToString(), previewPower.text, "Leaving battle restores base power.");
+                Assert.AreEqual(face.Power, card.DisplayedPower);
+                zoom.HideInstantly();
+                card.SetPower(after);
+                zoom.Show(face, origin, null);
+                Assert.AreEqual(face.Power.Value.ToString(), previewPower.text, "A later catalog preview must not retain the live source.");
+                zoom.HideInstantly();
+            }
+            finally
+            {
+                if (instance != null) Object.DestroyImmediate(instance);
+                Object.DestroyImmediate(canvas);
+            }
+        }
+
         [Test]
         public void AbilityFaces_SeparateConditionalBonusFromBasePower_AndKeepRules()
         {

@@ -257,7 +257,7 @@ namespace Game.Presentation.Interaction
             {
                 if (card != null)
                     card.SetVisible(true);
-            });
+            }, () => card != null ? card.DisplayedPower : null);
         }
 
         private void OnDragStarted(Vector2 position)

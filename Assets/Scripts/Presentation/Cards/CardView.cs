@@ -54,6 +54,7 @@ namespace Game.Presentation.Cards
         private Tween _powerFlash;
         private Tween _focus;
         private CardFace _face;
+        private int? _power;
         private CardSkin _skin;
         private float _dimming = 1f;
         private CardPlayableGlow _playableGlow;
@@ -67,6 +68,9 @@ namespace Game.Presentation.Cards
         public string CardId { get; private set; }
 
         public bool IsKnown => CardId != null;
+
+        /// <summary>The power currently drawn on this card, including the battle counter animation.</summary>
+        public int? DisplayedPower => _power ?? _face?.Power;
 
         /// <summary>The card lies in the viewer's own hand.</summary>
         public bool IsInHand { get; private set; }
@@ -154,6 +158,7 @@ namespace Game.Presentation.Cards
         /// <summary>Shows the creature's current power in a badge, in place of its base power; null hides it.</summary>
         public void SetPower(int? power)
         {
+            _power = power;
             if (_creatureFace != null && _creatureFace.gameObject.activeSelf)
             {
                 _creatureFace.SetPower(power);

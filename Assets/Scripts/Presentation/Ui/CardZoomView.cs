@@ -40,6 +40,8 @@ namespace Game.Presentation.Ui
         private float _dimAlpha;
         private Rect _from;
         private Action _closed;
+        private Func<int?> _power;
+        private int? _basePowerValue;
         private Sequence _tween;
         private RectTransform _closeIcon;
         private readonly Vector3[] _corners = new Vector3[4];
@@ -56,6 +58,7 @@ namespace Game.Presentation.Ui
 
         private void LateUpdate()
         {
+            RefreshPower();
             if (_closeIcon == null) return;
             _card.GetWorldCorners(_corners);
             var point = (Vector2)transform.InverseTransformPoint(_corners[2]);
@@ -79,11 +82,14 @@ namespace Game.Presentation.Ui
 
         /// <param name="from">Where the card is on the screen, in pixels; the view grows out of it and returns there.</param>
         /// <param name="closed">Called once the view has flown back.</param>
-        public void Show(CardFace face, Rect from, Action closed)
+        public void Show(CardFace face, Rect from, Action closed, Func<int?> power = null)
         {
             _from = from;
             _closed = closed;
+            _power = power;
+            _basePowerValue = face.Power;
             ShowFace(face);
+            RefreshPower();
             UiButtons.Bind(_close, Hide);
             _close.interactable = true;
             gameObject.SetActive(true);
@@ -142,9 +148,20 @@ namespace Game.Presentation.Ui
         private void Closed()
         {
             gameObject.SetActive(false);
+            _power = null;
             var closed = _closed;
             _closed = null;
             closed?.Invoke();
+        }
+
+        private void RefreshPower()
+        {
+            if (_power == null || !_basePowerValue.HasValue) return;
+            var value = _power() ?? _basePowerValue;
+            if (_creatureFace != null && _creatureFace.gameObject.activeSelf)
+                _creatureFace.SetPower(value);
+            else if (_basePowerText != null)
+                _basePowerText.text = value.Value.ToString();
         }
 
         private void SetDim(float alpha)
