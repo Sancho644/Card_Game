@@ -16,7 +16,7 @@ MonoBehaviour:
   _displayName: "\u0421\u0432\u043E\u044F \u0437\u0435\u043C\u043B\u044F"
   _description: "+50, \u0435\u0441\u043B\u0438 \u0442\u044B \u0445\u043E\u0437\u044F\u0438\u043D."
   _rarity: 0
-  _art: {fileID: 0}
+  _art: {fileID: 21300000, guid: 1d20f1d44f89e6848a0abafccb8773b2, type: 3}
   _frame: {fileID: 0}
   _timing: 4
   _effects:

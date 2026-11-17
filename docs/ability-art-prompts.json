@@ -1,0 +1,198 @@
+{
+  "style": "Landscape 4:3 full-bleed standalone spell illustration for a fantasy card art window, not a complete card. Rich hand-painted stylized fantasy rendering, crisp sculptural forms, soft painterly cloud background, luminous saturated magic, deep navy/emerald shadows and antique gold highlights, matching the existing turquoise shield intercepted by violet lightning artwork. A different clear central silhouette for this spell, readable as a small thumbnail. Subject in central 70%, generous crop-safe edges. Opaque artwork; no labels, letters, numbers, card frame, UI, border, watermark.",
+  "heat": "HEAT: a roaring fire-elemental heart, molten gold and orange ribbons above dark volcanic stone.",
+  "cards": [
+    {
+      "id": "ability.current",
+      "asset": "Assets/Art/Cards/Abilities/current-art-v1.png",
+      "theme": "CURRENT",
+      "subject": "A bright sapphire stream coils into a single powerful crest, water spiralling around a glowing pearl above dark river stone; silver-blue foam, dynamic upward flow."
+    },
+    {
+      "id": "ability.foothold",
+      "asset": "Assets/Art/Cards/Abilities/foothold-art-v1.png",
+      "theme": "FOOTHOLD",
+      "subject": "A massive angular earthen bastion rising from cracked jade stone, three golden amber crystals rooted into solid rock, heavy grounded protective silhouette, warm ochre against turquoise dust."
+    },
+    {
+      "id": "ability.gust",
+      "asset": "Assets/Art/Cards/Abilities/gust-art-v1.png",
+      "theme": "GUST",
+      "subject": "One elegant mint-turquoise spiral gust bending silver feather-like leaves of wind around an airy core, powerful sweeping diagonal, dark storm clouds behind."
+    },
+    {
+      "id": "ability.insight",
+      "asset": "Assets/Art/Cards/Abilities/insight-art-v1.png",
+      "theme": "ILLUMINATION",
+      "subject": "A radiant golden sunburst opening from an ivory crystal prism, clean sharp rays piercing dark emerald mist, hopeful luminous magic, bold central radiant shape."
+    },
+    {
+      "id": "ability.dusk",
+      "asset": "Assets/Art/Cards/Abilities/dusk-art-v1.png",
+      "theme": "DUSK",
+      "subject": "A dense violet crescent of shadow curls around a purple-black magical core, wisps of amethyst smoke and small sharp crystal shards, deep purple against moonlit teal clouds."
+    },
+    {
+      "id": "ability.surge",
+      "asset": "Assets/Art/Cards/Abilities/surge-art-v1.png",
+      "theme": "SURGE OF POWER",
+      "subject": "A luminous teal and gold sphere of concentrated energy with two thick orbiting ribbons of light, an awakening core sending ripples outward, dark blue mystical clouds."
+    },
+    {
+      "id": "ability.survival",
+      "asset": "Assets/Art/Cards/Abilities/survival-art-v1.png",
+      "theme": "SURVIVAL",
+      "subject": "A faceted translucent turquoise protective shield hovering over a tiny golden living spark, a brilliant star at its center, emerald magical wisps and healing motes, shield is the dominant single silhouette."
+    },
+    {
+      "id": "ability.advantage",
+      "asset": "Assets/Art/Cards/Abilities/advantage-art-v1.png",
+      "theme": "ADVANTAGE",
+      "subject": "An antique gold two-pan balance in a magical void, one scale descending with a brilliant turquoise gem while the opposite violet gem rises, clear unequal balance, strong sculptural composition."
+    },
+    {
+      "id": "ability.break-condition",
+      "asset": "Assets/Art/Cards/Abilities/break-condition-art-v1.png",
+      "theme": "BREAK THE CONDITION",
+      "subject": "A turquoise crystalline seal shattered cleanly in half by a brilliant golden diagonal slash, broken violet binding ribbons unravel around the pieces, energetic central impact."
+    },
+    {
+      "id": "ability.desperation",
+      "asset": "Assets/Art/Cards/Abilities/desperation-art-v1.png",
+      "theme": "DESPERATION",
+      "subject": "A battered small golden shield cracked but glowing with fierce amber light, a rising flame emerges through its fracture against encroaching enormous violet shadow, dramatic resilience, no people."
+    },
+    {
+      "id": "ability.devastation",
+      "asset": "Assets/Art/Cards/Abilities/devastation-art-v1.png",
+      "theme": "DEVASTATION",
+      "subject": "A black-violet magical vortex disintegrating one floating parchment spell scroll into luminous amethyst dust, a few ember fragments sweeping into the void, bold destructive spiral."
+    },
+    {
+      "id": "ability.displacement",
+      "asset": "Assets/Art/Cards/Abilities/displacement-art-v1.png",
+      "theme": "DISPLACEMENT",
+      "subject": "Two separate floating circular stone platforms in an emerald void, a purple magical silhouette of a crystalline beast pulled laterally from one platform to the other by a violet comet arc, motion clearly sideways."
+    },
+    {
+      "id": "ability.element-blockade",
+      "asset": "Assets/Art/Cards/Abilities/element-blockade-art-v1.png",
+      "theme": "ELEMENTAL BLOCKADE",
+      "subject": "A powerful gold-and-turquoise hexagonal magical barrier suppressing six small elemental streams: amber rock, orange fire, blue water, mint wind, ivory light and violet shadow, central barrier dominant."
+    },
+    {
+      "id": "ability.field-blessing",
+      "asset": "Assets/Art/Cards/Abilities/field-blessing-art-v1.png",
+      "theme": "FIELD BLESSING",
+      "subject": "A small ancient jade battlefield altar receiving a warm golden beam from above, turquoise energy spreading through the stone floor in luminous concentric rings, welcoming restorative sacred magic."
+    },
+    {
+      "id": "ability.forced-reveal",
+      "asset": "Assets/Art/Cards/Abilities/forced-reveal-art-v1.png",
+      "theme": "FORCED REVEAL",
+      "subject": "A golden arc of light lifts a dark opaque magical veil from an ancient emerald stone tablet, bright teal radiance escaping from beneath, the reveal is dramatic and immediately readable."
+    },
+    {
+      "id": "ability.hidden-strength",
+      "asset": "Assets/Art/Cards/Abilities/hidden-strength-art-v1.png",
+      "theme": "HIDDEN STRENGTH",
+      "subject": "A rough dark stone split slightly to expose a fierce golden energy core, turquoise magical pressure leaking through cracks, mysterious latent strength, strong central rock silhouette."
+    },
+    {
+      "id": "ability.home-ground",
+      "asset": "Assets/Art/Cards/Abilities/home-ground-art-v1.png",
+      "theme": "HOME GROUND",
+      "subject": "A compact fortified jade stone sanctuary with amber crystal roots anchoring deeply into the earth, protective golden halo surrounding its home soil, warm safe magical territory."
+    },
+    {
+      "id": "ability.last-word",
+      "asset": "Assets/Art/Cards/Abilities/last-word-art-v1.png",
+      "theme": "LAST WORD",
+      "subject": "A large immaculate golden rune-like geometric clasp closes over a glowing violet spell vortex, two crossed bands lock the energy silently, turquoise shock ring fading away, no readable writing."
+    },
+    {
+      "id": "ability.locked-field",
+      "asset": "Assets/Art/Cards/Abilities/locked-field-art-v1.png",
+      "theme": "LOCKED FIELD",
+      "subject": "An imposing ancient gold padlock with a turquoise gemstone keyhole wrapped in two thick luminous chains over a dark emerald stone slab, chains visibly fastening the closed surface, strong centered lock."
+    },
+    {
+      "id": "ability.maneuver",
+      "asset": "Assets/Art/Cards/Abilities/maneuver-art-v1.png",
+      "theme": "MANEUVER",
+      "subject": "A golden luminous trail sweeps in a graceful S curve across two floating jade stone stepping platforms, a small turquoise spectral creature silhouette traveling along it, tactical agile movement, strong direction."
+    },
+    {
+      "id": "ability.mirror-of-bonuses",
+      "asset": "Assets/Art/Cards/Abilities/mirror-of-bonuses-art-v1.png",
+      "theme": "MIRROR OF BONUSES",
+      "subject": "An ornate antique-gold oval magical mirror suspended in emerald mist, a warm golden energy stream enters one side and returns as cold violet shadow, a violet stream returns turquoise, clear inversion in the mirror."
+    },
+    {
+      "id": "ability.onslaught",
+      "asset": "Assets/Art/Cards/Abilities/onslaught-art-v1.png",
+      "theme": "ONSLAUGHT",
+      "subject": "Three enormous angular golden energy spearheads surge diagonally forward through a shattered turquoise barrier, fiery acceleration trails, aggressive clear motion, no characters."
+    },
+    {
+      "id": "ability.retreat",
+      "asset": "Assets/Art/Cards/Abilities/retreat-art-v1.png",
+      "theme": "RETREAT",
+      "subject": "A small luminous turquoise spirit beast safely stepping backward through a round teal portal edged with antique gold, distant violet attack dissipating behind it, safe withdrawal, dynamic magical motion."
+    },
+    {
+      "id": "ability.return-of-power",
+      "asset": "Assets/Art/Cards/Abilities/return-of-power-art-v1.png",
+      "theme": "RETURN OF POWER",
+      "subject": "A used cracked parchment spell scroll rises from dark ash into an open turquoise-and-gold energy ring, its glowing magical orb restored as it passes upward, one clear returning trail of light."
+    },
+    {
+      "id": "ability.scouting",
+      "asset": "Assets/Art/Cards/Abilities/scouting-art-v1.png",
+      "theme": "SCOUTING",
+      "subject": "A polished gold and jade scrying eye-shaped lens floating over three dark mysterious stone tablets, turquoise rays reveal luminous silhouettes beneath their surfaces, mystical reconnaissance, no legible runes."
+    },
+    {
+      "id": "ability.second-life",
+      "asset": "Assets/Art/Cards/Abilities/second-life-art-v1.png",
+      "theme": "SECOND LIFE",
+      "subject": "A small amber crystal heart reforms from scattered stone fragments, luminous emerald life energy spirals upward from ash and roots, a warm golden spark at the center, rebirth and renewal."
+    },
+    {
+      "id": "ability.stone-will",
+      "asset": "Assets/Art/Cards/Abilities/stone-will-art-v1.png",
+      "theme": "STONE WILL",
+      "subject": "A colossal stone fist with golden amber crystal knuckles braced against a translucent turquoise protective halo, rock fragments orbit the fist, resolute defensive earthen magic."
+    },
+    {
+      "id": "ability.storm-onslaught",
+      "asset": "Assets/Art/Cards/Abilities/storm-onslaught-art-v1.png",
+      "theme": "STORM ONSLAUGHT",
+      "subject": "A crowned whirlwind of silver-teal wind with two wing-like sweeping storm currents launches forward, sharp lightning-gold accents and dark teal thunderclouds, regal overwhelming cyclone magic."
+    },
+    {
+      "id": "ability.forge-flame",
+      "asset": "Assets/Art/Cards/Abilities/forge-flame-art-v1.png",
+      "theme": "FORGE FLAME",
+      "subject": "An ancient dark iron anvil with gold edges exploding into an intense molten-orange fire plume, two flowing fire streams diverge, one strengthening a bright amber core and another striking dark violet energy."
+    },
+    {
+      "id": "ability.dawn",
+      "asset": "Assets/Art/Cards/Abilities/dawn-art-v1.png",
+      "theme": "DAWN",
+      "subject": "A golden dawn disk rises behind an ivory faceted wing-like crystal, its radiant beam dissolves dark violet chains into turquoise sparks, warm liberating light with a strong central sun silhouette."
+    },
+    {
+      "id": "ability.ebb",
+      "asset": "Assets/Art/Cards/Abilities/ebb-art-v1.png",
+      "theme": "EBB",
+      "subject": "An immense sapphire wave sweeps backward into a glowing turquoise whirlpool, washing away a violet spell orb into scattered fragments, clean sweeping receding tidal motion, antique-gold light accents."
+    },
+    {
+      "id": "ability.dark-price",
+      "asset": "Assets/Art/Cards/Abilities/dark-price-art-v1.png",
+      "theme": "DARK PRICE",
+      "subject": "A floating obsidian chalice with antique gold edges overflows with potent violet energy while one small luminous amber crystal dissolves into its dark liquid, powerful magic with visible sacrifice, no gore."
+    }
+  ]
+}
