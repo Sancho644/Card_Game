@@ -29,6 +29,7 @@ namespace Game.Presentation.Menu
         private CollectionScreen _collection;
         private AppServices _app;
         private bool _searchingForMatch;
+        private Game.Presentation.Network.OnlineScreen _online;
 
         public void Enter(AppServices app) => _app = app;
 
@@ -49,12 +50,16 @@ namespace Game.Presentation.Menu
             _collection = new CollectionScreen(_menu.transform.parent, _menu.GetComponentInChildren<TMPro.TMP_Text>(true).font,
                 _collectionSettings, _app, ShowMenu, PlayVersusAi);
             _menu.Initialize(_collectionSettings, _menuSettings, _app, ChooseDeck);
+            _online=new Game.Presentation.Network.OnlineScreen(_menu.transform.parent,_menu.GetComponentInChildren<TMPro.TMP_Text>(true).font,_collectionSettings,_app,ShowMenu);
+            _menu.BindOnline(()=>{if(!_app.Collection.Validate(_app.Collection.SelectedIndex).IsValid){ChooseDeck();return;}_menu.Hide();_online.Show();});
             ShowMenu();
+            if(!string.IsNullOrEmpty(_app.OnlineNotice)){var notice=_app.OnlineNotice;_app.OnlineNotice=null;_menu.Hide();_online.Notice(notice);}
         }
 
         private void OnDestroy()
         {
             _collection?.Dispose();
+            _online?.Dispose();
             if (_searchingForMatch)
                 _app.Matchmaking.Cancel();
         }

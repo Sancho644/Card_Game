@@ -244,6 +244,7 @@ MonoBehaviour:
   _rules: {fileID: 11400000, guid: cd281c54a46f6c54684160811a185e72, type: 2}
   _ai: {fileID: 11400000, guid: b538ce2cbf0a7924396dad2195a87afd, type: 2}
   _matchmaking: {fileID: 11400000, guid: 5dbbf49fcc1d3f44ca19c295e2e0199c, type: 2}
+  _onlineSettings: {fileID: 11400000, guid: 28744257b0b26ce4cbd49a39067f2eb3, type: 2}
   _texts: {fileID: 11400000, guid: 79ee04999c7ff1647a9c960a1647c5d2, type: 2}
   _sounds: {fileID: 11400000, guid: c457245186854f146a5bc7065a3929a8, type: 2}
   _loadingSettings: {fileID: 11400000, guid: bbaff0dd3b86ae24db04063facea03db, type: 2}

@@ -204,6 +204,12 @@ namespace Game.Presentation.Match
             if (_disposed)
                 return;
 
+            if (_session is IAsyncMatchSession online)
+            {
+                foreach (var controller in _controllers) controller.CancelDecision();
+                online.SubmitAsync(command, result => { if (!_disposed && !result.IsAccepted) _queue.Enqueue(RequestDecision); });
+                return;
+            }
             var result = _session.Submit(command);
             if (result.IsAccepted)
                 return;

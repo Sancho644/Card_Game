@@ -27,6 +27,7 @@ namespace Game.Presentation.App
         [SerializeField] private GameRulesConfig _rules;
         [SerializeField] private AiConfig _ai;
         [SerializeField] private MatchmakingConfig _matchmaking;
+        [SerializeField] private OnlineSettings _onlineSettings;
         [SerializeField] private UiTexts _texts;
         [SerializeField] private SoundSettings _sounds;
         [SerializeField] private LoadingScreenSettings _loadingSettings;
@@ -67,7 +68,8 @@ namespace Game.Presentation.App
                 scenes,
                 random,
                 new LocalPlayerSettingsService(new PlayerPrefsSettingsStore()),
-                sound);
+                sound,
+                _onlineSettings);
 
             SceneManager.sceneLoaded += OnSceneLoaded;
         }

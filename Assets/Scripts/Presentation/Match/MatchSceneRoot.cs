@@ -176,6 +176,7 @@ namespace Game.Presentation.Match
             framer.Changed += () => _presenter.Resync();
             _topBar.ShowBothHandsChanged += show =>
             {
+                if (_launch.Session is Game.Services.Match.IAsyncMatchSession) return;
                 viewer.ShowBothHands = show;
                 _presenter.Resync();
             };

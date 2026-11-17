@@ -12,7 +12,7 @@ namespace Game.Presentation.Menu
     public sealed class MainMenuLayout : IDisposable
     {
         public readonly TMP_Text Title;
-        public readonly UnityEngine.UI.Button VersusAi, HotSeat, Collection, Difficulty, FastAnimations;
+        public readonly UnityEngine.UI.Button VersusAi, HotSeat, Collection, Difficulty, FastAnimations, Online;
         private readonly CollectionUi _ui;
         private readonly CollectionCardView _cards;
         private readonly AppServices _app;
@@ -44,8 +44,9 @@ namespace Game.Presentation.Menu
             _gallery = _ui.Rect(root, "DeckCards", .13f, .52f, .74f, .24f);
             VersusAi = Button(root, "VersusAi", .29f, .36f, .42f, .115f, 42);
             _ui.Select(VersusAi, true);
-            HotSeat = Button(root, "HotSeat", .29f, .255f, .42f, .08f, 27);
-            Collection = Button(root, "Collection", .29f, .15f, .42f, .08f, 32);
+            Online = _ui.Button(root,"Online",app.Texts.Get("online.menu"),.29f,.275f,.42f,.065f,()=>{});
+            HotSeat = Button(root, "HotSeat", .29f, .195f, .42f, .065f, 27);
+            Collection = Button(root, "Collection", .29f, .115f, .42f, .065f, 32);
             var settingsButton = _ui.Button(root, "Settings", app.Texts.Get("menu.settings"), .40f, .045f, .20f, .065f, OpenSettings);
             settingsButton.GetComponentInChildren<TMP_Text>().fontSizeMax = 26;
             _settings = _ui.Panel(root, "SettingsModal", 0, 0, 1, 1, new Color(0, 0, 0, .82f));

@@ -30,6 +30,7 @@ namespace Game.Presentation.Menu
         }
 
         public void OpenSettings() => _layout?.OpenSettings();
+        public void BindOnline(Action online)=>UiButtons.Bind(_layout.Online,online);
         private void OnDestroy() => _layout?.Dispose();
 
         public void Show(

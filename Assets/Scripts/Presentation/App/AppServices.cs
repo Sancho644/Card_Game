@@ -31,7 +31,8 @@ namespace Game.Presentation.App
             ISceneNavigator scenes,
             IRandom random,
             IPlayerSettingsService playerSettings,
-            ISoundPlayer sound)
+            ISoundPlayer sound,
+            OnlineSettings onlineSettings = null)
         {
             Database = database ?? throw new ArgumentNullException(nameof(database));
             Catalog = database.ToCatalog();
@@ -44,12 +45,14 @@ namespace Game.Presentation.App
             Random = random ?? throw new ArgumentNullException(nameof(random));
             PlayerSettings = playerSettings ?? throw new ArgumentNullException(nameof(playerSettings));
             Sound = sound ?? throw new ArgumentNullException(nameof(sound));
+            OnlineSettings=onlineSettings;
             Difficulty = ai.DefaultProfileId;
             Collection = new PlayerCollection(new PlayerPrefsCollectionStore(), Catalog, Rules,
                 decks.Select(d => new DeckPreset(d.DisplayName, d.ToDeckList().CardIds)).ToList());
         }
 
         public PlayerCollection Collection { get; }
+        public OnlineSettings OnlineSettings { get; }
         public CardDatabase Database { get; }
         public CardCatalog Catalog { get; }
         public GameRules Rules { get; }
@@ -75,5 +78,7 @@ namespace Game.Presentation.App
 
         /// <summary>The match the menu prepared for the match scene; the match scene takes it.</summary>
         public MatchLaunch PendingMatch { get; set; }
+        public string OnlineNotice { get; set; }
+        public System.Threading.Tasks.Task OnlineClosing { get; set; } = System.Threading.Tasks.Task.CompletedTask;
     }
 }
