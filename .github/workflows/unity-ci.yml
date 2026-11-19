@@ -105,12 +105,17 @@ jobs:
           key: unity-${{ runner.os }}-windows64-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ hashFiles('Assets/**', 'ProjectSettings/**') }}
           restore-keys: unity-${{ runner.os }}-windows64-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
       - name: Prepare GameCI image with Editor log capture
+        id: prepare
         run: |
           unity_version=$(sed -n 's/^m_EditorVersion: //p' ProjectSettings/ProjectVersion.txt)
           test -n "$unity_version"
           docker build --file .github/ci/WindowsBuilder.Dockerfile \
             --build-arg "UNITY_VERSION=${unity_version}" \
             --tag cardgame-windows-builder:ci .github/ci
+          mkdir -p Logs/CI/Windows
+          date --iso-8601=ns > Logs/CI/Windows/runner-resources.log
+          free -m >> Logs/CI/Windows/runner-resources.log
+          printf 'started=%s\n' "$(date --iso-8601=ns)" >> "$GITHUB_OUTPUT"
       - name: Build Windows x64 player
         id: build
         uses: game-ci/unity-builder@v5.0.1
@@ -126,10 +131,37 @@ jobs:
           buildsPath: Builds/CI
           versioning: None
           customImage: cardgame-windows-builder:ci
+          customParameters: -job-worker-count 2 -refreshImportMode InProcess
+      - name: Collect Windows container events
+        if: always() && steps.prepare.outcome == 'success'
+        env:
+          STARTED: ${{ steps.prepare.outputs.started }}
+        run: |
+          {
+            date --iso-8601=ns
+            free -m
+            if ! docker events --since "$STARTED" --until "$(date --iso-8601=ns)" \
+              --filter type=container --filter image=cardgame-windows-builder:ci \
+              --format '{{.TimeNano}} {{.Action}} {{.Actor.ID}} exit={{index .Actor.Attributes "exitCode"}} signal={{index .Actor.Attributes "signal"}}'; then
+              echo 'Docker event history unavailable. See the in-container resource log if present.'
+            fi
+          } >> Logs/CI/Windows/runner-resources.log
       - name: Verify player files
         run: |
-          test -f Builds/CI/StandaloneWindows64/CardGame.exe
-          test -d Builds/CI/StandaloneWindows64/CardGame_Data
+          player=Builds/CI/StandaloneWindows64
+          data="$player/CardGame_Data"
+          test -s "$player/CardGame.exe"
+          test -s "$player/UnityPlayer.dll"
+          test -s "$data/globalgamemanagers"
+          test -s "$data/Managed/Game.Presentation.dll"
+          scene_count=$(grep -cE '^[[:space:]]*- enabled: 1[[:space:]]*$' ProjectSettings/EditorBuildSettings.asset)
+          for ((i = 0; i < scene_count; i++)); do
+            test -s "$data/level$i"
+          done
+          test -s "$data/sharedassets0.assets.resS"
+          test -s "$data/sharedassets1.assets"
+          test -s "$data/sharedassets2.assets"
+          printf 'Verified %s scene files, player assemblies and shared assets.\n' "$scene_count"
       - name: Upload Windows x64 player
         uses: actions/upload-artifact@v7
         with:
@@ -160,5 +192,13 @@ jobs:
         with:
           name: unity-windows-build-log
           path: Logs/CI/Windows/Editor.log
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload Windows resource diagnostics
+        if: always() && steps.prepare.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: unity-windows-build-resources-${{ github.run_attempt }}
+          path: Logs/CI/Windows/*resources.log
           if-no-files-found: error
           retention-days: 14
