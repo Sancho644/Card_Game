@@ -1,101 +1,106 @@
-using System.Collections.Generic;
-using Game.Data.Presentation;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+
 namespace Game.Presentation.Cards
 {
     /// <summary>Shared field face with live bonus values and condition text in every card surface.</summary>
-    public sealed class FieldCardFaceView : MonoBehaviour
+    public sealed class FieldCardFaceView : CardFaceView
     {
-        private readonly Dictionary<Graphic,Color> _colors=new Dictionary<Graphic,Color>();
         private CardFace _face;
         private CardSkin _skin;
         private TMP_FontAsset _font;
         private TMP_Text _conditionTitle;
         private TMP_Text _rules;
         private UnityEngine.UI.Image _stateIcon;
-        public static FieldCardFaceView Create(Transform parent)
-        {
-            var go=new GameObject("FieldFace",typeof(RectTransform));
-            var rect=go.GetComponent<RectTransform>();rect.SetParent(parent,false);
-            rect.anchorMin=Vector2.zero;rect.anchorMax=Vector2.one;rect.offsetMin=rect.offsetMax=Vector2.zero;
-            return go.AddComponent<FieldCardFaceView>();
-        }
-        public void Bind(CardFace face,CardSkin skin,TMP_FontAsset font)
+
+        public static FieldCardFaceView Create(Transform parent) => CreateFace<FieldCardFaceView>(parent, "FieldFace");
+
+        public void Bind(CardFace face, CardSkin skin, TMP_FontAsset font)
         {
             gameObject.SetActive(true);
-            if(_face==face&&_skin==skin)return;
-            foreach(Transform child in transform){child.gameObject.SetActive(false);Destroy(child.gameObject);}
-            _colors.Clear();_face=face;_skin=skin;_font=font;
-            var style=skin.FieldStyle;
-            var art=Node("Art",style.Art).gameObject.AddComponent<RawImage>();art.raycastTarget=false;
-            if(face.Art!=null){
-                art.texture=face.Art.texture;
-                var uv=face.Art.textureRect;var tex=face.Art.texture;
-                var aspect=style.WorldSize.x/style.WorldSize.y*style.Art.width/style.Art.height;
-                if(uv.width/uv.height>aspect){var width=uv.height*aspect;uv.x+=(uv.width-width)/2;uv.width=width;}
-                else{var height=uv.width/aspect;uv.y+=(uv.height-height)/2;uv.height=height;}
-                art.uvRect=new Rect(uv.x/tex.width,uv.y/tex.height,uv.width/tex.width,uv.height/tex.height);
-                Remember(art,Color.white);
-            }else{
-                Remember(art,face.FrameColor*new Color(.28f,.28f,.28f,1));
-                Image("ArtPlaceholder",new Rect(.40f,.55f,.38f,.22f),face.ElementIcon,Color.white);
+            if (_face == face && _skin == skin && _font == font) return;
+            ResetFace(font);
+            _face = face;
+            _skin = skin;
+            _font = font;
+            var style = skin.FieldStyle;
+
+            DrawArt(style.Art, face.Art, style.WorldSize.x / style.WorldSize.y, ElementBackdrop(face.FrameColor), .88f);
+            if (face.Art == null)
+                SpriteNode("ArtPlaceholder", new Rect(.34f, .58f, .32f, .22f), face.ElementIcon, Color.white);
+            SpriteNode("Frame", new Rect(0, 0, 1, 1), style.Frame, Color.white, preserveAspect: false);
+            Panel("InformationPlate", new Rect(.055f, .078f, .89f, .37f), new Color(.035f, .105f, .10f));
+            Panel("TitlePlate", new Rect(.055f, .359f, .89f, .089f), new Color(.14f, .085f, .055f));
+            Panel("TitleTrim", new Rect(.055f, .44f, .89f, .008f), new Color(.71f, .47f, .20f));
+            Label("Title", style.Title, face.Title, style.Ink, 32, 54, wrap: true);
+            DrawBonuses(face);
+
+            var body = face.Body ?? "";
+            var colon = body.IndexOf(':');
+            var hasTitle = colon > 0 && colon < 45;
+            _conditionTitle = null;
+            _rules = null;
+            if (hasTitle)
+            {
+                Panel("ConditionRule", new Rect(.085f, .237f, .83f, .003f), new Color(.45f, .36f, .23f));
+                _conditionTitle = Label("ConditionTitle", style.ConditionTitle, body.Substring(0, colon),
+                    new Color(1, .82f, .52f), 28, 42, wrap: true);
             }
-            Image("Frame",new Rect(0,0,1,1),style.Frame,Color.white);
-            Image("RarityGem",style.RarityIcon,face.RarityIcon,face.RarityColor);
-            var rail=Node("Bonuses",style.BonusRail);
-            for(var i=0;i<face.FieldBonuses.Count;i++){
-                var bonus=face.FieldBonuses[i];var height=1f/face.FieldBonuses.Count;
-                var panel=Node("Bonus"+i,new Rect(0,1-(i+1)*height,1,height*.96f),rail);
-                Image("Panel",new Rect(0,0,1,1),style.BonusPanel,Color.white,panel);
-                Image("Icon",new Rect(.20f,.53f,.60f,.39f),bonus.Icon,Color.white,panel);
-                var element=Text("Element",new Rect(.05f,.29f,.90f,.22f),bonus.Element,style.Ink,panel);
-                var value=Text("Value",new Rect(.05f,.06f,.90f,.23f),(bonus.Value>0?"+":"")+bonus.Value,style.Ink,panel);
-                element.textWrappingMode=value.textWrappingMode=TextWrappingModes.NoWrap;
+            if (body.Length > 0)
+            {
+                var area = style.Rules;
+                if (!hasTitle) area.yMax = style.ConditionTitle.yMax;
+                _rules = Label("Rules", area, hasTitle ? body.Substring(colon + 1).TrimStart() : body, style.Ink,
+                    25, 42, wrap: true, alignment: TextAlignmentOptions.MidlineLeft);
             }
-            Text("Title",style.Title,face.Title,style.Ink);
-            var colon=(face.Body??"").IndexOf(':');var hasTitle=colon>0&&colon<45;
-            _conditionTitle=Text("ConditionTitle",style.ConditionTitle,hasTitle?face.Body.Substring(0,colon):"",style.Ink);
-            _rules=Text("Rules",style.Rules,hasTitle?face.Body.Substring(colon+1).Trim():face.Body,style.Ink);
-            Text("Type",style.Type,face.TypeLabel,style.Ink);
-            Text("Rarity",style.Rarity,face.Rarity,style.Ink);
-            // State stays bright while the closed field itself is dimmed.
-            _stateIcon=Node("FieldState",style.StateBadge).gameObject.AddComponent<UnityEngine.UI.Image>();
-            _stateIcon.raycastTarget=false;_stateIcon.preserveAspect=true;
+            Label("Type", style.Type, face.TypeLabel, style.Ink, 23, 32);
+            DrawRarity(style.Rarity, face, style.Ink);
+
+            // Keep the status bright while the closed field itself is dimmed.
+            _stateIcon = Node("FieldState", style.StateBadge).gameObject.AddComponent<UnityEngine.UI.Image>();
+            _stateIcon.raycastTarget = false;
+            _stateIcon.preserveAspect = true;
             _stateIcon.gameObject.SetActive(false);
         }
-        public void SetState(bool closed,bool locked)
+
+        private void DrawBonuses(CardFace face)
         {
-            if(_stateIcon==null)return;
-            _stateIcon.sprite=locked?_skin.FieldStyle.LockedIcon:closed?_skin.FieldStyle.ClosedIcon:null;
-            _stateIcon.gameObject.SetActive(_stateIcon.sprite!=null);
+            var bonuses = face.FieldBonuses;
+            if (bonuses.Count == 0) return;
+            var rail = Node("Bonuses", _skin.FieldStyle.BonusRail);
+            var width = 1f / bonuses.Count;
+            for (var i = 0; i < bonuses.Count; i++)
+            {
+                var bonus = bonuses[i];
+                var panel = Node("Bonus" + i, new Rect(i * width + .012f * width, 0, width * .976f, 1), rail);
+                var accent = bonus.Value < 0 ? new Color(1, .62f, .53f) :
+                    bonus.Value > 0 ? new Color(.67f, 1f, .82f) : _skin.FieldStyle.Ink;
+                Panel("Panel", new Rect(0, 0, 1, 1), new Color(.055f, .15f, .14f), panel);
+                Panel("Trim", new Rect(0, .96f, 1, .04f), accent, panel);
+                SpriteNode("Icon", new Rect(.06f, .34f, .32f, .58f), bonus.Icon, Color.white, panel);
+                Label("Value", new Rect(.37f, .32f, .59f, .58f), (bonus.Value > 0 ? "+" : "") + bonus.Value,
+                    accent, 26, 48, panel);
+                Label("Element", new Rect(.05f, .022f, .90f, .30f), bonus.Element, _skin.FieldStyle.Ink, 17, 25, panel);
+            }
         }
+
+        public void SetState(bool closed, bool locked)
+        {
+            if (_stateIcon == null) return;
+            _stateIcon.sprite = locked ? _skin.FieldStyle.LockedIcon : closed ? _skin.FieldStyle.ClosedIcon : null;
+            _stateIcon.gameObject.SetActive(_stateIcon.sprite != null);
+        }
+
         public void SetCancelled(bool cancelled)
         {
-            foreach(var text in new[]{_conditionTitle,_rules})if(text!=null)
-                text.fontStyle=cancelled?text.fontStyle|FontStyles.Strikethrough:text.fontStyle&~FontStyles.Strikethrough;
+            SetStrike(_conditionTitle, cancelled);
+            SetStrike(_rules, cancelled);
         }
-        public void SetDimming(float brightness)
+
+        private static void SetStrike(TMP_Text label, bool cancelled)
         {
-            foreach(var pair in _colors)if(pair.Key!=null){var c=pair.Value;pair.Key.color=new Color(c.r*brightness,c.g*brightness,c.b*brightness,c.a);}
+            if (label == null) return;
+            label.fontStyle = cancelled ? label.fontStyle | FontStyles.Strikethrough : label.fontStyle & ~FontStyles.Strikethrough;
         }
-        private RectTransform Node(string name,Rect area,Transform parent=null)
-        {
-            var rect=new GameObject(name,typeof(RectTransform)).GetComponent<RectTransform>();rect.SetParent(parent!=null?parent:transform,false);
-            rect.anchorMin=area.min;rect.anchorMax=area.max;rect.offsetMin=rect.offsetMax=Vector2.zero;return rect;
-        }
-        private void Image(string name,Rect area,Sprite sprite,Color color,Transform parent=null)
-        {
-            if(sprite==null)return;var image=Node(name,area,parent).gameObject.AddComponent<UnityEngine.UI.Image>();
-            image.sprite=sprite;image.raycastTarget=false;image.preserveAspect=name=="Icon"||name=="RarityGem"||name=="ArtPlaceholder";Remember(image,color);
-        }
-        private TMP_Text Text(string name,Rect area,string value,Color color,Transform parent=null)
-        {
-            var text=Node(name,area,parent).gameObject.AddComponent<TextMeshProUGUI>();text.font=_font;text.text=value??"";text.richText=false;
-            text.enableAutoSizing=true;text.fontSizeMin=1;text.fontSizeMax=250;text.alignment=TextAlignmentOptions.Midline;
-            text.overflowMode=TextOverflowModes.Ellipsis;text.raycastTarget=false;Remember(text,color);return text;
-        }
-        private void Remember(Graphic graphic,Color color){graphic.color=color;_colors.Add(graphic,color);}
     }
 }

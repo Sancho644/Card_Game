@@ -22,46 +22,46 @@ MonoBehaviour:
   _ink: {r: 1, g: 0.94, b: 0.8, a: 1}
   _art:
     serializedVersion: 2
-    x: 0.035
-    y: 0.265
-    width: 0.93
-    height: 0.71
+    x: 0.037
+    y: 0.264
+    width: 0.926
+    height: 0.719
   _power:
     serializedVersion: 2
-    x: 0.055
-    y: 0.77
-    width: 0.29
-    height: 0.18
+    x: 0.05
+    y: 0.779
+    width: 0.302
+    height: 0.16
   _elementIcon:
     serializedVersion: 2
-    x: 0.73
-    y: 0.818
-    width: 0.2
-    height: 0.16
+    x: 0.708
+    y: 0.815
+    width: 0.231
+    height: 0.154
   _element:
     serializedVersion: 2
-    x: 0.732
-    y: 0.778
-    width: 0.21
-    height: 0.042
+    x: 0.726
+    y: 0.774
+    width: 0.216
+    height: 0.044
   _title:
     serializedVersion: 2
-    x: 0.08
-    y: 0.15
-    width: 0.84
-    height: 0.105
+    x: 0.079
+    y: 0.145
+    width: 0.842
+    height: 0.111
   _type:
     serializedVersion: 2
-    x: 0.155
-    y: 0.06
-    width: 0.3
-    height: 0.04
+    x: 0.14
+    y: 0.056
+    width: 0.32
+    height: 0.049
   _rarity:
     serializedVersion: 2
-    x: 0.565
-    y: 0.06
-    width: 0.3
-    height: 0.04
+    x: 0.537
+    y: 0.054
+    width: 0.356
+    height: 0.052
   _rules:
     serializedVersion: 2
     x: 0.08

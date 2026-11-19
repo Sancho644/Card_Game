@@ -1,3 +1,4 @@
+using Game.Core.Cards;
 using UnityEngine;
 
 namespace Game.Presentation.Cards
@@ -18,7 +19,7 @@ namespace Game.Presentation.Cards
             Sprite art,
             int? power,
             bool hasCondition = false, string typeLabel = "", Sprite creatureFrame = null,
-            System.Collections.Generic.IReadOnlyList<FieldBonusFace> fieldBonuses = null, AbilityFace ability = null)
+            System.Collections.Generic.IReadOnlyList<FieldBonusFace> fieldBonuses = null, AbilityFace ability = null, Rarity grade = Game.Core.Cards.Rarity.Common)
         {
             CreatureFrame = creatureFrame;
             FieldBonuses = fieldBonuses;
@@ -28,6 +29,7 @@ namespace Game.Presentation.Cards
             Stats = stats;
             Body = body;
             Rarity = rarity;
+            Grade = grade;
             FrameColor = frameColor;
             RarityColor = rarityColor;
             RarityIcon = rarityIcon;
@@ -50,6 +52,7 @@ namespace Game.Presentation.Cards
 
         public string Body { get; }
         public string Rarity { get; }
+        public Rarity Grade { get; }
 
         /// <summary>Color of the element: of the creature, of the field's largest bonus; neutral for abilities.</summary>
         public Color FrameColor { get; }
