@@ -104,9 +104,15 @@ jobs:
           path: Library
           key: unity-${{ runner.os }}-windows64-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ hashFiles('Assets/**', 'ProjectSettings/**') }}
           restore-keys: unity-${{ runner.os }}-windows64-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
-      - name: Prepare build log directory
-        run: mkdir -p Logs/CI/Windows
+      - name: Prepare GameCI image with Editor log capture
+        run: |
+          unity_version=$(sed -n 's/^m_EditorVersion: //p' ProjectSettings/ProjectVersion.txt)
+          test -n "$unity_version"
+          docker build --file .github/ci/WindowsBuilder.Dockerfile \
+            --build-arg "UNITY_VERSION=${unity_version}" \
+            --tag cardgame-windows-builder:ci .github/ci
       - name: Build Windows x64 player
+        id: build
         uses: game-ci/unity-builder@v5.0.1
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -119,7 +125,7 @@ jobs:
           buildName: CardGame
           buildsPath: Builds/CI
           versioning: None
-          customParameters: -logFile /github/workspace/Logs/CI/Windows/Editor.log
+          customImage: cardgame-windows-builder:ci
       - name: Verify player files
         run: |
           test -f Builds/CI/StandaloneWindows64/CardGame.exe
@@ -134,10 +140,25 @@ jobs:
             !Builds/CI/StandaloneWindows64/**/*.pdb
           if-no-files-found: error
           retention-days: 14
-      - name: Upload Windows build log
+      - name: Check whether Unity wrote the build log
+        id: build-log
         if: always()
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+        run: |
+          if [[ -s Logs/CI/Windows/Editor.log ]]; then
+            echo 'available=true' >> "$GITHUB_OUTPUT"
+          elif [[ "$BUILD_OUTCOME" == success ]]; then
+            echo '::error::Unity reported success but its Editor.log is missing or empty.'
+            exit 1
+          elif [[ "$BUILD_OUTCOME" == failure ]]; then
+            echo '::notice::No Editor.log was produced. Check the GameCI output for startup or activation errors.'
+          fi
+      - name: Upload Windows build log
+        if: always() && steps.build-log.outputs.available == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: unity-windows-build-log
-          path: Logs/CI/Windows/
+          path: Logs/CI/Windows/Editor.log
+          if-no-files-found: error
           retention-days: 14

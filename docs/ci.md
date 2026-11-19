@@ -12,6 +12,8 @@ Workflow [Unity CI](../.github/workflows/unity-ci.yml) запускается п
 
 Unity Library кэшируется отдельно для тестов и Windows. В ключ входит версия редактора, содержимое `Packages/` и хэш исходников проекта. При изменении исходников Unity может переиспользовать предыдущий импорт для той же версии редактора и пакетов, а изменившиеся ассеты импортирует заново. После job GitHub удаляет временную машину. В Git хранятся workflow и скрипты проверки, артефакты хранятся 14 дней в Actions.
 
+В [первом запуске CI](https://github.com/Sancho644/Card_Game/actions/runs/44451051640) Windows runner начал с пустой Library и сохранил кэш после сборки. Сообщение GameCI об отсутствии Library ожидаемо, когда подходящего кэша ещё нет или его вытеснил GitHub. Проверить попадание в кэш можно в шаге `actions/cache`. Windows runner восстанавливает свою Library из предыдущих Windows-сборок, а Card Database Validation использует кэш EditMode. Ключи восстановления ограничены версией Unity и хэшем пакетов. Кэш, созданный внутри PR, доступен повторным запускам того же PR, поэтому первый запуск нового PR всё ещё может начать с пустой Library. [Область доступа к кэшу GitHub](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#restrictions-for-accessing-a-cache)
+
 ## Лицензия и первый запуск
 
 В репозитории откройте **Settings → Secrets and variables → Actions → New repository secret**. Добавьте набор секретов, соответствующий вашей лицензии.
@@ -34,6 +36,17 @@ Unity Library кэшируется отдельно для тестов и Windo
 - **Тесты.** NUnit XML содержит имя, сообщение и stack trace теста. Неполный прогон или отсутствие пройденных тестов в одной из обязательных сборок также завершает job ошибкой.
 - **Каталог.** Ошибка теста указывает каталог и затронутый ассет или колоду. Для воспроизведения запустите `ProjectCardDatabaseValidation` в Unity Test Runner.
 - **Сборка.** Проверьте лог job и наличие модуля Windows Mono в образе GameCI для версии из `ProjectVersion.txt`. При недоступности образа сборка завершается ошибкой до запуска Editor.
+
+### Журнал Windows Build
+
+GameCI Builder 5.0.1 передаёт редактору `-logfile /dev/stdout`. Второй `-logFile` из `customParameters` в первом запуске дошёл до Unity, но журнал остался в stdout. Windows-задача теперь использует тот же образ Unity Windows Mono с [обёрткой unity-editor](../.github/ci/unity-editor). Для сборки она заменяет путь в исходном аргументе на `Logs/CI/Windows/Editor.log`, выводит журнал в job и возвращает исходный код завершения Unity.
+
+Если Editor записал непустой файл, Actions загружает его и при успешной, и при неудачной сборке. Успешная сборка без журнала считается ошибкой CI. Если лицензирование или запуск контейнера прервались до записи файла, подробности остаются в логе job.
+
+### Unity Services и URP
+
+- **Services Core.** Предсборочная проверка версии 1.18.0 требует одновременно привязки проекта и входа пользователя в редактор. У открытого локального проекта оба условия выполнялись, а `Application.cloudProjectId` совпадал с ID в Player Settings. Активация лицензии GameCI сама по себе не создаёт сессию входа пользователя Unity Editor для этой проверки. Если перестанут работать комнаты, откройте **Edit → Project Settings → Services** в редакторе после входа через Unity Hub. Сверьте ID с **Unity Dashboard → Projects → Card → Settings**, затем проверьте доступ к Authentication и Relay для того же проекта и окружения. Если редактор действительно отвязан, выберите существующий проект с ID `77fc0387-f067-49c9-9e11-c212a8fa25aa`. [Инструкция Unity](https://docs.unity.com/en-us/services/getting-started)
+- **Terrain shader stripping.** Предупреждения об удалении всех вариантов `Universal Render Pipeline/Terrain/Lit` и его вспомогательных проходов допустимы для текущих сцен. В сценах и префабах игры нет Terrain, а стол построен на мешах. Если в будущем появится Terrain или видимый материал станет розовым, проверьте конкретный шейдер и настройки URP для Windows. [Документация URP](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@17.0/manual/shader-stripping.html)
 
 ## Новые EditMode-тесты
 

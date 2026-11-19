@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+read -r editor < "${BASH_SOURCE[0]%/*}/unity-editor-path"
+args=("$@")
+windows_build=false
+log_option=-1
+
+for ((i = 0; i + 1 < ${#args[@]}; i++)); do
+    case "${args[i],,}" in
+        -custombuildtarget)
+            if [[ "${args[i + 1]}" == StandaloneWindows64 ]]; then
+                windows_build=true
+            fi
+            ;;
+        -logfile)
+            log_option=$((i + 1))
+            ;;
+    esac
+done
+
+# GameCI also calls unity-editor to activate and return the license.
+if [[ "$windows_build" == false ]]; then
+    exec "$editor" "$@"
+fi
+
+editor_log="${GITHUB_WORKSPACE:?}/Logs/CI/Windows/Editor.log"
+mkdir -p -- "${editor_log%/*}"
+# Replace GameCI's /dev/stdout value so Unity gets only one -logFile option.
+if (( log_option >= 0 )); then
+    args[log_option]="$editor_log"
+else
+    args+=(-logFile "$editor_log")
+fi
+
+status=0
+"$editor" "${args[@]}" || status=$?
+if [[ -s "$editor_log" ]]; then
+    cat -- "$editor_log"
+fi
+exit "$status"
