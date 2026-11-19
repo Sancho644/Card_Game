@@ -1,0 +1,143 @@
+name: Unity CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unity-tests:
+    name: Unity Tests
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/cache@v6
+        with:
+          path: Library
+          key: unity-${{ runner.os }}-editmode-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ hashFiles('Assets/**', 'ProjectSettings/**') }}
+          restore-keys: unity-${{ runner.os }}-editmode-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
+      - name: Compile and run all EditMode tests
+        uses: game-ci/unity-test-runner@v4.3.2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: auto
+          testMode: editmode
+          artifactsPath: Logs/CI/EditMode
+          customParameters: -nographics
+      - name: Check NUnit report
+        run: python3 .github/scripts/check-unity-results.py Logs/CI/EditMode/editmode-results.xml
+      - name: Upload EditMode results and Editor log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unity-editmode-results
+          path: Logs/CI/EditMode/
+          retention-days: 14
+
+  card-validation:
+    name: Card Database Validation
+    needs: unity-tests
+    # A failed full run can include a validation failure. Still publish its separate report.
+    if: ${{ !cancelled() && (needs.unity-tests.result == 'success' || needs.unity-tests.result == 'failure') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/cache/restore@v6
+        with:
+          path: Library
+          key: unity-${{ runner.os }}-editmode-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ hashFiles('Assets/**', 'ProjectSettings/**') }}
+          restore-keys: unity-${{ runner.os }}-editmode-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
+      - name: Validate card data and decks
+        uses: game-ci/unity-test-runner@v4.3.2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: auto
+          testMode: editmode
+          artifactsPath: Logs/CI/CardValidation
+          customParameters: -nographics -testFilter Game.Data.Tests.FirstCardSetTests.ProjectCardDatabaseValidation
+      - name: Check validation report
+        run: python3 .github/scripts/check-unity-results.py Logs/CI/CardValidation/editmode-results.xml --validation
+      - name: Upload card validation results and Editor log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unity-card-validation
+          path: Logs/CI/CardValidation/
+          retention-days: 14
+
+  windows-build:
+    name: Windows Build
+    needs: [unity-tests, card-validation]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/cache@v6
+        with:
+          path: Library
+          key: unity-${{ runner.os }}-windows64-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ hashFiles('Assets/**', 'ProjectSettings/**') }}
+          restore-keys: unity-${{ runner.os }}-windows64-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
+      - name: Prepare build log directory
+        run: mkdir -p Logs/CI/Windows
+      - name: Build Windows x64 player
+        uses: game-ci/unity-builder@v5.0.1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: auto
+          targetPlatform: StandaloneWindows64
+          buildName: CardGame
+          buildsPath: Builds/CI
+          versioning: None
+          customParameters: -logFile /github/workspace/Logs/CI/Windows/Editor.log
+      - name: Verify player files
+        run: |
+          test -f Builds/CI/StandaloneWindows64/CardGame.exe
+          test -d Builds/CI/StandaloneWindows64/CardGame_Data
+      - name: Upload Windows x64 player
+        uses: actions/upload-artifact@v7
+        with:
+          name: CardGame-Windows-x64-${{ github.run_number }}-${{ github.run_attempt }}
+          path: |
+            Builds/CI/StandaloneWindows64/
+            !Builds/CI/StandaloneWindows64/**/*DontShip*/**
+            !Builds/CI/StandaloneWindows64/**/*.pdb
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload Windows build log
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unity-windows-build-log
+          path: Logs/CI/Windows/
+          retention-days: 14

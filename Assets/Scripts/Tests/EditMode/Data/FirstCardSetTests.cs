@@ -45,6 +45,13 @@ namespace Game.Data.Tests
         }
 
         [Test]
+        public void ProjectCardDatabaseValidation()
+        {
+            var problems = Game.Data.Editor.CardValidationMenu.FindProblems().ToArray();
+            Assert.That(problems, Is.Empty, string.Join("\n", problems));
+        }
+
+        [Test]
         public void EveryCard_ConvertsToEngineData()
         {
             var catalog = _database.ToCatalog();
