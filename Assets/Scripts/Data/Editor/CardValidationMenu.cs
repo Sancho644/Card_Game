@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Game.Core.Decks;
 using Game.Data.Cards;
@@ -14,50 +15,56 @@ namespace Game.Data.Editor
         [MenuItem("Tools/Game/Validate Cards")]
         public static void ValidateAll()
         {
-            var problems = 0;
-            foreach (var database in LoadAll<CardDatabase>())
+            var problems = FindProblems().ToArray();
+            foreach (var problem in problems)
+                Debug.LogError(problem);
+            if (problems.Length == 0)
+                Debug.Log("Cards, balance and decks: no problems found.");
+        }
+
+        public static IEnumerable<string> FindProblems()
+        {
+            var databases = LoadAll<CardDatabase>();
+            var rules = LoadAll<GameRulesConfig>();
+            var decks = LoadAll<DeckDef>();
+            var variants = LoadAll<BalanceVariantDef>();
+            var balances = LoadAll<BalanceConfig>();
+
+            if (databases.Length == 0) yield return "No card database found.";
+            if (rules.Length == 0) yield return "No game rules config found.";
+            if (decks.Length == 0) yield return "No deck definitions found.";
+
+            foreach (var database in databases)
             {
-                foreach (var problem in database.Validate())
+                var problems = database.Validate().ToArray();
+                foreach (var problem in problems)
+                    yield return $"[{database.name}] {problem}";
+                if (database.Cards.Count == 0)
                 {
-                    Debug.LogError($"[{database.name}] {problem}", database);
-                    problems++;
+                    yield return $"[{database.name}] the database has no cards";
+                    continue;
                 }
 
-                foreach (var variant in LoadAll<BalanceVariantDef>())
-                {
+                // Converting a catalog with duplicate IDs or missing references may throw.
+                if (problems.Length != 0) continue;
+
+                foreach (var variant in variants)
                     foreach (var problem in variant.Validate(database))
-                    {
-                        Debug.LogError($"[{variant.name}] {problem}", variant);
-                        problems++;
-                    }
-                }
+                        yield return $"[{database.name} / {variant.name}] {problem}";
 
-                foreach (var balance in LoadAll<BalanceConfig>())
-                {
+                foreach (var balance in balances)
                     foreach (var warning in new CardBalanceValidator(balance).Check(database.Cards))
-                    {
-                        Debug.LogWarning($"[{balance.name}] {warning}", balance);
-                        problems++;
-                    }
-                }
+                        yield return $"[{database.name} / {balance.name}] {warning}";
 
-                foreach (var rules in LoadAll<GameRulesConfig>())
+                var catalog = database.ToCatalog();
+                foreach (var config in rules)
                 {
-                    var catalog = database.ToCatalog();
-                    var validator = new DeckValidator(catalog, rules.ToRules().Deck);
-                    foreach (var deck in LoadAll<DeckDef>())
-                    {
+                    var validator = new DeckValidator(catalog, config.ToRules().Deck);
+                    foreach (var deck in decks)
                         foreach (var error in validator.Validate(deck.ToDeckList()).Errors)
-                        {
-                            Debug.LogError($"[{deck.name}] {error}", deck);
-                            problems++;
-                        }
-                    }
+                            yield return $"[{database.name} / {config.name} / {deck.name}] {error}";
                 }
             }
-
-            if (problems == 0)
-                Debug.Log("Cards, balance and decks: no problems found.");
         }
 
         private static T[] LoadAll<T>() where T : Object =>
