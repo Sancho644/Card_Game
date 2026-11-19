@@ -4,7 +4,7 @@ Workflow [Unity CI](../.github/workflows/unity-ci.yml) запускается п
 
 | Job | Что проверяет | Артефакт |
 | --- | --- | --- |
-| Unity Tests | Импорт пакетов и компиляция Editor-кода, все EditMode-тесты без фильтра, наличие пройденных тестов во всех четырёх текущих сборках | `unity-editmode-results` |
+| Unity Tests | Импорт пакетов и компиляция Editor-кода, все EditMode-тесты без фильтра, наличие пройденных тестов во всех четырёх текущих сборках | `unity-editmode-results`, `unity-tests-memory-diagnostics` |
 | Card Database Validation | Отдельный прогон `ProjectCardDatabaseValidation`. Использует общий код меню **Tools → Game → Validate Cards** и `CardDatabase.Validate()`. Проверяет каталог, эффекты, именные способности, варианты баланса и колоды | `unity-card-validation` |
 | Windows Build | Release-игрок `StandaloneWindows64`, текущий Mono backend, включённые сцены `Bootstrap`, `MainMenu` и `Match` из Editor Build Settings | `CardGame-Windows-x64-<run>-<attempt>` и `unity-windows-build-log` |
 
@@ -36,6 +36,14 @@ Unity Library кэшируется отдельно для тестов и Windo
 - **Тесты.** NUnit XML содержит имя, сообщение и stack trace теста. Неполный прогон или отсутствие пройденных тестов в одной из обязательных сборок также завершает job ошибкой.
 - **Каталог.** Ошибка теста указывает каталог и затронутый ассет или колоду. Для воспроизведения запустите `ProjectCardDatabaseValidation` в Unity Test Runner.
 - **Сборка.** Проверьте лог job и наличие модуля Windows Mono в образе GameCI для версии из `ProjectVersion.txt`. При недоступности образа сборка завершается ошибкой до запуска Editor.
+
+### Unity Tests с кодом 137
+
+В [запуске 44461564171](https://github.com/Sancho644/Card_Game/actions/runs/44461564171) Editor завершился с кодом 137 после компиляции, при загрузке сборок и до записи NUnit XML. Было включено Code Coverage. Runner сообщил 15 701 МБ памяти, а GameCI задал контейнеру лимит 14 916 МБ и 4 CPU. Сам журнал не подтверждает OOM. Отдельная проверка каталога завершилась успешно.
+
+В основном **Unity Tests** Code Coverage временно отключён для диагностики. В теге v4.3.2 параметра `coverageEnabled` ещё нет, а скрипт запуска всегда передаёт `-enableCodeCoverage`. Тестовый образ использует ту же версию Unity и убирает только аргументы Coverage из запуска `-runTests`. GameCI передаёт `-nographics -job-worker-count 2` через `customParameters`. Подтверждение этих флагов появится в выводе обёртки и в командной строке тестового Editor в `editmode.log`. В этом задании по-прежнему выполняются все EditMode-тесты и проверяется NUnit XML. Card Database Validation продолжает работать в исходной конфигурации. [Входы тега GameCI](https://raw.githubusercontent.com/game-ci/unity-test-runner/v4.3.2/action.yml) · [Скрипт запуска](https://raw.githubusercontent.com/game-ci/unity-test-runner/v4.3.2/dist/platforms/ubuntu/run_tests.sh)
+
+Артефакт `unity-tests-memory-diagnostics` сохраняется и при падении тестов. `memory.log` содержит замеры во время работы контейнера, включая RSS процессов в КиБ, счётчики cgroup v2 и `docker stats`. `events.log` сохраняет события Docker, в том числе `oom`, `kill` и `die`, даже если GameCI удалил контейнер. Сборщик читает только имена процессов, числовые показатели и отдельные поля Docker. Если следующий прогон пройдёт, его результат покажет, что сработала комбинация настроек. Сам по себе он не определит вклад Coverage и числа рабочих потоков по отдельности.
 
 ### Журнал Windows Build
 

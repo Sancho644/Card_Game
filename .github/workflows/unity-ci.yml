@@ -30,6 +30,21 @@ jobs:
           path: Library
           key: unity-${{ runner.os }}-editmode-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-${{ hashFiles('Assets/**', 'ProjectSettings/**') }}
           restore-keys: unity-${{ runner.os }}-editmode-${{ hashFiles('ProjectSettings/ProjectVersion.txt', 'Packages/**') }}-
+      - name: Prepare Unity Tests diagnostic image
+        run: |
+          unity_version=$(sed -n 's/^m_EditorVersion: //p' ProjectSettings/ProjectVersion.txt)
+          test -n "$unity_version"
+          docker build --file .github/ci/TestRunner.Dockerfile \
+            --build-arg "UNITY_VERSION=${unity_version}" \
+            --tag cardgame-unity-tests:ci .github/ci
+      - name: Start Unity Tests memory diagnostics
+        id: memory
+        run: |
+          diagnostics=Logs/CI/UnityTestsMemory
+          mkdir -p "$diagnostics"
+          printf 'started=%s\n' "$(date --iso-8601=ns)" >> "$GITHUB_OUTPUT"
+          nohup python3 -u .github/ci/monitor-unity-tests.py cardgame-unity-tests:ci "$diagnostics" \
+            > "$diagnostics/memory.log" 2>&1 < /dev/null &
       - name: Compile and run all EditMode tests
         uses: game-ci/unity-test-runner@v4.3.2
         env:
@@ -41,9 +56,36 @@ jobs:
           unityVersion: auto
           testMode: editmode
           artifactsPath: Logs/CI/EditMode
-          customParameters: -nographics
+          customImage: cardgame-unity-tests:ci
+          # The v4.3.2 image wrapper removes Coverage flags for this experiment.
+          customParameters: -nographics -job-worker-count 2
       - name: Check NUnit report
         run: python3 .github/scripts/check-unity-results.py Logs/CI/EditMode/editmode-results.xml
+      - name: Collect Unity Tests container exit events
+        if: always() && steps.memory.outcome == 'success'
+        env:
+          STARTED: ${{ steps.memory.outputs.started }}
+        run: |
+          diagnostics=Logs/CI/UnityTestsMemory
+          touch "$diagnostics/.stop"
+          for ((i = 0; i < 15; i++)); do
+            if [[ -f "$diagnostics/.stopped" ]]; then break; fi
+            sleep 1
+          done
+          {
+            echo 'Docker container events for Unity Tests'
+            docker events --since "$STARTED" --until "$(date --iso-8601=ns)" \
+              --filter type=container --filter image=cardgame-unity-tests:ci \
+              --format '{{.TimeNano}} {{.Action}} {{.Actor.ID}} exit={{index .Actor.Attributes "exitCode"}} signal={{index .Actor.Attributes "signal"}}'
+          } > "$diagnostics/events.log" 2>&1
+      - name: Upload Unity Tests memory diagnostics
+        if: always() && steps.memory.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: unity-tests-memory-diagnostics
+          path: Logs/CI/UnityTestsMemory/*.log
+          if-no-files-found: error
+          retention-days: 14
       - name: Upload EditMode results and Editor log
         if: always()
         uses: actions/upload-artifact@v7
