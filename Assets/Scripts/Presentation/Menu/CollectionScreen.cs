@@ -6,6 +6,7 @@ using Game.Core.Decks;
 using Game.Data.Cards;
 using Game.Data.Presentation;
 using Game.Presentation.App;
+using Game.Presentation.Cards;
 using Game.Services.Collection;
 using TMPro;
 using UnityEngine;
@@ -255,6 +256,7 @@ namespace Game.Presentation.Menu
             var rotation=previewButton.gameObject.AddComponent<CardPreviewRotation>();
             rotation.Configure(_previewCard,_style,CloseModal);_previewRotation=rotation;
             foreach(var text in _previewCard.GetComponentsInChildren<TMP_Text>()){
+                if (text.GetComponentInParent<CardFaceView>() != null) continue;
                 text.fontSizeMin=10;text.fontSizeMax=Mathf.Max(30,text.fontSizeMax);text.overflowMode=TextOverflowModes.Ellipsis;
             }
             var end=area.min+new Vector2(area.width*safe.center.x/Mathf.Max(1,Screen.width),area.height*safe.center.y/Mathf.Max(1,Screen.height));
