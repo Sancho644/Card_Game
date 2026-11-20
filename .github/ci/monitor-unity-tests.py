@@ -38,10 +38,26 @@ def sample_cgroup(pid):
         print(f"{name} {value}")
 
 
+def sample_host():
+    for path, fields in (
+        ("/proc/meminfo", {"MemAvailable", "SwapFree"}),
+        ("/proc/vmstat", {"oom_kill"}),
+    ):
+        try:
+            for line in Path(path).read_text().splitlines():
+                if line.split(maxsplit=1)[0].rstrip(":") in fields:
+                    print(f"host {line}")
+        except OSError:
+            print(f"host counters unavailable: {path}")
+
+
 def sample(container):
     print(f"\n{datetime.now(timezone.utc).isoformat()} container={container}")
-    pid = docker("inspect", "--format", "{{.State.Pid}}", container)
-    sample_cgroup(pid)
+    sample_host()
+    state = docker("inspect", "--format", "{{.State.Pid}} {{.State.OOMKilled}}", container).split()
+    if len(state) == 2:
+        print(f"container daemon OOMKilled={state[1]}")
+        sample_cgroup(state[0])
     # RSS is in KiB. comm is the executable name, not argv.
     processes = docker("top", container, "-eo", "pid,ppid,rss,comm")
     if processes:
