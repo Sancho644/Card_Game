@@ -139,11 +139,10 @@ namespace Game.Presentation.Match
                 new LogPresenter(new EventLogFormatter(texts, names, lookup, faces), _log),
                 new DealPresenter(_animation),
                 new FieldOpenedPresenter(registry, _animation, _app.Sound),
-                new AbilityPlayedPresenter(_layout, registry, _animation, _app.Sound),
-                new CardSoundPresenter(_app.Sound),
+                new AbilityPlayedPresenter(_layout, registry, _app.Database, _animation, _app.Sound),
 
                 new BattleStartedPresenter(_banner, lookup, texts, _animation, _app.Sound),
-                new BattleResolvedPresenter(new BattleSummaryBuilder(texts, names, lookup), details, _banner, registry, _animation, _visual, _app.Sound, texts),
+                new BattleResolvedPresenter(new BattleSummaryBuilder(texts, names, lookup), details, _banner, registry, _animation, _visual, _app.Sound, texts, _launch.Mode),
                 new TurnBannerPresenter(_banner, details, _launch.Mode, texts, _animation, _app.Sound),
                 new ScoutedPresenter(_breakdown, faces, texts),
                 new TableMovePresenter(),

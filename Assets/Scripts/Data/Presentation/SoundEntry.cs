@@ -8,12 +8,14 @@ namespace Game.Data.Presentation
     {
         public SoundCue Cue;
         public AudioClip Clip;
+        public AudioClip[] Variants;
         [Range(0f, 1f)] public float Volume;
 
         public SoundEntry(SoundCue cue)
         {
             Cue = cue;
             Clip = null;
+            Variants = null;
             Volume = 1f;
         }
     }

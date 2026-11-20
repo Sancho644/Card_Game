@@ -22,5 +22,7 @@ namespace Game.Data.Presentation
         Defeat,
         Draw,
         Button,
+        FieldPlace,
+        BattleLose,
     }
 }

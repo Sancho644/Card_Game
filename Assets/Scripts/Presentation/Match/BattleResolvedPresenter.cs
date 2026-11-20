@@ -21,12 +21,17 @@ namespace Game.Presentation.Match
         private readonly VisualSettings _visual;
         private readonly ISoundPlayer _sound;
         private readonly UiTexts _texts;
+        private readonly MatchMode _mode;
 
         public BattleResolvedPresenter(BattleSummaryBuilder summary, BattleDetails details, BannerView banner,
-            CardViewRegistry cards, AnimationSettings animation, VisualSettings visual, ISoundPlayer sound, UiTexts texts)
+            CardViewRegistry cards, AnimationSettings animation, VisualSettings visual, ISoundPlayer sound, UiTexts texts, MatchMode mode)
         {
             _summary = summary; _details = details; _banner = banner; _cards = cards;
-            _animation = animation; _visual = visual; _sound = sound; _texts = texts;
+            _animation = animation;
+            _visual = visual;
+            _sound = sound;
+            _texts = texts;
+            _mode = mode;
         }
 
         public void Present(GameEvent gameEvent, PresentationContext context)
@@ -77,7 +82,10 @@ namespace Game.Presentation.Match
                 }
                 sequence.AppendInterval(_animation.OutcomeBannerSeconds);
                 if (isFirstOutcome)
-                    BattleOutcomeAudio.Schedule(sequence, result?.Winner != null, consequences, _sound);
+                {
+                    var cue = BattleOutcomeAudio.ResultCue(result?.Winner, context.View.Viewer, _mode.ShowsHandoff);
+                    BattleOutcomeAudio.Schedule(sequence, cue, consequences, _sound);
+                }
                 return sequence;
             }));
             context.Enqueue(_banner.Hide);

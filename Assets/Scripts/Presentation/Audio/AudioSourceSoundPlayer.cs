@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Game.Data.Presentation;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -8,6 +9,9 @@ namespace Game.Presentation.Audio
     public sealed class AudioSourceSoundPlayer : MonoBehaviour, ISoundPlayer
     {
         private const int Voices = 4;
+        private const double MinimumDealSpacing = .045;
+        private readonly Dictionary<SoundCue, int> _nextVariant = new Dictionary<SoundCue, int>();
+        private double _lastDealAt = double.NegativeInfinity;
 
         private SoundSettings _settings;
         private AudioSource[] _sources;
@@ -17,6 +21,11 @@ namespace Game.Presentation.Audio
 
         public void Configure(SoundSettings settings, AudioMixerGroup sfx = null, AudioMixerGroup ui = null, MusicPlayer music = null)
         {
+            if (_settings != settings)
+            {
+                _nextVariant.Clear();
+                _lastDealAt = double.NegativeInfinity;
+            }
             _settings = settings;
             _music = music;
             if (_sources == null)
@@ -61,8 +70,26 @@ namespace Game.Presentation.Audio
                 return;
             }
 
-            _sources[_next].PlayOneShot(entry.Clip, trim);
+            if (cue == SoundCue.CardDeal)
+            {
+                var now = Time.unscaledTimeAsDouble;
+                if (now - _lastDealAt < MinimumDealSpacing)
+                    return;
+                _lastDealAt = now;
+            }
+
+            _sources[_next].PlayOneShot(NextClip(entry), trim);
             _next = (_next + 1) % _sources.Length;
+        }
+
+        private AudioClip NextClip(SoundEntry entry)
+        {
+            if (entry.Variants == null || entry.Variants.Length == 0)
+                return entry.Clip;
+
+            _nextVariant.TryGetValue(entry.Cue, out var index);
+            _nextVariant[entry.Cue] = (index + 1) % (entry.Variants.Length + 1);
+            return index == 0 ? entry.Clip : entry.Variants[index - 1] ?? entry.Clip;
         }
 
         private AudioSource CreateSource()

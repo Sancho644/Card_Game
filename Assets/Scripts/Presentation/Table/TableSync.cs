@@ -42,7 +42,7 @@ namespace Game.Presentation.Table
         /// <param name="instant">Place cards without animation, e.g. behind the hand-off screen.</param>
         /// <param name="dealInterval">Cards new on the table start one after another with this pause; 0 moves all at once.</param>
         public Tween Sync(PlayerView view, PlayerView revealedOpponent, bool instant, float dealInterval = 0f,
-            HashSet<int> discardArrivals = null)
+            HashSet<int> discardArrivals = null, Dictionary<int, SoundCue> placementArrivals = null)
         {
             var duration = instant ? 0f : _animation.MoveDuration;
             var sequence = DOTween.Sequence();
@@ -76,7 +76,14 @@ namespace Game.Presentation.Table
                 var move = cardView.MoveTo(pose, duration);
                 if (onArrival != null && move != null)
                     move.OnComplete(() => onArrival());
-                Add(move, isNew);
+                Add(move, isNew && onArrival == null);
+            }
+
+            Action PlacementSound(int cardId)
+            {
+                if (instant || placementArrivals == null || !placementArrivals.Remove(cardId, out var cue))
+                    return null;
+                return () => _sound.Play(cue);
             }
 
             foreach (var owner in PlayerIds.All)
@@ -97,13 +104,17 @@ namespace Game.Presentation.Table
                     var brightness = known && !field.IsOpen && !field.IsRemoved ? _visual.ClosedFieldBrightness : 1f;
                     Move(new CardRef(field.Id, field.CardId), side, pose, brightness,
                         fieldClosed: known && !field.IsRemoved && !field.IsOpen,
-                        fieldLocked: known && !field.IsRemoved && field.IsLocked);
+                        fieldLocked: known && !field.IsRemoved && field.IsLocked,
+                        onArrival: PlacementSound(field.Id));
 
                     foreach (var occupantOwner in PlayerIds.All)
                     {
                         var creature = field.Occupant(occupantOwner);
-                        if (creature != null)
-                            Move(creature, SideOf(occupantOwner, view.Viewer), _layout.Creature(pose, SideOf(occupantOwner, view.Viewer)));
+                        if (creature == null)
+                            continue;
+                        var creatureSide = SideOf(occupantOwner, view.Viewer);
+                        Move(creature, creatureSide, _layout.Creature(pose, creatureSide),
+                            onArrival: PlacementSound(creature.InstanceId));
                     }
                 }
 

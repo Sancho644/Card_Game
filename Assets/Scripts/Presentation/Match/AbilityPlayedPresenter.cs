@@ -1,4 +1,6 @@
+using Game.Core.Cards;
 using Game.Core.Events;
+using Game.Data.Cards;
 using Game.Data.Presentation;
 using Game.Presentation.Animation;
 using Game.Presentation.Audio;
@@ -12,13 +14,16 @@ namespace Game.Presentation.Match
     {
         private readonly TableLayout _layout;
         private readonly CardViewRegistry _registry;
+        private readonly CardDatabase _database;
         private readonly AnimationSettings _animation;
         private readonly ISoundPlayer _sound;
 
-        public AbilityPlayedPresenter(TableLayout layout, CardViewRegistry registry, AnimationSettings animation, ISoundPlayer sound)
+        public AbilityPlayedPresenter(TableLayout layout, CardViewRegistry registry, CardDatabase database,
+            AnimationSettings animation, ISoundPlayer sound)
         {
             _layout = layout;
             _registry = registry;
+            _database = database;
             _animation = animation;
             _sound = sound;
         }
@@ -33,7 +38,8 @@ namespace Game.Presentation.Match
             {
                 var card = _registry.GetOrCreate(played.Ability.InstanceId, played.Ability.CardId, _layout.Spawn(side));
                 card.SetInHand(false);
-                _sound.Play(SoundCue.AbilityPlay);
+                if (_database.Find(played.Ability.CardId)?.Rarity == Rarity.Common)
+                    _sound.Play(SoundCue.AbilityPlay);
                 return card.MoveTo(_layout.BattleFocus(_animation.AbilityShowScale), _animation.MoveDuration);
             }));
             context.Enqueue(new DelayStep(_animation.AbilityShowSeconds));

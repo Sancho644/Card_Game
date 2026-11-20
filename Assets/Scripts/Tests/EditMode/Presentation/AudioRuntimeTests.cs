@@ -143,7 +143,7 @@ namespace Game.Presentation.Tests
             try
             {
                 timeline.AppendInterval(3f);
-                BattleOutcomeAudio.Schedule(timeline, true, consequences, sound);
+                BattleOutcomeAudio.Schedule(timeline, SoundCue.BattleWin, consequences, sound);
                 Assert.AreEqual(3f, timeline.Duration());
                 timeline.Play();
                 DOTween.ManualUpdate(.1f, .1f);
@@ -167,7 +167,7 @@ namespace Game.Presentation.Tests
             try
             {
                 timeline.AppendInterval(3f);
-                BattleOutcomeAudio.Schedule(timeline, false, new GameEvent[] { new CreatureOut(PlayerId.Player1, 10) }, sound);
+                BattleOutcomeAudio.Schedule(timeline, null, new GameEvent[] { new CreatureOut(PlayerId.Player1, 10) }, sound);
                 timeline.Play();
                 DOTween.ManualUpdate(2.5f, 2.5f);
                 CollectionAssert.AreEqual(new[] { SoundCue.CreatureOut }, sound.Calls);
