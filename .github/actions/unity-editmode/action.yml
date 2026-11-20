@@ -1,0 +1,142 @@
+name: Run Unity EditMode
+description: Run a GameCI EditMode check with shared launch and diagnostics
+inputs:
+  results-path:
+    description: Directory for Unity Editor log and NUnit XML
+    required: true
+  results-artifact:
+    description: Name of the results artifact
+    required: true
+  memory-artifact:
+    description: Name of the memory diagnostics artifact
+    required: true
+  validation:
+    description: Run only the card database validation test
+    default: 'false'
+  unity-license:
+    description: Unity Personal license
+    required: false
+  unity-serial:
+    description: Unity license serial
+    required: false
+  unity-email:
+    description: Unity account email
+    required: false
+  unity-password:
+    description: Unity account password
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare the shared EditMode image
+      shell: bash
+      run: |
+        unity_version=$(sed -n 's/^m_EditorVersion: //p' ProjectSettings/ProjectVersion.txt)
+        test -n "$unity_version"
+        docker build --file .github/ci/TestRunner.Dockerfile \
+          --build-arg "UNITY_VERSION=${unity_version}" \
+          --tag cardgame-unity-tests:ci .github/ci
+    - name: Start Unity memory diagnostics
+      id: memory
+      shell: bash
+      run: |
+        diagnostics=Logs/CI/EditModeMemory
+        mkdir -p "$diagnostics"
+        printf 'started=%s\n' "$(date --iso-8601=ns)" >> "$GITHUB_OUTPUT"
+        printf 'started-epoch=%s\n' "$(date +%s)" >> "$GITHUB_OUTPUT"
+        nohup python3 -u .github/ci/monitor-unity-tests.py cardgame-unity-tests:ci "$diagnostics" \
+          > "$diagnostics/memory.log" 2>&1 < /dev/null &
+    - name: Compile and run EditMode tests
+      id: tests
+      uses: game-ci/unity-test-runner@v4.3.2
+      env:
+        UNITY_LICENSE: ${{ inputs.unity-license }}
+        UNITY_SERIAL: ${{ inputs.unity-serial }}
+        UNITY_EMAIL: ${{ inputs.unity-email }}
+        UNITY_PASSWORD: ${{ inputs.unity-password }}
+      with:
+        unityVersion: auto
+        testMode: editmode
+        artifactsPath: ${{ inputs.results-path }}
+        customImage: cardgame-unity-tests:ci
+        customParameters: >-
+          -nographics -job-worker-count 2
+          ${{ inputs.validation == 'true' && '-testFilter Game.Data.Tests.FirstCardSetTests.ProjectCardDatabaseValidation' || '' }}
+    - name: Check Editor arguments
+      if: always() && (steps.tests.outcome == 'success' || steps.tests.outcome == 'failure')
+      shell: bash
+      env:
+        RESULTS: ${{ inputs.results-path }}
+        VALIDATION: ${{ inputs.validation }}
+        TEST_OUTCOME: ${{ steps.tests.outcome }}
+      run: |
+        if [[ "$TEST_OUTCOME" == failure && ! -s "$RESULTS/editmode.log" ]]; then
+          echo 'No Editor log was produced. See GameCI output and the resource diagnostics.'
+          exit 0
+        fi
+        flags=()
+        if [[ "$VALIDATION" == true ]]; then
+          flags+=(--validation)
+        fi
+        python3 .github/scripts/check-unity-editor-launch.py "$RESULTS/editmode.log" "${flags[@]}"
+    - name: Check NUnit report
+      if: ${{ !cancelled() && steps.tests.outcome == 'success' }}
+      shell: bash
+      env:
+        RESULTS: ${{ inputs.results-path }}
+        VALIDATION: ${{ inputs.validation }}
+      run: |
+        flags=()
+        if [[ "$VALIDATION" == true ]]; then
+          flags+=(--validation)
+        fi
+        python3 .github/scripts/check-unity-results.py "$RESULTS/editmode-results.xml" "${flags[@]}"
+    - name: Collect exit events and runner evidence
+      if: always() && steps.memory.outcome == 'success'
+      shell: bash
+      env:
+        STARTED: ${{ steps.memory.outputs.started }}
+        STARTED_EPOCH: ${{ steps.memory.outputs.started-epoch }}
+      run: |
+        diagnostics=Logs/CI/EditModeMemory
+        touch "$diagnostics/.stop"
+        for ((i = 0; i < 15; i++)); do
+          if [[ -f "$diagnostics/.stopped" ]]; then break; fi
+          sleep 1
+        done
+        {
+          echo 'Docker container events for this EditMode job'
+          if ! docker events --since "$STARTED" --until "$(date --iso-8601=ns)" \
+            --filter type=container --filter image=cardgame-unity-tests:ci \
+            --filter event=create --filter event=start --filter event=kill --filter event=oom \
+            --filter event=die --filter event=destroy \
+            --format '{{.TimeNano}} {{.Action}} {{.Actor.ID}} exit={{index .Actor.Attributes "exitCode"}} signal={{index .Actor.Attributes "signal"}}'; then
+            echo 'Docker event history unavailable.'
+          fi
+        } > "$diagnostics/events.log" 2>&1
+        {
+          date --iso-8601=ns
+          free -m
+          if kernel=$(sudo -n journalctl -k --since "@$STARTED_EPOCH" --no-pager 2>/dev/null); then
+            echo 'Kernel memory termination messages in the job interval:'
+            printf '%s\n' "$kernel" | awk 'tolower($0) ~ /oom-kill|out of memory|killed process|oom_reaper/'
+          else
+            echo 'Kernel journal unavailable on this runner.'
+          fi
+        } > "$diagnostics/host.log"
+    - name: Upload memory diagnostics
+      if: always() && steps.memory.outcome == 'success'
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.memory-artifact }}
+        path: Logs/CI/EditModeMemory/*.log
+        if-no-files-found: error
+        retention-days: 14
+    - name: Upload NUnit results and Editor log
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ inputs.results-artifact }}
+        path: ${{ inputs.results-path }}/
+        retention-days: 14
