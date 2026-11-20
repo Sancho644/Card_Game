@@ -12,6 +12,7 @@ using Game.Presentation.Ui;
 using Game.Services.Matchmaking;
 using Game.Services.Settings;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 namespace Game.Presentation.App
@@ -39,6 +40,12 @@ namespace Game.Presentation.App
         [SerializeField] private string _matchScene = "Match";
 
         private AppServices _context;
+        private AudioSourceSoundPlayer _sound;
+        private MusicPlayer _music;
+        private AudioMixerLevels _audioLevels;
+        private AudioMixerGroup _sfxGroup;
+        private AudioMixerGroup _uiGroup;
+        private AudioMixerGroup _musicGroup;
 
         private void Awake()
         {
@@ -55,8 +62,16 @@ namespace Game.Presentation.App
             var opponents = new AiOpponentFactory(catalog, rules, _ai.ToProfile, scheduler);
             var matchmaking = new LocalMatchmakingService(
                 catalog, rules, opponents, scheduler, random, _matchmaking.SearchSecondsMin, _matchmaking.SearchSecondsMax);
-            var sound = gameObject.AddComponent<AudioSourceSoundPlayer>();
-            sound.Configure(_sounds);
+            var mixer = _sounds != null ? _sounds.Mixer : null;
+            _sfxGroup = FindGroup(mixer, "SFX");
+            _uiGroup = FindGroup(mixer, "UI");
+            _musicGroup = FindGroup(mixer, "Music");
+            _music = gameObject.AddComponent<MusicPlayer>();
+            _music.Configure(_musicGroup);
+            _sound = gameObject.AddComponent<AudioSourceSoundPlayer>();
+            _sound.Configure(_sounds, _sfxGroup, _uiGroup, _music);
+            _audioLevels = new AudioMixerLevels((name, gain) =>
+                mixer != null && mixer.GetFloat(name, out _) && mixer.SetFloat(name, gain));
 
             _context = new AppServices(
                 _database,
@@ -68,27 +83,67 @@ namespace Game.Presentation.App
                 scenes,
                 random,
                 new LocalPlayerSettingsService(new PlayerPrefsSettingsStore()),
-                sound,
+                _sound,
                 _onlineSettings);
 
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
-        private void Start() => _context.Scenes.ToMainMenu();
+        private void Start()
+        {
+            _context.PlayerSettings.Changed += ApplyAudioLevels;
+            ApplyAudioLevels();
+            _context.Scenes.ToMainMenu();
+        }
+
+        private void OnApplicationPause(bool paused)
+        {
+            if (paused)
+                _context?.PlayerSettings.SaveAudio();
+        }
 
         private void OnDestroy()
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
-            _context?.Matchmaking.Cancel();
+            if (_context == null)
+                return;
+
+            _context.PlayerSettings.Changed -= ApplyAudioLevels;
+            _context.PlayerSettings.SaveAudio();
+            _context.Matchmaking.Cancel();
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             foreach (var root in scene.GetRootGameObjects())
             {
+                foreach (var canvas in root.GetComponentsInChildren<Canvas>(true))
+                {
+                    if (canvas.isRootCanvas && canvas.renderMode != RenderMode.WorldSpace)
+                        canvas.gameObject.AddComponent<UiAudioScope>().Sound = _sound;
+                }
+
                 foreach (var appScene in root.GetComponentsInChildren<MonoBehaviour>(true).OfType<IAppScene>())
                     appScene.Enter(_context);
             }
+
+            if (scene.name == _mainMenuScene)
+                _music.Play(_sounds != null ? _sounds.MenuMusic : null);
+            else if (scene.name == _matchScene)
+                _music.Play(_sounds != null ? _sounds.MatchMusic : null);
+            else
+                _music.Stop();
         }
+
+        private void ApplyAudioLevels()
+        {
+            _audioLevels.Apply(_context.PlayerSettings);
+            _sound.SetVolume(_audioLevels.SourceGain(AudioBus.Sfx, _sfxGroup != null),
+                _audioLevels.SourceGain(AudioBus.Ui, _uiGroup != null));
+            _music.SetVolume(_audioLevels.SourceGain(AudioBus.Music, _musicGroup != null));
+        }
+
+        private static AudioMixerGroup FindGroup(AudioMixer mixer, string name) =>
+            mixer == null ? null : mixer.FindMatchingGroups("Master/" + name).FirstOrDefault(group => group.name == name);
     }
 }

@@ -38,6 +38,7 @@ namespace Game.Presentation.Match
             var consequences = context.Batch.Skip(context.Index + 1)
                 .TakeWhile(e => !(e is TurnStarted) && !(e is BattleStarted)).ToList();
             var result = gameEvent as BattleResolved;
+            var isFirstOutcome = !context.Batch.Take(context.Index).Any(e => e is BattleResolved || e is BattleRetreated);
             var shortText = result == null ? _texts.Get(UiTextKeys.BattleRetreat)
                 : _summary.BuildShort(result, battle.Host, consequences);
             var details = result == null ? shortText : _summary.BuildDetails(result, battle.Host,
@@ -66,7 +67,6 @@ namespace Game.Presentation.Match
                         sequence.Join(winner.Pulse(_animation.BattlePulse, _animation.OutcomeSeconds));
                         sequence.AppendCallback(() => { if (winner != null) winner.SetBattle(null); });
                     }
-                    _sound.Play(SoundCue.BattleWin);
                 }
                 foreach (var removed in consequences.OfType<CreatureOut>())
                 {
@@ -74,10 +74,10 @@ namespace Game.Presentation.Match
                     if (card != null)
                         sequence.Insert(0, DOVirtual.Float(1f, _animation.OutBrightness,
                             _animation.OutcomeSeconds, value => { if (card != null) card.SetDimming(value); }));
-                    _sound.Play(SoundCue.CreatureOut);
                 }
-                if (consequences.OfType<FieldRemoved>().Any()) _sound.Play(SoundCue.FieldRemove);
                 sequence.AppendInterval(_animation.OutcomeBannerSeconds);
+                if (isFirstOutcome)
+                    BattleOutcomeAudio.Schedule(sequence, result?.Winner != null, consequences, _sound);
                 return sequence;
             }));
             context.Enqueue(_banner.Hide);

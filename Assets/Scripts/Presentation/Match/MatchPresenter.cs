@@ -41,6 +41,7 @@ namespace Game.Presentation.Match
         private readonly UiTexts _texts;
         private readonly Action _newMatch;
         private readonly OpponentPacingPresenter _pacing;
+        private readonly MatchResultAudio _resultAudio = new MatchResultAudio();
         private int _batchVersion;
         private PlayerView _lastView;
         private bool _disposed;
@@ -129,8 +130,9 @@ namespace Game.Presentation.Match
             _lastView = view;
             var version = ++_batchVersion;
             var revealed = RevealedOpponent();
+            var discardArrivals = DiscardAudio.NewCards(batch, previous, view);
             var context = new PresentationContext(batch, previous, view, _queue,
-                interval => CreateSnapshotSync(view, revealed, interval));
+                interval => CreateSnapshotSync(view, revealed, interval, discardArrivals));
             for (var i = 0; i < batch.Count; i++)
             {
                 if (!_hotSeat.IsVisible(batch[i]))
@@ -241,15 +243,18 @@ namespace Game.Presentation.Match
                     });
             });
 
-        private void ShowMatchEnd(PlayerView view) =>
-            _matchEnd.Show(view, _mode, _names, _texts, _sound, _newMatch);
+        private void ShowMatchEnd(PlayerView view)
+        {
+            _matchEnd.Show(view, _mode, _names, _texts, _newMatch);
+            _resultAudio.PlayOnce(view.Result.Winner, view.Viewer, _mode.ShowsHandoff, _sound);
+        }
 
         /// <param name="dealInterval">Pause between new cards flying in; 0 moves everything at once.</param>
         private IAnimationStep CreateSync(float dealInterval) =>
             new TweenStep(() => _sync.Sync(ViewerView(), RevealedOpponent(), instant: false, dealInterval));
 
-        private IAnimationStep CreateSnapshotSync(PlayerView view, PlayerView revealed, float interval) =>
-            new TweenStep(() => _sync.Sync(view, revealed, instant: false, interval));
+        private IAnimationStep CreateSnapshotSync(PlayerView view, PlayerView revealed, float interval, HashSet<int> discardArrivals) =>
+            new TweenStep(() => _sync.Sync(view, revealed, instant: false, interval, discardArrivals));
 
         private PlayerView ViewerView() => _session.GetView(_hotSeat.Viewer);
 

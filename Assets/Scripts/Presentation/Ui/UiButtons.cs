@@ -1,4 +1,5 @@
 using System;
+using Game.Data.Presentation;
 using TMPro;
 using UnityEngine.UI;
 
@@ -10,10 +11,26 @@ namespace Game.Presentation.Ui
         /// <summary>Shows the button with this action, or hides it when the action is null.</summary>
         public static void Bind(Button button, Action action)
         {
-            button.onClick.RemoveAllListeners();
             button.gameObject.SetActive(action != null);
-            if (action != null)
-                button.onClick.AddListener(() => action());
+            Assign(button, action);
+        }
+
+        /// <summary>Binds a button without changing its visibility, including a newly generated button.</summary>
+        public static void Assign(Button button, Action action)
+        {
+            button.onClick.RemoveAllListeners();
+            if (action == null)
+                return;
+
+            button.onClick.AddListener(() =>
+            {
+                if (!button.IsInteractable())
+                    return;
+
+                var scope = button.GetComponentInParent<UiAudioScope>();
+                scope?.Sound?.Play(SoundCue.Button);
+                action();
+            });
         }
 
         public static void SetLabel(Button button, string text)

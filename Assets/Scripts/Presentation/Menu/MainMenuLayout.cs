@@ -50,12 +50,13 @@ namespace Game.Presentation.Menu
             var settingsButton = _ui.Button(root, "Settings", app.Texts.Get("menu.settings"), .40f, .045f, .20f, .065f, OpenSettings);
             settingsButton.GetComponentInChildren<TMP_Text>().fontSizeMax = 26;
             _settings = _ui.Panel(root, "SettingsModal", 0, 0, 1, 1, new Color(0, 0, 0, .82f));
-            var panel = _ui.Frame(_settings, "SettingsPanel", .25f, .24f, .50f, .52f);
-            var caption = _ui.Text(panel, "Title", app.Texts.Get("menu.settings"), .08f, .77f, .84f, .14f, 34);
+            var panel = _ui.Frame(_settings, "SettingsPanel", .20f, .10f, .60f, .80f);
+            var caption = _ui.Text(panel, "Title", app.Texts.Get("menu.settings"), .08f, .87f, .84f, .09f, 34);
             caption.alignment = TextAlignmentOptions.Midline;
-            Difficulty = Button(panel, "Difficulty", .08f, .51f, .84f, .16f, 26);
-            FastAnimations = Button(panel, "FastAnimations", .08f, .29f, .84f, .16f, 26);
-            _ui.Button(panel, "CloseSettings", app.Texts.Get("library.close"), .30f, .07f, .40f, .13f, () => _settings.gameObject.SetActive(false));
+            Difficulty = Button(panel, "Difficulty", .08f, .75f, .84f, .09f, 26);
+            FastAnimations = Button(panel, "FastAnimations", .08f, .645f, .84f, .09f, 26);
+            new MenuAudioSettings(panel, _ui, app.Texts, app.PlayerSettings);
+            _ui.Button(panel, "CloseSettings", app.Texts.Get("library.close"), .57f, .065f, .35f, .105f, CloseSettings);
             _settings.gameObject.SetActive(false);
             _details = _ui.Panel(root, "CardDetails", 0, 0, 1, 1, new Color(0, 0, 0, .88f));
             var detailPanel = _ui.Frame(_details, "Panel", .12f, .07f, .76f, .86f);
@@ -84,8 +85,23 @@ namespace Game.Presentation.Menu
             }
         }
         public void OpenSettings() { _settings.gameObject.SetActive(true); _settings.SetAsLastSibling(); }
-        public void CloseModals() { _settings.gameObject.SetActive(false); _details.gameObject.SetActive(false); }
-        public void Dispose() { _ui.Dispose(); }
+        public void CloseModals()
+        {
+            CloseSettings();
+            _details.gameObject.SetActive(false);
+        }
+
+        public void Dispose()
+        {
+            _app.PlayerSettings.SaveAudio();
+            _ui.Dispose();
+        }
+
+        private void CloseSettings()
+        {
+            _app.PlayerSettings.SaveAudio();
+            _settings.gameObject.SetActive(false);
+        }
         private UnityEngine.UI.Button Button(Transform parent, string name, float x, float y, float w, float h, float size)
         {
             var button = _ui.Button(parent, name, "", x, y, w, h, () => { });

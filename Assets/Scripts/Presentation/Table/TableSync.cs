@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -40,7 +41,8 @@ namespace Game.Presentation.Table
         /// <param name="revealedOpponent">The opponent's own view, to show their hand face up (debug); null keeps it hidden.</param>
         /// <param name="instant">Place cards without animation, e.g. behind the hand-off screen.</param>
         /// <param name="dealInterval">Cards new on the table start one after another with this pause; 0 moves all at once.</param>
-        public Tween Sync(PlayerView view, PlayerView revealedOpponent, bool instant, float dealInterval = 0f)
+        public Tween Sync(PlayerView view, PlayerView revealedOpponent, bool instant, float dealInterval = 0f,
+            HashSet<int> discardArrivals = null)
         {
             var duration = instant ? 0f : _animation.MoveDuration;
             var sequence = DOTween.Sequence();
@@ -63,7 +65,7 @@ namespace Game.Presentation.Table
             }
 
             void Move(CardRef card, TableSide owner, CardPose pose, float brightness = 1f, bool inHand = false,
-                bool fieldClosed = false, bool fieldLocked = false)
+                bool fieldClosed = false, bool fieldLocked = false, Action onArrival = null)
             {
                 visible.Add(card.InstanceId);
                 var isNew = _registry.Find(card.InstanceId) == null;
@@ -71,7 +73,10 @@ namespace Game.Presentation.Table
                 cardView.SetFieldState(fieldClosed,fieldLocked);
                 cardView.SetDimming(brightness);
                 cardView.SetInHand(inHand);
-                Add(cardView.MoveTo(pose, duration), isNew);
+                var move = cardView.MoveTo(pose, duration);
+                if (onArrival != null && move != null)
+                    move.OnComplete(() => onArrival());
+                Add(move, isNew);
             }
 
             foreach (var owner in PlayerIds.All)
@@ -104,7 +109,13 @@ namespace Game.Presentation.Table
 
                 var discard = view.Discard(owner);
                 for (var i = 0; i < discard.Count; i++)
-                    Move(discard[i], side, _layout.Pile(side, PileKind.Discard, i, true));
+                {
+                    var card = discard[i];
+                    Action onArrival = null;
+                    if (!instant && discardArrivals?.Remove(card.InstanceId) == true)
+                        onArrival = () => _sound.Play(SoundCue.AbilityDiscard);
+                    Move(card, side, _layout.Pile(side, PileKind.Discard, i, true), onArrival: onArrival);
+                }
 
                 var outOfGame = view.OutOfGame(owner);
                 for (var i = 0; i < outOfGame.Count; i++)

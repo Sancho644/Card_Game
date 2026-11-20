@@ -128,7 +128,8 @@ namespace Game.Presentation.Ui
             fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent; fitter.aspectRatio = .70f;
             var button = rect.gameObject.AddComponent<Button>(); button.targetGraphic = rect.GetComponent<Image>();
             var colors = button.colors; colors.highlightedColor = new Color(.65f, 1, .92f); colors.pressedColor = new Color(.4f, .8f, .72f); button.colors = colors;
-            if (clicked != null) button.onClick.AddListener(() => clicked()); else button.interactable = false;
+            UiButtons.Assign(button, clicked);
+            button.interactable = clicked != null;
             if (cardId == null)
             {
                 Ui.Frame(rect, "UnknownChoice", 0, 0, 1, 1).GetComponent<Image>().raycastTarget = false;

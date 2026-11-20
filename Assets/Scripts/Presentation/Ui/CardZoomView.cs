@@ -53,7 +53,7 @@ namespace Game.Presentation.Ui
             icon.raycastTarget = true;
             _closeIcon = icon.rectTransform; _closeIcon.sizeDelta = new Vector2(68, 68);
             var button = icon.gameObject.AddComponent<Button>(); button.targetGraphic = icon;
-            button.onClick.AddListener(Hide);
+            UiButtons.Assign(button, Hide);
         }
 
         private void LateUpdate()

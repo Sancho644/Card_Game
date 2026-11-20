@@ -1,5 +1,6 @@
 using System;
 using Game.Data.Presentation;
+using Game.Presentation.Ui;
 using TMPro;
 using UnityEngine;
 
@@ -89,7 +90,7 @@ namespace Game.Presentation.Menu
             text.alignment = TextAlignmentOptions.Midline;
             text.enableAutoSizing=true;text.fontSizeMin=12;text.fontSizeMax=_style.SmallSize;
             text.textWrappingMode=TextWrappingModes.NoWrap;
-            button.onClick.AddListener(() => clicked());
+            UiButtons.Assign(button, clicked);
             return button;
         }
         public TMP_InputField Input(Transform parent, string name, float x, float y, float w, float h, string placeholder, Action<string> changed, bool live=false)

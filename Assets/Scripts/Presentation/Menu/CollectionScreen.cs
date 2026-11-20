@@ -74,7 +74,7 @@ namespace Game.Presentation.Menu
             _library.CloseClicked=Close;_library.NewClicked=NewDeck;_library.EditClicked=()=>OpenEditor(_editing);_library.PlayClicked=Play;_library.UseClicked=Use;
             _library.ClearClicked=ShowDeckActions;_library.Renamed=Rename;_library.Searched=value=>{_deckSearch=value;RefreshLibrary();_library.Scroll.verticalNormalizedPosition=1;};
             _modal=_ui.Panel(_root,"Modal",0,0,1,1,new Color(0,0,0,.90f));
-            _modal.gameObject.AddComponent<UnityEngine.UI.Button>().onClick.AddListener(CloseModal);
+            Game.Presentation.Ui.UiButtons.Assign(_modal.gameObject.AddComponent<UnityEngine.UI.Button>(), CloseModal);
             _modal.gameObject.SetActive(false);_root.gameObject.SetActive(false);
         }
         public void Show(){_root.gameObject.SetActive(true);OpenEditor(_app.Collection.SelectedIndex);}
