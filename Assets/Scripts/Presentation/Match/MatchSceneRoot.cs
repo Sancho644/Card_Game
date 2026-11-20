@@ -147,7 +147,7 @@ namespace Game.Presentation.Match
                 new TurnBannerPresenter(_banner, details, _launch.Mode, texts, _animation, _app.Sound),
                 new ScoutedPresenter(_breakdown, faces, texts),
                 new TableMovePresenter(),
-                new SkipPresenter(_banner, names, texts, _animation),
+                new SkipPresenter(_banner, names, texts, _animation, _app.Sound),
             };
 
             _presenter = new MatchPresenter(

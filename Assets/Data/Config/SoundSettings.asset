@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: SoundSettings
   m_EditorClassIdentifier: Game.Data::Game.Data.Presentation.SoundSettings
   _masterVolume: 1
+  _mixer: {fileID: 24100000, guid: ee442ef3ca5e8044b81e0d14147a308c, type: 2}
+  _menuMusic: {fileID: 0}
+  _matchMusic: {fileID: 0}
   _sounds:
   - Cue: 0
     Clip: {fileID: 0}

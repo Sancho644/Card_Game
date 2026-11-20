@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace Game.Data.Presentation
 {
@@ -10,9 +11,15 @@ namespace Game.Data.Presentation
     public sealed class SoundSettings : ScriptableObject
     {
         [SerializeField, Range(0f, 1f)] private float _masterVolume = 1f;
+        [SerializeField] private AudioMixer _mixer;
+        [SerializeField] private AudioClip _menuMusic;
+        [SerializeField] private AudioClip _matchMusic;
         [SerializeField] private List<SoundEntry> _sounds = AllCues().Select(cue => new SoundEntry(cue)).ToList();
 
         public float MasterVolume => _masterVolume;
+        public AudioMixer Mixer => _mixer;
+        public AudioClip MenuMusic => _menuMusic;
+        public AudioClip MatchMusic => _matchMusic;
 
         /// <summary>The entry of the cue; a silent one if the list has none.</summary>
         public SoundEntry Find(SoundCue cue)

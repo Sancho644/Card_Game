@@ -2,16 +2,16 @@ using System;
 
 namespace Game.Services.Settings
 {
-    /// <summary>
-    /// The player's own settings kept on the device: animation speed now, later sound volume and the like.
-    /// Changes are saved at once.
-    /// </summary>
+    /// <summary>Settings kept on the current device.</summary>
     public interface IPlayerSettingsService
     {
-        /// <summary>Animations play faster than normal.</summary>
         bool FastAnimations { get; set; }
+        bool AudioMuted { get; set; }
 
-        /// <summary>Raised after any setting changed.</summary>
+        float Volume(AudioBus bus);
+        void SetVolume(AudioBus bus, float value);
+        void SaveAudio();
+
         event Action Changed;
     }
 }

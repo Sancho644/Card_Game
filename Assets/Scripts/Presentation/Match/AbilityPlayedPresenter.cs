@@ -37,7 +37,6 @@ namespace Game.Presentation.Match
                 return card.MoveTo(_layout.BattleFocus(_animation.AbilityShowScale), _animation.MoveDuration);
             }));
             context.Enqueue(new DelayStep(_animation.AbilityShowSeconds));
-            context.Enqueue(() => _sound.Play(SoundCue.AbilityDiscard));
             context.EnqueueSync();
         }
     }

@@ -1,7 +1,6 @@
 using System;
 using Game.Core.State;
 using Game.Data.Presentation;
-using Game.Presentation.Audio;
 using Game.Presentation.Match;
 using TMPro;
 using UnityEngine;
@@ -29,7 +28,7 @@ namespace Game.Presentation.Ui
             BattleWindowSkin.Place(_body.rectTransform, _body.transform.parent, .09f, .24f, .82f, .17f);
         }
 
-        public void Show(PlayerView view, MatchMode mode, PlayerNames names, UiTexts texts, ISoundPlayer sound, Action menu)
+        public void Show(PlayerView view, MatchMode mode, PlayerNames names, UiTexts texts, Action menu)
         {
             var result = view.Result;
             if (_skin != null)
@@ -54,7 +53,6 @@ namespace Game.Presentation.Ui
             _skin?.SingleButton(_primary, _secondary);
             gameObject.SetActive(true);
             transform.SetAsLastSibling();
-            sound.Play(result.IsDraw ? SoundCue.Draw : mode.ShowsHandoff || result.Winner == view.Viewer ? SoundCue.Victory : SoundCue.Defeat);
         }
 
         public void Hide() => gameObject.SetActive(false);
