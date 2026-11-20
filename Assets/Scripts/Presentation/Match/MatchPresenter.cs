@@ -44,6 +44,7 @@ namespace Game.Presentation.Match
         private readonly MatchResultAudio _resultAudio = new MatchResultAudio();
         private int _batchVersion;
         private PlayerView _lastView;
+        private PlayerId? _pendingTurnAudio;
         private bool _disposed;
 
         public MatchPresenter(
@@ -130,9 +131,17 @@ namespace Game.Presentation.Match
             _lastView = view;
             var version = ++_batchVersion;
             var revealed = RevealedOpponent();
+            if (_mode.ShowsHandoff)
+            {
+                var turn = batch.OfType<TurnStarted>().LastOrDefault();
+                if (turn != null)
+                    _pendingTurnAudio = turn.Player;
+            }
+
             var discardArrivals = DiscardAudio.NewCards(batch, previous, view);
+            var placementArrivals = CardSoundPresenter.Arrivals(batch, previous, view);
             var context = new PresentationContext(batch, previous, view, _queue,
-                interval => CreateSnapshotSync(view, revealed, interval, discardArrivals));
+                interval => CreateSnapshotSync(view, revealed, interval, discardArrivals, placementArrivals));
             for (var i = 0; i < batch.Count; i++)
             {
                 if (!_hotSeat.IsVisible(batch[i]))
@@ -182,6 +191,12 @@ namespace Game.Presentation.Match
                 _queue.Enqueue(HandoffStep(awaiting.Value));
                 _queue.Enqueue(RequestDecision);
                 return;
+            }
+
+            if (_pendingTurnAudio == awaiting.Value)
+            {
+                _pendingTurnAudio = null;
+                _sound.Play(SoundCue.TurnStart);
             }
 
             controller.RequestDecision(view, _session.GetLegalActions(awaiting.Value), Submit);
@@ -253,8 +268,9 @@ namespace Game.Presentation.Match
         private IAnimationStep CreateSync(float dealInterval) =>
             new TweenStep(() => _sync.Sync(ViewerView(), RevealedOpponent(), instant: false, dealInterval));
 
-        private IAnimationStep CreateSnapshotSync(PlayerView view, PlayerView revealed, float interval, HashSet<int> discardArrivals) =>
-            new TweenStep(() => _sync.Sync(view, revealed, instant: false, interval, discardArrivals));
+        private IAnimationStep CreateSnapshotSync(PlayerView view, PlayerView revealed, float interval,
+            HashSet<int> discardArrivals, Dictionary<int, SoundCue> placementArrivals) =>
+            new TweenStep(() => _sync.Sync(view, revealed, instant: false, interval, discardArrivals, placementArrivals));
 
         private PlayerView ViewerView() => _session.GetView(_hotSeat.Viewer);
 

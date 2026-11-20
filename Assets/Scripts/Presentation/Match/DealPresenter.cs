@@ -3,7 +3,7 @@ using Game.Data.Presentation;
 
 namespace Game.Presentation.Match
 {
-    /// <summary>Dealt fields and hands fly onto the table one card after another.</summary>
+    /// <summary>Dealt hands fly onto the table one card after another.</summary>
     public sealed class DealPresenter : IEventPresenter
     {
         private readonly AnimationSettings _animation;
@@ -15,7 +15,7 @@ namespace Game.Presentation.Match
 
         public void Present(GameEvent gameEvent, PresentationContext context)
         {
-            if (gameEvent is FieldsDealt || gameEvent is HandDealt)
+            if (gameEvent is HandDealt)
                 context.EnqueueDeal(_animation.DealInterval);
         }
     }

@@ -18,59 +18,90 @@ MonoBehaviour:
   _matchMusic: {fileID: 0}
   _sounds:
   - Cue: 0
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: 574e7314b659d064d8d28605e1461b63, type: 3}
+    Variants:
+    - {fileID: 8300000, guid: 27f091f0f4d08134dbd08db8aa24e8c7, type: 3}
+    - {fileID: 8300000, guid: 66d36e89f60888c46a088d3b67c115b3, type: 3}
     Volume: 1
   - Cue: 1
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: 35944e42175c018458dfce085bbf877b, type: 3}
+    Variants: []
     Volume: 1
   - Cue: 2
     Clip: {fileID: 0}
+    Variants: []
     Volume: 1
   - Cue: 3
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: 94c54178d0a764d4c9024363020612c6, type: 3}
+    Variants:
+    - {fileID: 8300000, guid: 7bc8296bb209d3d48888d1ddd263df6b, type: 3}
     Volume: 1
   - Cue: 4
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: 32ceee1e6514cec49a225a93aed35833, type: 3}
+    Variants: []
     Volume: 1
   - Cue: 5
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: aa403bb6ac3897e4ea668473fc755820, type: 3}
+    Variants: []
     Volume: 1
   - Cue: 6
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: 9a3d34b4da2b1dc49ad315518a83247f, type: 3}
+    Variants:
+    - {fileID: 8300000, guid: af3afcadca84ee24e9e420e663e884d0, type: 3}
     Volume: 1
   - Cue: 7
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: d6ee9112745f02a42ab941cfd9e2321e, type: 3}
+    Variants: []
     Volume: 1
   - Cue: 8
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: 054b9906d3d5f784b871da78081ec4f1, type: 3}
+    Variants: []
     Volume: 1
   - Cue: 9
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: b012b5b8cdf5caf4cb425250da373f25, type: 3}
+    Variants: []
     Volume: 1
   - Cue: 10
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: 2da5ce49b9eaf5d479479cd12208660c, type: 3}
+    Variants: []
     Volume: 1
   - Cue: 11
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: f20d908957aca2e4e9c552f6ae02da0f, type: 3}
+    Variants: []
     Volume: 1
   - Cue: 12
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: 79478f92147325547bed2cc27c9e5f54, type: 3}
+    Variants: []
     Volume: 1
   - Cue: 13
     Clip: {fileID: 0}
+    Variants: []
     Volume: 1
   - Cue: 14
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: 81c445740c5f33d43bfbe306d49a2cb9, type: 3}
+    Variants: []
     Volume: 1
   - Cue: 15
     Clip: {fileID: 0}
+    Variants: []
     Volume: 1
   - Cue: 16
     Clip: {fileID: 0}
+    Variants: []
     Volume: 1
   - Cue: 17
     Clip: {fileID: 0}
+    Variants: []
     Volume: 1
   - Cue: 18
-    Clip: {fileID: 0}
+    Clip: {fileID: 8300000, guid: db4e467030f11f64389fc71985ff4fea, type: 3}
+    Variants: []
+    Volume: 1
+  - Cue: 19
+    Clip: {fileID: 8300000, guid: 0c5bf9115a489094cb9dc8edd8e5dfe8, type: 3}
+    Variants: []
+    Volume: 1
+  - Cue: 20
+    Clip: {fileID: 8300000, guid: bf69e5c481948bb44bd925dec41011ab, type: 3}
+    Variants: []
     Volume: 1

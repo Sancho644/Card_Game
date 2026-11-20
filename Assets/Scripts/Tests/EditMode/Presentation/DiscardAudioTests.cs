@@ -8,6 +8,7 @@ using Game.Core.Effects;
 using Game.Core.Events;
 using Game.Core.Rules;
 using Game.Core.State;
+using Game.Data.Presentation;
 using Game.Presentation.Match;
 using Game.Presentation.Network;
 using Game.Services.Match;
@@ -67,12 +68,14 @@ namespace Game.Presentation.Tests
             var viewer = PlayerId.Player1;
             var client = new OnlineMatchSession(viewer, (_, _, _) => Assert.Fail("Unexpected client command"));
             var arrivals = new List<int>();
+            var placements = new List<SoundCue>();
             var requests = new long[2];
             PlayerView previous = null;
             client.EventsProduced += batch =>
             {
                 var current = client.GetView(viewer);
                 arrivals.AddRange(DiscardAudio.NewCards(batch, previous, current));
+                placements.AddRange(CardSoundPresenter.Arrivals(batch, previous, current).Values);
                 previous = current;
             };
             authority.Updated += (player, frame) =>
@@ -89,6 +92,8 @@ namespace Game.Presentation.Tests
             var play = Ability(session, rarity);
             Submit(play);
             CollectionAssert.AreEqual(new[] { play.AbilityId }, arrivals);
+            CollectionAssert.AreEqual(
+                new[] { SoundCue.FieldPlace, SoundCue.FieldPlace, SoundCue.CardPlace, SoundCue.CardPlace }, placements);
 
             void Submit(GameCommand command)
             {
@@ -96,6 +101,38 @@ namespace Game.Presentation.Tests
                 var index = actions.ToList().FindIndex(candidate => OnlineCodec.Encode(candidate) == OnlineCodec.Encode(command));
                 Assert.GreaterOrEqual(index, 0, command.GetType().Name);
                 authority.Submit(command.Player, ++requests[(int)command.Player], authority.Version, index);
+            }
+        }
+
+        [Test]
+        public void AcceptedPlacementsUseDistinctCuesAndDoNotReplayFromTheSameSnapshot()
+        {
+            var session = CreateSession(out var setup);
+            session.EventsProduced += _ => { };
+            session.Start(setup, 5);
+            var field = session.GetLegalActions(PlayerId.Player1).First();
+            AssertArrival(field, SoundCue.FieldPlace);
+
+            session.Submit(session.GetLegalActions(PlayerId.Player2).First());
+            var coinWinner = session.GetView(PlayerId.Player1).CoinTossWinner.Value;
+            session.Submit(new ChooseTurnOrder(coinWinner, coinWinner == PlayerId.Player1));
+            var creature = session.GetLegalActions(PlayerId.Player1).OfType<PlaceCreature>().First();
+            AssertArrival(creature, SoundCue.CardPlace);
+
+            void AssertArrival(GameCommand command, SoundCue cue)
+            {
+                var before = PlayerIds.All.Select(session.GetView).ToArray();
+                var accepted = session.Submit(command);
+                Assert.IsTrue(accepted.IsAccepted, accepted.Reason.ToString());
+                foreach (var viewer in PlayerIds.All)
+                {
+                    var after = session.GetView(viewer);
+                    var repeated = accepted.Events.Concat(accepted.Events).ToArray();
+                    CollectionAssert.AreEqual(new[] { cue },
+                        CardSoundPresenter.Arrivals(repeated, before[(int)viewer], after).Values);
+                    CollectionAssert.IsEmpty(CardSoundPresenter.Arrivals(repeated, after, after));
+                    CollectionAssert.IsEmpty(CardSoundPresenter.Arrivals(repeated, before[(int)viewer], before[(int)viewer]));
+                }
             }
         }
 
