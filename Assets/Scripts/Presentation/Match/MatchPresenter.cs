@@ -141,8 +141,10 @@ namespace Game.Presentation.Match
             var discardArrivals = DiscardAudio.NewCards(batch, previous, view);
             var placementArrivals = CardSoundPresenter.Arrivals(batch, previous, view);
             var fieldRemovals = BattleOutcomeAudio.RemovedFields(batch, previous, view);
+            var handReturns = CardSoundPresenter.HandReturns(batch, previous, view);
             var context = new PresentationContext(batch, previous, view, _queue,
-                interval => CreateSnapshotSync(view, revealed, interval, discardArrivals, placementArrivals, fieldRemovals));
+                interval => CreateSnapshotSync(view, revealed, interval, discardArrivals, placementArrivals, fieldRemovals, handReturns),
+                _session.GetBattlePower());
             for (var i = 0; i < batch.Count; i++)
             {
                 if (!_hotSeat.IsVisible(batch[i]))
@@ -153,7 +155,7 @@ namespace Game.Presentation.Match
             }
 
             context.EnqueueSync();
-            _power.Present(_session.GetBattlePower(), context);
+            _power.Present(context.Power, context);
             var pause = _pacing.CreateStep(batch, view.Viewer, id => previous?.Field(id)?.Owner ?? view.Field(id)?.Owner);
             if (pause != null) context.Enqueue(pause);
             // A newer remote batch may have arrived while these animations were playing.
@@ -270,8 +272,9 @@ namespace Game.Presentation.Match
             new TweenStep(() => _sync.Sync(ViewerView(), RevealedOpponent(), instant: false, dealInterval));
 
         private IAnimationStep CreateSnapshotSync(PlayerView view, PlayerView revealed, float interval,
-            HashSet<int> discardArrivals, Dictionary<int, SoundCue> placementArrivals, HashSet<int> fieldRemovals) =>
-            new TweenStep(() => _sync.Sync(view, revealed, instant: false, interval, discardArrivals, placementArrivals, fieldRemovals));
+            HashSet<int> discardArrivals, Dictionary<int, SoundCue> placementArrivals, HashSet<int> fieldRemovals,
+            HashSet<int> handReturns) =>
+            new TweenStep(() => _sync.Sync(view, revealed, instant: false, interval, discardArrivals, placementArrivals, fieldRemovals, handReturns));
 
         private PlayerView ViewerView() => _session.GetView(_hotSeat.Viewer);
 

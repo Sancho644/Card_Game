@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Game.Core.Battle;
 using Game.Core.Events;
 using Game.Core.State;
 using Game.Presentation.Animation;
@@ -19,11 +20,12 @@ namespace Game.Presentation.Match
             PlayerView previousView,
             PlayerView view,
             AnimationQueue queue,
-            Func<float, IAnimationStep> createSync)
+            Func<float, IAnimationStep> createSync, BattlePower power = null)
         {
             Batch = batch;
             PreviousView = previousView;
             View = view;
+            Power = power;
             _queue = queue;
             _createSync = createSync;
         }
@@ -38,6 +40,8 @@ namespace Game.Presentation.Match
 
         /// <summary>The viewer's view after this batch.</summary>
         public PlayerView View { get; }
+
+        public BattlePower Power { get; }
 
         public void Enqueue(IAnimationStep step)
         {

@@ -1,0 +1,162 @@
+[
+  {
+    "file": "Abilities/ability-epic",
+    "cue": "AbilityEpic",
+    "preview_seconds": 0.0,
+    "seconds": 0.49,
+    "peak_dbfs": -8.02,
+    "volume": 0.86,
+    "master_sha256": "0515884b53e2620fe0c89c69c3d719c7de1ea544cc22cebf99325ec82386f2b9",
+    "runtime_sha256": "e1fa7387bd47a4725eeb55c10985ab8a6b5f4ced2fcc3cd1b7bcd80d05c1d380"
+  },
+  {
+    "file": "Abilities/ability-epic-02",
+    "cue": "AbilityEpic",
+    "preview_seconds": 0.73,
+    "seconds": 0.55,
+    "peak_dbfs": -8.02,
+    "volume": 0.86,
+    "master_sha256": "0526d1bcd620ce51f351a29c3a88fe8d6b7fa557d35261e214c32ecd3f05e3f1",
+    "runtime_sha256": "b75281910f94dcb85b92c45869a1af55ba7732a875ccdae1f20738689d9a6ff2"
+  },
+  {
+    "file": "Abilities/ability-legendary",
+    "cue": "AbilityLegendary",
+    "preview_seconds": 1.52,
+    "seconds": 0.81,
+    "peak_dbfs": -7.01,
+    "volume": 0.82,
+    "master_sha256": "0dbb628648c9182bd941311fecc0945039d3dcb692c20648a222f61c4c1b73ce",
+    "runtime_sha256": "f3452c2d2c268870643e9881b3728c0e249e08dca97650f99676d703c5ea846b"
+  },
+  {
+    "file": "Abilities/ability-legendary-02",
+    "cue": "AbilityLegendary",
+    "preview_seconds": 2.57,
+    "seconds": 0.91,
+    "peak_dbfs": -7.01,
+    "volume": 0.82,
+    "master_sha256": "950c38a21485e3b8ead36082a6bb11bd21ad39c2ae5e49e7fbca43f825e37629",
+    "runtime_sha256": "32ef7498294816995c47f99dabc267254b312d82e3d175196b81754760d0d10e"
+  },
+  {
+    "file": "Abilities/ability-cancel",
+    "cue": "AbilityCancel",
+    "preview_seconds": 3.72,
+    "seconds": 0.31,
+    "peak_dbfs": -10.09,
+    "volume": 0.76,
+    "master_sha256": "f5b5d83425d7862630cde391edada2c12b9dd975b792f6da8a13ec53225cced5",
+    "runtime_sha256": "e5c4ad32701b2aa971b1dbcade2e59c190424000de09ceb31d910d644d553670"
+  },
+  {
+    "file": "Elements/element-fire",
+    "cue": "ElementFire",
+    "preview_seconds": 4.65,
+    "seconds": 0.29,
+    "peak_dbfs": -10.31,
+    "volume": 0.5,
+    "master_sha256": "7faa6bc22216565799725399ee1f876ac6424e0ae7e4a51ad80bb91fe420afce",
+    "runtime_sha256": "ce378f58a66e9e8b11bd89c194cb4955ef2197c0b2d59316a6ba9da6e5016a88"
+  },
+  {
+    "file": "Elements/element-water",
+    "cue": "ElementWater",
+    "preview_seconds": 5.18,
+    "seconds": 0.32,
+    "peak_dbfs": -10.01,
+    "volume": 0.5,
+    "master_sha256": "b0e40bb0cb5a59beee057f7a35dc962405ff7c59b978a458e69009cb21aae273",
+    "runtime_sha256": "c630e5df26c63a679478e4806acd7cc9e983e8482ed40353217e045d87147376"
+  },
+  {
+    "file": "Elements/element-earth",
+    "cue": "ElementEarth",
+    "preview_seconds": 5.74,
+    "seconds": 0.36,
+    "peak_dbfs": -10.01,
+    "volume": 0.5,
+    "master_sha256": "c363ed31402f8a6cbe9fd9f2c8b25672ed1c844c2cbf7d15de1cbad2e4e4c3ce",
+    "runtime_sha256": "02662b2b173debeedb187a04ee7b201c8e8e57b44b7ed787ac40f33fcce20805"
+  },
+  {
+    "file": "Elements/element-wind",
+    "cue": "ElementWind",
+    "preview_seconds": 6.34,
+    "seconds": 0.26,
+    "peak_dbfs": -10.08,
+    "volume": 0.5,
+    "master_sha256": "5d0767d3249785b5024376062c79eeca85c6ec1a982ca98d6e8899e368de5e05",
+    "runtime_sha256": "f707b09699fc200f389371b397470288a194c44dc8d9622f4001beba06ebf04b"
+  },
+  {
+    "file": "Elements/element-light",
+    "cue": "ElementLight",
+    "preview_seconds": 6.84,
+    "seconds": 0.32,
+    "peak_dbfs": -10.04,
+    "volume": 0.5,
+    "master_sha256": "961c3b3885d98bd0acdb5b682babbf6975ba975e4d55b7ca916d013ae5856d30",
+    "runtime_sha256": "52262979aec42eaa4cf1bd5fbcac5ce0fdf5909c2e05e8e82cc22eb9031c0bd4"
+  },
+  {
+    "file": "Elements/element-dark",
+    "cue": "ElementDark",
+    "preview_seconds": 7.4,
+    "seconds": 0.36,
+    "peak_dbfs": -10.01,
+    "volume": 0.5,
+    "master_sha256": "e1e08005415618af1bd5c6445a0f475b34c802e4ad9a74bc63929afbdb909406",
+    "runtime_sha256": "d760fab9a0addb7b8e147b0b9f6f5e24a24f65474e4154e1aca1355f8650041a"
+  },
+  {
+    "file": "Cards/creature-shift",
+    "cue": "CreatureShift",
+    "preview_seconds": 8.38,
+    "seconds": 0.24,
+    "peak_dbfs": -10.01,
+    "volume": 0.82,
+    "master_sha256": "26e09a8da4a6a1add6f658c050dc0551d9f0aed34ef6bbbeb29c5affabddd9f9",
+    "runtime_sha256": "a948206d1dae2a389f653f8e75c269b939e8aa0558d99cd1086b12713dad2530"
+  },
+  {
+    "file": "Cards/card-return",
+    "cue": "CardReturn",
+    "preview_seconds": 8.86,
+    "seconds": 0.19,
+    "peak_dbfs": -11.02,
+    "volume": 0.76,
+    "master_sha256": "e3284bf7166aa1c019c27dd8c04d390ef268763fcbf2367736b2ae5517b038f0",
+    "runtime_sha256": "4e185ae59478115cb262e634a2c52b7132210b3276fcfc6776613a6ae42f1202"
+  },
+  {
+    "file": "Battle/battle-retreat",
+    "cue": "BattleRetreat",
+    "preview_seconds": 9.67,
+    "seconds": 0.34,
+    "peak_dbfs": -10.0,
+    "volume": 0.78,
+    "master_sha256": "08ffebdf0299735475799a83f211351d100ed19dd6c88972e99736caec9b3e56",
+    "runtime_sha256": "60eb684c41b296cf2120c5145659f6a5d013e78b2506aada1beb1f72a3542ba1"
+  },
+  {
+    "file": "Battle/turn-remote",
+    "cue": "TurnRemote",
+    "preview_seconds": 10.25,
+    "seconds": 0.19,
+    "peak_dbfs": -12.0,
+    "volume": 0.68,
+    "master_sha256": "e3b093a2be893bdd1d2d255c77ec9d9d29ff04d5a27acb6f92b6675508f6c253",
+    "runtime_sha256": "21bb7e193972e58d87afffdc3b5bffc14cbb437e0c96d12e6afe2603e7ddddd8"
+  },
+  {
+    "file": "Battle/battle-draw",
+    "cue": "BattleDraw",
+    "preview_seconds": 10.68,
+    "seconds": 0.45,
+    "peak_dbfs": -9.0,
+    "volume": 0.82,
+    "master_sha256": "00156b40a5ef08951dcd090f907d44790005bfb725f48a9b760a37a33c954b45",
+    "runtime_sha256": "b204eb54eda2ed679293a4406a1788a16dfcef2a9a58e9bde0cadbbecbec80b9"
+  }
+]

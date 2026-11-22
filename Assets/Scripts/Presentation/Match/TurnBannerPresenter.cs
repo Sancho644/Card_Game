@@ -29,8 +29,7 @@ namespace Game.Presentation.Match
             if (_mode.ShowsHandoff) return;
             context.Enqueue(() =>
             {
-                if (turn.Player == context.View.Viewer)
-                    _sound.Play(SoundCue.TurnStart);
+                _sound.Play(turn.Player == context.View.Viewer ? SoundCue.TurnStart : SoundCue.TurnRemote);
                 _banner.Show(_texts.Get(turn.Player == context.View.Viewer ? UiTextKeys.YourTurn : UiTextKeys.OpponentTurn), "");
             });
             context.Enqueue(new DelayStep(_animation.TurnBannerSeconds));

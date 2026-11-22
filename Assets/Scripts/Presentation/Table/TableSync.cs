@@ -43,7 +43,7 @@ namespace Game.Presentation.Table
         /// <param name="dealInterval">Cards new on the table start one after another with this pause; 0 moves all at once.</param>
         public Tween Sync(PlayerView view, PlayerView revealedOpponent, bool instant, float dealInterval = 0f,
             HashSet<int> discardArrivals = null, Dictionary<int, SoundCue> placementArrivals = null,
-            HashSet<int> fieldRemovals = null)
+            HashSet<int> fieldRemovals = null, HashSet<int> handReturns = null)
         {
             var duration = instant ? 0f : _animation.MoveDuration;
             var sequence = DOTween.Sequence();
@@ -76,6 +76,8 @@ namespace Game.Presentation.Table
                 cardView.SetInHand(inHand);
                 var movesToRemovedPile = removingField && !isNew && cardView.transform.position != pose.Position
                     && fieldRemovals?.Contains(card.InstanceId) == true;
+                var movesToHand = inHand && !isNew && cardView.transform.position != pose.Position
+                    && handReturns?.Contains(card.InstanceId) == true;
                 var move = cardView.MoveTo(pose, duration);
                 if (movesToRemovedPile && move != null)
                 {
@@ -87,6 +89,16 @@ namespace Game.Presentation.Table
                 }
                 if (onArrival != null && move != null)
                     move.OnComplete(() => onArrival());
+                if (movesToHand && move != null)
+                {
+                    move.OnStart(() =>
+                    {
+                        if (cardView == null || !handReturns.Contains(card.InstanceId))
+                            return;
+                        handReturns.Clear();
+                        _sound.Play(SoundCue.CardReturn);
+                    });
+                }
                 Add(move, isNew && onArrival == null);
             }
 

@@ -88,7 +88,8 @@ namespace Game.Presentation.Match
                 sequence.AppendInterval(_animation.OutcomeBannerSeconds);
                 if (isFirstOutcome)
                 {
-                    var cue = BattleOutcomeAudio.ResultCue(result?.Winner, context.View.Viewer, _mode.ShowsHandoff);
+                    var cue = result == null ? SoundCue.BattleRetreat
+                        : BattleOutcomeAudio.ResultCue(result.Winner, context.View.Viewer, _mode.ShowsHandoff);
                     BattleOutcomeAudio.Schedule(sequence, cue, firstCreatureFade, _sound);
                 }
                 return sequence;

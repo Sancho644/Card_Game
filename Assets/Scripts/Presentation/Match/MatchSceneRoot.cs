@@ -138,7 +138,7 @@ namespace Game.Presentation.Match
             {
                 new LogPresenter(new EventLogFormatter(texts, names, lookup, faces), _log),
                 new DealPresenter(_animation),
-                new FieldOpenedPresenter(registry, _animation, _app.Sound),
+                new FieldOpenedPresenter(registry, _app.Database, _animation, _app.Sound),
                 new AbilityPlayedPresenter(_layout, registry, _app.Database, _animation, _app.Sound),
 
                 new BattleStartedPresenter(_banner, lookup, texts, _animation, _app.Sound),

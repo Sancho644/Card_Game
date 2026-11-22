@@ -8,10 +8,10 @@ namespace Game.Presentation.Audio
 {
     public static class BattleOutcomeAudio
     {
-        public static SoundCue? ResultCue(PlayerId? winner, PlayerId viewer, bool hotSeat)
+        public static SoundCue ResultCue(PlayerId? winner, PlayerId viewer, bool hotSeat)
         {
             if (!winner.HasValue)
-                return null;
+                return SoundCue.BattleDraw;
 
             return hotSeat || winner.Value == viewer ? SoundCue.BattleWin : SoundCue.BattleLose;
         }

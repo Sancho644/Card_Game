@@ -105,3 +105,61 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: bf69e5c481948bb44bd925dec41011ab, type: 3}
     Variants: []
     Volume: 1
+  - Cue: 21
+    Clip: {fileID: 8300000, guid: 38405f6d1b62d274ca729122c079fa85, type: 3}
+    Variants:
+    - {fileID: 8300000, guid: 9ee5ddd9cf8de8940b9a25b907131d62, type: 3}
+    Volume: 0.86
+  - Cue: 22
+    Clip: {fileID: 8300000, guid: e64be1c073f8a9746b87271717fb179b, type: 3}
+    Variants:
+    - {fileID: 8300000, guid: 9ef7217547f69c247b2f00970f3ce995, type: 3}
+    Volume: 0.82
+  - Cue: 23
+    Clip: {fileID: 8300000, guid: b6ec69aa94170704abb2b9ccb043f1e7, type: 3}
+    Variants: []
+    Volume: 0.76
+  - Cue: 24
+    Clip: {fileID: 8300000, guid: ebece985acf894446a03e606c754166b, type: 3}
+    Variants: []
+    Volume: 0.5
+  - Cue: 25
+    Clip: {fileID: 8300000, guid: 4f195ab4e6ce4e84cb51c8feb92b5fba, type: 3}
+    Variants: []
+    Volume: 0.5
+  - Cue: 26
+    Clip: {fileID: 8300000, guid: 252d4981841949848bda69011e02b6f2, type: 3}
+    Variants: []
+    Volume: 0.5
+  - Cue: 27
+    Clip: {fileID: 8300000, guid: ce94d2617ebff2247911696c7771e87b, type: 3}
+    Variants: []
+    Volume: 0.5
+  - Cue: 28
+    Clip: {fileID: 8300000, guid: 96ecafc5a4139b8479e635507a6bb314, type: 3}
+    Variants: []
+    Volume: 0.5
+  - Cue: 29
+    Clip: {fileID: 8300000, guid: 69ce5c9d4852fd34c8e74854195cd20d, type: 3}
+    Variants: []
+    Volume: 0.5
+  - Cue: 30
+    Clip: {fileID: 8300000, guid: 28396068dabfdfb42badbdfeadaffe2d, type: 3}
+    Variants: []
+    Volume: 0.82
+  - Cue: 31
+    Clip: {fileID: 8300000, guid: ff7813695e6a4bc4794225bfbea99cf1, type: 3}
+    Variants: []
+    Volume: 0.76
+  - Cue: 32
+    Clip: {fileID: 8300000, guid: 400b1f6841b245146b6d98aaa3868b84, type: 3}
+    Variants: []
+    Volume: 0.78
+  - Cue: 33
+    Clip: {fileID: 8300000, guid: 19c83d2cd7f9db345a2a8076b85f4baf, type: 3}
+    Variants: []
+    Volume: 0.68
+  - Cue: 34
+    Clip: {fileID: 8300000, guid: 9570c14b121533a42bfc52adcd0939e6, type: 3}
+    Variants: []
+    Volume: 0.82
