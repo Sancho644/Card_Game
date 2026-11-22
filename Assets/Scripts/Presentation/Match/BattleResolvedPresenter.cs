@@ -21,12 +21,17 @@ namespace Game.Presentation.Match
         private readonly VisualSettings _visual;
         private readonly ISoundPlayer _sound;
         private readonly UiTexts _texts;
+        private readonly MatchMode _mode;
 
         public BattleResolvedPresenter(BattleSummaryBuilder summary, BattleDetails details, BannerView banner,
-            CardViewRegistry cards, AnimationSettings animation, VisualSettings visual, ISoundPlayer sound, UiTexts texts)
+            CardViewRegistry cards, AnimationSettings animation, VisualSettings visual, ISoundPlayer sound, UiTexts texts, MatchMode mode)
         {
             _summary = summary; _details = details; _banner = banner; _cards = cards;
-            _animation = animation; _visual = visual; _sound = sound; _texts = texts;
+            _animation = animation;
+            _visual = visual;
+            _sound = sound;
+            _texts = texts;
+            _mode = mode;
         }
 
         public void Present(GameEvent gameEvent, PresentationContext context)
@@ -68,16 +73,24 @@ namespace Game.Presentation.Match
                         sequence.AppendCallback(() => { if (winner != null) winner.SetBattle(null); });
                     }
                 }
+                Tween firstCreatureFade = null;
                 foreach (var removed in consequences.OfType<CreatureOut>())
                 {
                     var card = _cards.Find(removed.CreatureId);
-                    if (card != null)
-                        sequence.Insert(0, DOVirtual.Float(1f, _animation.OutBrightness,
-                            _animation.OutcomeSeconds, value => { if (card != null) card.SetDimming(value); }));
+                    if (card == null)
+                        continue;
+
+                    var fade = DOVirtual.Float(1f, _animation.OutBrightness,
+                        _animation.OutcomeSeconds, value => { if (card != null) card.SetDimming(value); });
+                    sequence.Insert(0f, fade);
+                    firstCreatureFade ??= fade;
                 }
                 sequence.AppendInterval(_animation.OutcomeBannerSeconds);
                 if (isFirstOutcome)
-                    BattleOutcomeAudio.Schedule(sequence, result?.Winner != null, consequences, _sound);
+                {
+                    var cue = BattleOutcomeAudio.ResultCue(result?.Winner, context.View.Viewer, _mode.ShowsHandoff);
+                    BattleOutcomeAudio.Schedule(sequence, cue, firstCreatureFade, _sound);
+                }
                 return sequence;
             }));
             context.Enqueue(_banner.Hide);

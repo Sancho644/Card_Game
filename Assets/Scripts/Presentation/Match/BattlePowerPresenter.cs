@@ -72,6 +72,8 @@ namespace Game.Presentation.Match
         {
             var sequence = DOTween.Sequence();
             var current = new HashSet<int>();
+            var playedPowerUp = false;
+            var playedPowerDown = false;
             foreach (var player in PlayerIds.All)
             {
                 var creature = field.Occupant(player);
@@ -91,7 +93,16 @@ namespace Game.Presentation.Match
                 if (before.FinalPower != now.FinalPower)
                 {
                     var grew = now.FinalPower > before.FinalPower;
-                    _sound.Play(grew ? SoundCue.PowerUp : SoundCue.PowerDown);
+                    if (grew && !playedPowerUp)
+                    {
+                        _sound.Play(SoundCue.PowerUp);
+                        playedPowerUp = true;
+                    }
+                    else if (!grew && !playedPowerDown)
+                    {
+                        _sound.Play(SoundCue.PowerDown);
+                        playedPowerDown = true;
+                    }
                     var count = view.CountPower(before.FinalPower, now.FinalPower, _animation.PowerCountSeconds);
                     if (count != null)
                         sequence.Join(count);

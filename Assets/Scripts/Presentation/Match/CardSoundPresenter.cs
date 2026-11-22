@@ -1,23 +1,49 @@
+using System.Collections.Generic;
 using Game.Core.Events;
+using Game.Core.State;
 using Game.Data.Presentation;
-using Game.Presentation.Audio;
 
 namespace Game.Presentation.Match
 {
-    /// <summary>Sounds of cards put on the table that have no animation of their own.</summary>
-    public sealed class CardSoundPresenter : IEventPresenter
+    /// <summary>Finds placements that reached the table in this event batch.</summary>
+    public static class CardSoundPresenter
     {
-        private readonly ISoundPlayer _sound;
-
-        public CardSoundPresenter(ISoundPlayer sound)
+        public static Dictionary<int, SoundCue> Arrivals(IReadOnlyList<GameEvent> batch, PlayerView previous, PlayerView current)
         {
-            _sound = sound;
-        }
+            var arrivals = new Dictionary<int, SoundCue>();
+            if (previous == null)
+                return arrivals;
 
-        public void Present(GameEvent gameEvent, PresentationContext context)
-        {
-            if (gameEvent is CreaturePlaced || gameEvent is CreatureMoved)
-                context.Enqueue(() => _sound.Play(SoundCue.CardPlace));
+            foreach (var gameEvent in batch)
+            {
+                switch (gameEvent)
+                {
+                    case FieldsDealt fields:
+                        foreach (var fieldId in fields.FieldIds)
+                        {
+                            var field = current.Field(fieldId);
+                            if (field != null && field.IsActive && field.Owner == fields.Owner &&
+                                previous.Field(fieldId)?.IsInReserve == true)
+                                arrivals[fieldId] = SoundCue.FieldPlace;
+                        }
+                        break;
+                    case CreaturePlaced placed:
+                        AddCreature(placed.Creature.InstanceId, placed.Player, placed.FieldId);
+                        break;
+                    case CreatureMoved moved:
+                        AddCreature(moved.CreatureId, moved.Player, moved.ToFieldId);
+                        break;
+                }
+            }
+
+            return arrivals;
+
+            void AddCreature(int creatureId, PlayerId player, int fieldId)
+            {
+                if (current.Field(fieldId)?.Occupant(player)?.InstanceId == creatureId &&
+                    previous.Field(fieldId)?.Occupant(player)?.InstanceId != creatureId)
+                    arrivals[creatureId] = SoundCue.CardPlace;
+            }
         }
     }
 }

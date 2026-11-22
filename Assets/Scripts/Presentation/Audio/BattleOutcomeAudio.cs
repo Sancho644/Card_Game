@@ -1,24 +1,43 @@
 using System.Collections.Generic;
-using System.Linq;
 using DG.Tweening;
 using Game.Core.Events;
+using Game.Core.State;
 using Game.Data.Presentation;
 
 namespace Game.Presentation.Audio
 {
     public static class BattleOutcomeAudio
     {
-        public static void Schedule(Sequence timeline, bool hasWinner, IReadOnlyList<GameEvent> consequences, ISoundPlayer sound)
+        public static SoundCue? ResultCue(PlayerId? winner, PlayerId viewer, bool hotSeat)
         {
-            // Use the existing visual interval. At the default maximum speed (8x),
-            // the three attacks still have distinct onsets. Group simultaneous removals.
-            var duration = timeline.Duration();
-            if (hasWinner)
-                timeline.InsertCallback(0f, () => sound.Play(SoundCue.BattleWin));
-            if (consequences.OfType<CreatureOut>().Any())
-                timeline.InsertCallback(duration * .34f, () => sound.Play(SoundCue.CreatureOut));
-            if (consequences.OfType<FieldRemoved>().Any())
-                timeline.InsertCallback(duration * .67f, () => sound.Play(SoundCue.FieldRemove));
+            if (!winner.HasValue)
+                return null;
+
+            return hotSeat || winner.Value == viewer ? SoundCue.BattleWin : SoundCue.BattleLose;
+        }
+
+        public static void Schedule(Sequence timeline, SoundCue? resultCue, Tween firstCreatureFade, ISoundPlayer sound)
+        {
+            if (resultCue.HasValue)
+                timeline.OnStart(() => sound.Play(resultCue.Value));
+            firstCreatureFade?.OnStart(() => sound.Play(SoundCue.CreatureOut));
+        }
+
+        public static HashSet<int> RemovedFields(IReadOnlyList<GameEvent> batch, PlayerView previous, PlayerView current)
+        {
+            var removals = new HashSet<int>();
+            if (previous == null)
+                return removals;
+
+            foreach (var gameEvent in batch)
+            {
+                if (gameEvent is FieldRemoved removed
+                    && previous.Field(removed.FieldId)?.IsActive == true
+                    && current.Field(removed.FieldId)?.IsRemoved == true)
+                    removals.Add(removed.FieldId);
+            }
+
+            return removals;
         }
     }
 }
