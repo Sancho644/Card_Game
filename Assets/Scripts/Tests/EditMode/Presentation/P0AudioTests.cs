@@ -75,7 +75,7 @@ namespace Game.Presentation.Tests
         }
 
         [Test]
-        public void EachCueHasOneEntryAndFutureAudioStaysUnassigned()
+        public void EachCueHasOneEntryAndDrawStaysUnassigned()
         {
             var settings = AssetDatabase.LoadAssetAtPath<SoundSettings>(SettingsPath);
             using var serialized = new SerializedObject(settings);
@@ -83,10 +83,7 @@ namespace Game.Presentation.Tests
             var assigned = Enumerable.Range(0, entries.arraySize)
                 .Select(index => entries.GetArrayElementAtIndex(index).FindPropertyRelative("Cue").intValue);
             CollectionAssert.AreEquivalent(Enum.GetValues(typeof(SoundCue)).Cast<SoundCue>().Select(cue => (int)cue), assigned);
-            Assert.IsNull(settings.MenuMusic);
-            Assert.IsNull(settings.MatchMusic);
-            foreach (var cue in new[] { SoundCue.Victory, SoundCue.Defeat, SoundCue.Draw })
-                Assert.IsNull(settings.Find(cue).Clip);
+            Assert.IsNull(settings.Find(SoundCue.Draw).Clip);
         }
 
         [Test]
