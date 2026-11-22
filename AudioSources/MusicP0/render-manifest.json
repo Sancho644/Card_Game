@@ -1,0 +1,38 @@
+{
+  "music.menu.loop": {
+    "seconds": 106.66667,
+    "frames": 5120000,
+    "sample_peak_dbfs": -10.0,
+    "rms_dbfs": -27.02,
+    "seam_delta_dbfs": -48.77,
+    "local_delta_max_dbfs": -41.2,
+    "master_sha256": "bc516cdefd42fba0cc361b61989344027568976597a4b017e694ec10aecaa0e0",
+    "runtime_sha256": "1b84ced77b49dbf7ba5f68cefa232ea45658d8ccc5de16688c60a32e0f4e04a0"
+  },
+  "music.match.loop": {
+    "seconds": 124.8,
+    "frames": 5990400,
+    "sample_peak_dbfs": -11.0,
+    "rms_dbfs": -26.62,
+    "seam_delta_dbfs": -70.88,
+    "local_delta_max_dbfs": -42.16,
+    "master_sha256": "39a37b319ea0fb5039ff5c723c6cbee960da1158200e22aee8b1730b399f0af8",
+    "runtime_sha256": "b77ca6c9df728845f156fa1a4ab848d2b687537836645a7cdab4cddf545d2ecf"
+  },
+  "music.result.victory": {
+    "seconds": 3.8,
+    "frames": 182400,
+    "sample_peak_dbfs": -5.0,
+    "rms_dbfs": -19.64,
+    "master_sha256": "01622d2b10aafd644698bc0719ca0e4c533fb472e2772dc30a8cd00139afcbb9",
+    "runtime_sha256": "30db474b4bf796b97150e10b8acc868221fd98c568b01f7fa273d54795b336ea"
+  },
+  "music.result.defeat": {
+    "seconds": 3.65,
+    "frames": 175200,
+    "sample_peak_dbfs": -7.0,
+    "rms_dbfs": -22.23,
+    "master_sha256": "8dc49a2e9a3bb91c22211b6c7ecdfcbcbdf0fca2bd05f188f7e2c16d0189283a",
+    "runtime_sha256": "4d6eec102bd1b4366287fb99a71406c8798ae3b42ce1e81c5ba38cd4d29c6b2b"
+  }
+}
