@@ -13,11 +13,11 @@
     "seconds": 124.8,
     "frames": 5990400,
     "sample_peak_dbfs": -11.0,
-    "rms_dbfs": -26.62,
-    "seam_delta_dbfs": -70.88,
-    "local_delta_max_dbfs": -42.16,
-    "master_sha256": "39a37b319ea0fb5039ff5c723c6cbee960da1158200e22aee8b1730b399f0af8",
-    "runtime_sha256": "b77ca6c9df728845f156fa1a4ab848d2b687537836645a7cdab4cddf545d2ecf"
+    "rms_dbfs": -29.48,
+    "seam_delta_dbfs": -91.21,
+    "local_delta_max_dbfs": -42.75,
+    "master_sha256": "763b92f44aaa248928a1ea5a1a71d7233d5fd5b835ffe9137757a1d98bfd9d5b",
+    "runtime_sha256": "8dc8ad17546a3d3d788f78b750b43a81b382d4c5f369fd1546ee70bd1fba614a"
   },
   "music.result.victory": {
     "seconds": 3.8,

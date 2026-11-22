@@ -29,8 +29,6 @@ HARMONY = {
     "F": (41, (57, 60, 64, 67, 72)),
     "Csus": (36, (55, 60, 62, 67, 74)),
     "Asus": (33, (55, 57, 62, 64, 74)),
-    "A": (33, (55, 57, 61, 64, 70)),
-    "Eb": (39, (55, 58, 62, 65, 77)),
     "BbD": (38, (53, 58, 62, 65, 72)),
     "Fadd": (41, (53, 60, 65, 67, 69)),
 }
@@ -113,6 +111,19 @@ class Score:
         edges = (1 - np.exp(-t / .028)) * np.clip((t[-1] - t) / .20, 0, 1) ** 2
         self.place(when, signal * edges, level, pan)
 
+    def frame_drum(self, when: float, level: float, pan: float, pitch: float) -> None:
+        t = np.arange(round(.56 * RATE), dtype=np.float64) / RATE
+        sweep = .035 * pitch * (1 - np.exp(-t * 28))
+        body = np.sin(math.tau * (pitch * t + sweep)) * np.exp(-t * 9)
+        body += .27 * np.sin(math.tau * (1.58 * pitch * t + sweep)) * np.exp(-t * 17)
+        skin = self.random.standard_normal(len(t) + 96)
+        rim = np.convolve(skin, np.hanning(33) / 16, mode="valid")[32:-32]
+        air = np.convolve(skin, np.hanning(97) / 48, mode="valid")
+        body += .58 * (rim - air) * np.exp(-t * 33)
+        edges = np.minimum(t / .012, 1) ** 1.5
+        edges *= np.clip((t[-1] - t) / .12, 0, 1) ** 2
+        self.place(when, body * edges, level, pan)
+
     def master(self, peak_db: float) -> np.ndarray:
         # Reflections use periodic convolution for loops, including the tail before sample zero.
         dry = self.mix.copy()
@@ -136,11 +147,9 @@ class Score:
         return wet * (10 ** (peak_db / 20) / np.max(np.abs(wet)))
 
 
-def chord(score: Score, start: float, beat: float, name: str, strength: float, match: bool) -> None:
+def chord(score: Score, start: float, beat: float, name: str, strength: float) -> None:
     bass, voices = HARMONY[name]
     score.bowed(start, 3.76 * beat, bass, .067 * strength, -.054, "cello", .66, 1.15)
-    if match:
-        voices = voices[:4]
     for index, pitch in enumerate(voices):
         pan = (-.41, .41, -.26, .28, .08)[index]
         level = (.024, .023, .021, .018, .012)[index] * strength
@@ -167,7 +176,7 @@ def menu() -> np.ndarray:
     score = Score(len(harmony) * 4 * beat, True, 71955)
     for bar, name in enumerate(harmony):
         start = bar * 4 * beat
-        chord(score, start, beat, name, .87 + .12 * math.sin(bar * math.tau / 16 + .55), False)
+        chord(score, start, beat, name, .87 + .12 * math.sin(bar * math.tau / 16 + .55))
         _, notes = HARMONY[name]
         if bar % 4 != 3:
             score.pluck(start + 2.75 * beat, notes[bar % 3] + 12, .019, .43 if bar % 2 else -.43)
@@ -184,41 +193,64 @@ def menu() -> np.ndarray:
 
 
 def match() -> np.ndarray:
-    beat = 60 / 100
-    harmony = (
-        "Dm", "Dm", "BbD", "Asus", "Dm", "Gm", "Bb", "A",
-        "Dm", "BbD", "Gm", "Asus", "Dm", "Eb", "Bb", "A",
-        "Gm", "Gm", "DmC", "Asus", "Bb", "Gm", "Eb", "A",
-        "Dm", "BbD", "Dm", "Asus", "Gm", "Bb", "DmC", "A",
-        "Dm", "Dm", "BbD", "Asus", "Bb", "Eb", "Gm", "A",
-        "Dm", "Gm", "DmC", "Asus", "BbD", "Gm", "Bb", "A",
-        "Dm", "DmC", "Asus", "Dm",
+    # Four dotted-quarter beats per bar. The short bows and drums establish
+    # the triple subdivision immediately, before the opening horn phrase.
+    eighth = 60 / 100 / 3
+    chords = {
+        "Gm": (43, 46, 50), "Ab": (44, 48, 51), "Eb": (39, 43, 46),
+        "Bb": (46, 50, 53), "F": (41, 45, 48), "Cm": (36, 39, 43), "D": (38, 42, 45),
+    }
+    sections = (
+        ("Gm", "Gm", "Eb", "D"), ("Gm", "Ab", "Eb", "D"),
+        ("Gm", "Bb", "F", "D"), ("Cm", "Eb", "Gm", "D"),
+        ("Gm", "Eb", "Bb", "D"), ("Cm", "Ab", "Gm", "D"),
+        ("Eb", "Cm", "Gm", "D"), ("Gm", "Gm", "Ab", "D"),
+        ("Gm", "Bb", "Eb", "F"), ("Cm", "Gm", "Ab", "D"),
+        ("Gm", "Eb", "Cm", "D"), ("Gm", "Ab", "Eb", "D"),
+        ("Gm", "Eb", "D", "Gm"),
     )
-    score = Score(len(harmony) * 4 * beat, True, 78035)
-    for bar, name in enumerate(harmony):
-        start = bar * 4 * beat
-        intensity = .77 + .15 * math.sin((bar + .6) * math.tau / 16)
-        chord(score, start, beat, name, intensity, True)
-        bass, notes = HARMONY[name]
-        accent = bar % 4
-        for i, offset in enumerate((0.0, 1.5, 2.5, 3.5)):
-            if i == 3 and accent not in (1, 2):
-                continue
-            pitch = bass + 12 if i % 2 == 0 else notes[i % 4]
-            score.pluck(start + offset * beat, pitch, (.056, .029, .043, .026)[i] * intensity,
-                        -.23 if i % 2 == 0 else .28, .39)
-        if accent != 3:
-            score.pulse(start, .07 * intensity)
-        if accent in (1, 2):
-            score.pulse(start + 2.5 * beat, .044 * intensity, .14)
-        if accent in (0, 2) and bar % 16 >= 4:
-            score.pluck(start + .8 * beat, notes[2] + 12, .016, .45, .57)
-    for bar in (0, 8, 24, 32, 40):
-        if bar % 16 == 0:
-            phrase(score, (bar + 1) * 4 * beat, beat, MOTIF, .040, "viola", -12)
+    score = Score(len(sections) * 48 * eighth, True, 42687)
+    for section, progression in enumerate(sections):
+        reduced = section in (3, 6, 9)
+        for measure, name in enumerate(progression):
+            start = (section * 48 + measure * 12) * eighth
+            root, third, fifth = chords[name]
+            strength = .74 if reduced else .93 + .07 * math.sin(start * .24)
+            notes = ((0, root, .112), (2, fifth, .051), (3, root + 12, .085),
+                     (5, third, .046), (6, root, .105), (8, fifth, .052),
+                     (9, third + 12, .067), (11, fifth, .044))
+            for slot, pitch, level in notes:
+                if reduced and slot in (5, 8):
+                    continue
+                score.bowed(start + slot * eighth, .125, pitch, level * strength,
+                            -.22 if slot % 3 == 0 else .24, "cello", .019, .112)
+                if slot % 3 == 0:
+                    score.pluck(start + slot * eighth + .012, pitch, .032 * strength, .23, .23)
+            score.frame_drum(start, .098 * strength, -.10, 59)
+            score.frame_drum(start + 6 * eighth, .076 * strength, .12, 64)
+            for slot in (3, 9):
+                score.frame_drum(start + slot * eighth, .039 * strength, .28, 108)
+            if measure == 3 and not reduced:
+                for slot in (10, 11):
+                    score.frame_drum(start + slot * eighth, .032 * strength, -.24, 118)
+            if measure in (1, 2):
+                score.bowed(start + .17, 1.17, fifth + 12, .025 * strength, .31, "strings", .37, .54)
+                for slot, pitch in ((4, third + 24), (7, fifth + 24), (10, root + 24)):
+                    score.pluck(start + slot * eighth, pitch, .026 * strength, .48, .39)
+
+        when = section * 48 * eighth
+        if not reduced:
+            challenge = ((2, 62, 2.6), (6, 55, 1.5), (9, 58, 2.3),
+                         (13, 62, 2.4), (17, 60, 1.6), (19, 55, 2.3))
+            answer = ((26, 63, 2.2), (30, 58, 2.5), (34, 55, 1.5),
+                      (37, 57, 2.1), (41, 54, 2.3), (44, 57, 1.5))
+            if section in (0, 4, 7, 11):
+                phrase(score, when, eighth, challenge, .061, "horn")
+            if section in (0, 2, 7, 10):
+                phrase(score, when, eighth, answer, .048, "horn")
         else:
-            phrase(score, bar * 4 * beat + .5 * beat, beat, MOTIF, .039, "reed")
-        phrase(score, (bar + 4) * 4 * beat + .25 * beat, beat, ANSWER, .033, "viola", -12)
+            ward = ((6, 74, 4.2), (16, 75, 2.2), (22, 72, 4.0), (34, 70, 3.0))
+            phrase(score, when, eighth, ward, .029, "reed")
     return score.master(TRACKS["music.match.loop"][1])
 
 
