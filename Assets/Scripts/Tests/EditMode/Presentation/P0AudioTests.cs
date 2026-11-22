@@ -111,7 +111,7 @@ namespace Game.Presentation.Tests
         [TestCase(PlayerId.Player1, false, SoundCue.BattleWin)]
         [TestCase(PlayerId.Player2, false, SoundCue.BattleLose)]
         [TestCase(PlayerId.Player2, true, SoundCue.BattleWin)]
-        [TestCase(null, false, null)]
+        [TestCase(null, false, SoundCue.BattleDraw)]
         public void BattleOutcomeFollowsTheViewer(PlayerId? winner, bool hotSeat, SoundCue? cue) =>
             Assert.AreEqual(cue, BattleOutcomeAudio.ResultCue(winner, PlayerId.Player1, hotSeat));
     }
