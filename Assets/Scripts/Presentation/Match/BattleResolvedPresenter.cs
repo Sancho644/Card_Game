@@ -73,18 +73,23 @@ namespace Game.Presentation.Match
                         sequence.AppendCallback(() => { if (winner != null) winner.SetBattle(null); });
                     }
                 }
+                Tween firstCreatureFade = null;
                 foreach (var removed in consequences.OfType<CreatureOut>())
                 {
                     var card = _cards.Find(removed.CreatureId);
-                    if (card != null)
-                        sequence.Insert(0, DOVirtual.Float(1f, _animation.OutBrightness,
-                            _animation.OutcomeSeconds, value => { if (card != null) card.SetDimming(value); }));
+                    if (card == null)
+                        continue;
+
+                    var fade = DOVirtual.Float(1f, _animation.OutBrightness,
+                        _animation.OutcomeSeconds, value => { if (card != null) card.SetDimming(value); });
+                    sequence.Insert(0f, fade);
+                    firstCreatureFade ??= fade;
                 }
                 sequence.AppendInterval(_animation.OutcomeBannerSeconds);
                 if (isFirstOutcome)
                 {
                     var cue = BattleOutcomeAudio.ResultCue(result?.Winner, context.View.Viewer, _mode.ShowsHandoff);
-                    BattleOutcomeAudio.Schedule(sequence, cue, consequences, _sound);
+                    BattleOutcomeAudio.Schedule(sequence, cue, firstCreatureFade, _sound);
                 }
                 return sequence;
             }));

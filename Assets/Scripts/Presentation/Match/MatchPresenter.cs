@@ -140,8 +140,9 @@ namespace Game.Presentation.Match
 
             var discardArrivals = DiscardAudio.NewCards(batch, previous, view);
             var placementArrivals = CardSoundPresenter.Arrivals(batch, previous, view);
+            var fieldRemovals = BattleOutcomeAudio.RemovedFields(batch, previous, view);
             var context = new PresentationContext(batch, previous, view, _queue,
-                interval => CreateSnapshotSync(view, revealed, interval, discardArrivals, placementArrivals));
+                interval => CreateSnapshotSync(view, revealed, interval, discardArrivals, placementArrivals, fieldRemovals));
             for (var i = 0; i < batch.Count; i++)
             {
                 if (!_hotSeat.IsVisible(batch[i]))
@@ -269,8 +270,8 @@ namespace Game.Presentation.Match
             new TweenStep(() => _sync.Sync(ViewerView(), RevealedOpponent(), instant: false, dealInterval));
 
         private IAnimationStep CreateSnapshotSync(PlayerView view, PlayerView revealed, float interval,
-            HashSet<int> discardArrivals, Dictionary<int, SoundCue> placementArrivals) =>
-            new TweenStep(() => _sync.Sync(view, revealed, instant: false, interval, discardArrivals, placementArrivals));
+            HashSet<int> discardArrivals, Dictionary<int, SoundCue> placementArrivals, HashSet<int> fieldRemovals) =>
+            new TweenStep(() => _sync.Sync(view, revealed, instant: false, interval, discardArrivals, placementArrivals, fieldRemovals));
 
         private PlayerView ViewerView() => _session.GetView(_hotSeat.Viewer);
 

@@ -42,7 +42,8 @@ namespace Game.Presentation.Table
         /// <param name="instant">Place cards without animation, e.g. behind the hand-off screen.</param>
         /// <param name="dealInterval">Cards new on the table start one after another with this pause; 0 moves all at once.</param>
         public Tween Sync(PlayerView view, PlayerView revealedOpponent, bool instant, float dealInterval = 0f,
-            HashSet<int> discardArrivals = null, Dictionary<int, SoundCue> placementArrivals = null)
+            HashSet<int> discardArrivals = null, Dictionary<int, SoundCue> placementArrivals = null,
+            HashSet<int> fieldRemovals = null)
         {
             var duration = instant ? 0f : _animation.MoveDuration;
             var sequence = DOTween.Sequence();
@@ -65,7 +66,7 @@ namespace Game.Presentation.Table
             }
 
             void Move(CardRef card, TableSide owner, CardPose pose, float brightness = 1f, bool inHand = false,
-                bool fieldClosed = false, bool fieldLocked = false, Action onArrival = null)
+                bool fieldClosed = false, bool fieldLocked = false, Action onArrival = null, bool removingField = false)
             {
                 visible.Add(card.InstanceId);
                 var isNew = _registry.Find(card.InstanceId) == null;
@@ -73,7 +74,17 @@ namespace Game.Presentation.Table
                 cardView.SetFieldState(fieldClosed,fieldLocked);
                 cardView.SetDimming(brightness);
                 cardView.SetInHand(inHand);
+                var movesToRemovedPile = removingField && !isNew && cardView.transform.position != pose.Position
+                    && fieldRemovals?.Contains(card.InstanceId) == true;
                 var move = cardView.MoveTo(pose, duration);
+                if (movesToRemovedPile && move != null)
+                {
+                    move.OnStart(() =>
+                    {
+                        if (cardView != null && fieldRemovals.Remove(card.InstanceId))
+                            _sound.Play(SoundCue.FieldRemove);
+                    });
+                }
                 if (onArrival != null && move != null)
                     move.OnComplete(() => onArrival());
                 Add(move, isNew && onArrival == null);
@@ -105,7 +116,7 @@ namespace Game.Presentation.Table
                     Move(new CardRef(field.Id, field.CardId), side, pose, brightness,
                         fieldClosed: known && !field.IsRemoved && !field.IsOpen,
                         fieldLocked: known && !field.IsRemoved && field.IsLocked,
-                        onArrival: PlacementSound(field.Id));
+                        onArrival: PlacementSound(field.Id), removingField: field.IsRemoved);
 
                     foreach (var occupantOwner in PlayerIds.All)
                     {

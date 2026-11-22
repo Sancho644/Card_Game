@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using DG.Tweening;
-using Game.Core.Events;
 using Game.Core.State;
 using Game.Data.Presentation;
 using Game.Presentation.Audio;
@@ -129,29 +128,29 @@ namespace Game.Presentation.Tests
             }
         }
 
-        [Test]
-        public void BattleOutcomeSpacesOneAttackPerKindWithinTheExistingAnimation()
+        [TestCase(1)]
+        [TestCase(2)]
+        public void BattleOutcomeSoundsAtFirstFadeAndGroupsSimultaneousRemovals(int creatureCount)
         {
             var sound = new RecordingSoundPlayer();
-            var consequences = new GameEvent[]
-            {
-                new CreatureOut(PlayerId.Player1, 10),
-                new CreatureOut(PlayerId.Player2, 20),
-                new FieldRemoved(30), new FieldRemoved(30)
-            };
+            var brightness = 1f;
             var timeline = DOTween.Sequence().SetUpdate(UpdateType.Manual).Pause();
             try
             {
-                timeline.AppendInterval(3f);
-                BattleOutcomeAudio.Schedule(timeline, SoundCue.BattleWin, consequences, sound);
+                var fade = DOVirtual.Float(1f, .25f, .65f, value => brightness = value);
+                timeline.Insert(0f, fade);
+                if (creatureCount == 2)
+                    timeline.Insert(0f, DOVirtual.Float(1f, .25f, .65f, _ => { }));
+                timeline.AppendInterval(2.35f);
+                BattleOutcomeAudio.Schedule(timeline, SoundCue.BattleWin, fade, sound);
                 Assert.AreEqual(3f, timeline.Duration());
+                CollectionAssert.IsEmpty(sound.Calls);
                 timeline.Play();
-                DOTween.ManualUpdate(.1f, .1f);
-                CollectionAssert.AreEqual(new[] { SoundCue.BattleWin }, sound.Calls);
-                DOTween.ManualUpdate(1.05f, 1.05f);
+                DOTween.ManualUpdate(.01f, .01f);
+                Assert.That(brightness, Is.LessThan(1f).And.GreaterThan(.25f));
                 CollectionAssert.AreEqual(new[] { SoundCue.BattleWin, SoundCue.CreatureOut }, sound.Calls);
-                DOTween.ManualUpdate(1f, 1f);
-                CollectionAssert.AreEqual(new[] { SoundCue.BattleWin, SoundCue.CreatureOut, SoundCue.FieldRemove }, sound.Calls);
+                DOTween.ManualUpdate(3f, 3f);
+                CollectionAssert.AreEqual(new[] { SoundCue.BattleWin, SoundCue.CreatureOut }, sound.Calls);
             }
             finally
             {
@@ -159,18 +158,22 @@ namespace Game.Presentation.Tests
             }
         }
 
-        [Test]
-        public void DrawnBattleOnlySoundsItsActualConsequences()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void OutcomeWithoutWinnerOnlySoundsAnActualFade(bool fades)
         {
             var sound = new RecordingSoundPlayer();
             var timeline = DOTween.Sequence().SetUpdate(UpdateType.Manual).Pause();
             try
             {
-                timeline.AppendInterval(3f);
-                BattleOutcomeAudio.Schedule(timeline, null, new GameEvent[] { new CreatureOut(PlayerId.Player1, 10) }, sound);
+                var fade = fades ? DOVirtual.Float(1f, .25f, .65f, _ => { }) : null;
+                if (fade != null)
+                    timeline.Append(fade);
+                timeline.AppendInterval(1f);
+                BattleOutcomeAudio.Schedule(timeline, null, fade, sound);
                 timeline.Play();
                 DOTween.ManualUpdate(2.5f, 2.5f);
-                CollectionAssert.AreEqual(new[] { SoundCue.CreatureOut }, sound.Calls);
+                CollectionAssert.AreEqual(fades ? new[] { SoundCue.CreatureOut } : System.Array.Empty<SoundCue>(), sound.Calls);
             }
             finally
             {
