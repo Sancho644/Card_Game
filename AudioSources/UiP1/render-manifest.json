@@ -1,0 +1,82 @@
+[
+  {
+    "cue": "UiConfirm",
+    "file": "ui-confirm",
+    "seconds": 0.16,
+    "volume": 0.88,
+    "preview_seconds": 0.0,
+    "peak_dbfs": -16.01,
+    "master_sha256": "f67b38b0e39d6b6b6f1f4be3e93a7a88090a36bc3e3fc5782ae39c985c54501f",
+    "runtime_sha256": "9f24933e10276281803eaec4259b5e079dcc710a49df448a54451cc5ff5c141f"
+  },
+  {
+    "cue": "UiCancel",
+    "file": "ui-cancel",
+    "seconds": 0.12,
+    "volume": 0.82,
+    "preview_seconds": 0.52,
+    "peak_dbfs": -18.0,
+    "master_sha256": "36cf739cd6510ccb426d38e3cdc6882f9bba9ce997d8de0825a5cbaa307114b2",
+    "runtime_sha256": "78c982f607939b5345059dcb5be792f9151a5f2c0dab3cf257841c68e8b3c76b"
+  },
+  {
+    "cue": "UiDenied",
+    "file": "ui-denied",
+    "seconds": 0.145,
+    "volume": 0.8,
+    "preview_seconds": 1.0,
+    "peak_dbfs": -18.02,
+    "master_sha256": "422e1122e95d4a705bdabab6fd85d7d3ec71e1840cee0794fcffc28640d50970",
+    "runtime_sha256": "b4bdf50aada929063ec1027798bcafba7a65ef0fe993e062133ec114efe91bdc"
+  },
+  {
+    "cue": "UiModalOpen",
+    "file": "ui-modal-open",
+    "seconds": 0.2,
+    "volume": 0.83,
+    "preview_seconds": 1.505,
+    "peak_dbfs": -18.05,
+    "master_sha256": "b3b21656208e36a29c87ac086c1db12b47153e8e14b72a2ba7b23ca7755931f9",
+    "runtime_sha256": "2e53a51ee3daf771069d94b1ef04c647cb5d2cbbc89d572717995a0490fba778"
+  },
+  {
+    "cue": "UiModalClose",
+    "file": "ui-modal-close",
+    "seconds": 0.14,
+    "volume": 0.79,
+    "preview_seconds": 2.065,
+    "peak_dbfs": -18.02,
+    "master_sha256": "5b152164c0e8d7ab2c151dcc04bbb808f20dc4517ad96d49a2118d65047a4a89",
+    "runtime_sha256": "50b19787650db8c4fc9ccf9814c07075554da621845dee33ed035c4cb16eab2b"
+  },
+  {
+    "cue": "UiCardSelect",
+    "file": "ui-card-select",
+    "seconds": 0.105,
+    "volume": 0.84,
+    "preview_seconds": 2.565,
+    "peak_dbfs": -18.18,
+    "master_sha256": "c42b714411df9c01b40297a88133f715c1a211eb756c29a468df70ada8f0d7e9",
+    "runtime_sha256": "71abd0d720d9773cd44825d02fb37ddc5d9dfc4fc502ac18e923dacca90d2ac7"
+  },
+  {
+    "cue": "UiDeckSelect",
+    "file": "ui-deck-select",
+    "seconds": 0.155,
+    "volume": 0.88,
+    "preview_seconds": 3.03,
+    "peak_dbfs": -18.02,
+    "master_sha256": "2bb26f5336274439fa2f78acd1f06f2a710833dcdb5ddb4afb09daa0ab35a520",
+    "runtime_sha256": "d99c9a599cc962835bbf3f91e6f8930cf6a1d60958a4c97ca7a79952b7db130b"
+  },
+  {
+    "cue": "UiSettingsPreview",
+    "file": "ui-settings-preview",
+    "seconds": 0.135,
+    "volume": 0.86,
+    "preview_seconds": 3.545,
+    "peak_dbfs": -18.0,
+    "master_sha256": "777d260ab8ffff9d6b8f9094c0f1dadd9132cda0ba8e283494ca4e541a95ad12",
+    "runtime_sha256": "b1059140e7b1d60504f411372a2635561dba4ba481a0363d74a2aa8bc6e13f5b"
+  }
+]

@@ -1,4 +1,5 @@
 using System;
+using Game.Data.Presentation;
 using Game.Presentation.Ui;
 using TMPro;
 using UnityEngine;
@@ -54,7 +55,7 @@ namespace Game.Presentation.Menu
             UiButtons.SetLabel(_deck, _layout == null ? deckLabel : _collectionLabel);
             UiButtons.Bind(_deck, chooseDeck);
             UiButtons.SetLabel(_difficulty, difficultyLabel);
-            UiButtons.Bind(_difficulty, chooseDifficulty);
+            UiButtons.Bind(_difficulty, chooseDifficulty, SoundCue.UiModalOpen);
             UiButtons.SetLabel(_fastAnimations, fastAnimationsLabel);
             UiButtons.Bind(_fastAnimations, toggleFastAnimations);
             _layout?.RefreshDeck();

@@ -48,7 +48,7 @@ namespace Game.Presentation.Ui
                 _body.text = texts.Get(MatchEndText.ReasonKey(result.Reason));
             }
             UiButtons.SetLabel(_primary, texts.Get(UiTextKeys.ToMenu));
-            UiButtons.Bind(_primary, menu);
+            UiButtons.Bind(_primary, menu, SoundCue.UiModalClose);
             UiButtons.Bind(_secondary, null);
             _skin?.SingleButton(_primary, _secondary);
             gameObject.SetActive(true);

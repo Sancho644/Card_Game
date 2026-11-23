@@ -120,7 +120,10 @@ namespace Game.Presentation.App
                 foreach (var canvas in root.GetComponentsInChildren<Canvas>(true))
                 {
                     if (canvas.isRootCanvas && canvas.renderMode != RenderMode.WorldSpace)
-                        canvas.gameObject.AddComponent<UiAudioScope>().Sound = _sound;
+                    {
+                        var scope = canvas.GetComponent<UiAudioScope>() ?? canvas.gameObject.AddComponent<UiAudioScope>();
+                        scope.Sound = _sound;
+                    }
                 }
 
                 foreach (var appScene in root.GetComponentsInChildren<MonoBehaviour>(true).OfType<IAppScene>())

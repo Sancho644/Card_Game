@@ -147,7 +147,7 @@ namespace Game.Presentation.Menu
                 _app.Decks.Select(deck => deck.DisplayName).ToList(),
                 index => PlayHotSeat(_app.DeckIndex, index),
                 Texts.Get(UiTextKeys.Cancel),
-                ShowMenu);
+                ShowMenu, SoundCue.UiDeckSelect);
         }
 
         private void PlayHotSeat(int firstDeck, int secondDeck)

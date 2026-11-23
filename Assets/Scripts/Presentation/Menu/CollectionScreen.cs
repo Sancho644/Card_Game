@@ -7,6 +7,7 @@ using Game.Data.Cards;
 using Game.Data.Presentation;
 using Game.Presentation.App;
 using Game.Presentation.Cards;
+using Game.Presentation.Ui;
 using Game.Services.Collection;
 using TMPro;
 using UnityEngine;
@@ -74,7 +75,8 @@ namespace Game.Presentation.Menu
             _library.CloseClicked=Close;_library.NewClicked=NewDeck;_library.EditClicked=()=>OpenEditor(_editing);_library.PlayClicked=Play;_library.UseClicked=Use;
             _library.ClearClicked=ShowDeckActions;_library.Renamed=Rename;_library.Searched=value=>{_deckSearch=value;RefreshLibrary();_library.Scroll.verticalNormalizedPosition=1;};
             _modal=_ui.Panel(_root,"Modal",0,0,1,1,new Color(0,0,0,.90f));
-            Game.Presentation.Ui.UiButtons.Assign(_modal.gameObject.AddComponent<UnityEngine.UI.Button>(), CloseModal);
+            UiButtons.Assign(_modal.gameObject.AddComponent<UnityEngine.UI.Button>(),
+                () => CloseModal(SoundCue.UiModalClose), null);
             _modal.gameObject.SetActive(false);_root.gameObject.SetActive(false);
         }
         public void Show(){_root.gameObject.SetActive(true);OpenEditor(_app.Collection.SelectedIndex);}
@@ -92,7 +94,8 @@ namespace Game.Presentation.Menu
         private void Close(){HideModalInstantly();_root.gameObject.SetActive(false);_closed();}
         private void Rename(string name)
         {
-            if(!string.IsNullOrWhiteSpace(name))_app.Collection.Rename(_editing,name);
+            if(!string.IsNullOrWhiteSpace(name) && _app.Collection.Get(_editing).Name != name.Trim())
+                _app.Collection.Rename(_editing,name);
             Refresh();
         }
         private void NewDeck(){var index=_app.Collection.Create(_app.Texts.Format("library.newName",_app.Collection.Count+1));OpenEditor(index);}
@@ -172,7 +175,12 @@ namespace Game.Presentation.Menu
                 _deckRows.Add(holder.gameObject);
                 for(var col=0;col<3&&row*3+col<indices.Count;col++){
                     var index=indices[row*3+col];var deck=_app.Collection.Get(index);
-                    var button=_ui.Button(holder,"Preset"+index,"",col/3f+.01f,.02f,.313f,.96f,()=>{_editing=index;RefreshLibrary();});
+                    var button=_ui.Button(holder,"Preset"+index,"",col/3f+.01f,.02f,.313f,.96f,()=>{
+                        if (_editing == index) return;
+                        _editing=index;
+                        UiButtons.Play(_root, SoundCue.UiDeckSelect);
+                        RefreshLibrary();
+                    },null);
                     button.GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);_ui.Select(button,index==_editing);
                     var art=deck.Cards.Select(_app.Database.Find).OfType<CreatureDef>().OrderByDescending(c=>c.Rarity).Select(c=>c.Art).FirstOrDefault(a=>a!=null);
                     if(art!=null){
@@ -194,12 +202,38 @@ namespace Game.Presentation.Menu
             var valid=_app.Collection.Validate(_editing).IsValid;_library.Use.interactable=_library.Play.interactable=valid;
             UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(_library.Content);
         }
-        private void Add(){if(_focused==null)return;_app.Collection.Replace(_editing,_focused.Id);RefreshEditor();}
-        private void Remove(){if(_focused==null)return;_app.Collection.Remove(_editing,_focused.Id);_focused=null;RefreshEditor();}
-        private void Use(){if(!_app.Collection.Select(_editing))return;Close();}
-        private void Play(){if(!_app.Collection.Select(_editing))return;_root.gameObject.SetActive(false);_playAi();}
-        private void CloseModal()
+        private void Add()
         {
+            if (_focused == null || _app.Collection.Get(_editing).Cards.Contains(_focused.Id)) return;
+            _app.Collection.Replace(_editing, _focused.Id);
+            UiButtons.Play(_root, SoundCue.UiConfirm);
+            RefreshEditor();
+        }
+        private void Remove()
+        {
+            if (_focused == null || !_app.Collection.Get(_editing).Cards.Contains(_focused.Id)) return;
+            _app.Collection.Remove(_editing, _focused.Id);
+            UiButtons.Play(_root, SoundCue.UiConfirm);
+            _focused = null;
+            RefreshEditor();
+        }
+        private void Use()
+        {
+            if (!_app.Collection.Select(_editing)) return;
+            UiButtons.Play(_root, SoundCue.UiConfirm);
+            Close();
+        }
+        private void Play()
+        {
+            if (!_app.Collection.Select(_editing)) return;
+            UiButtons.Play(_root, SoundCue.UiConfirm);
+            _root.gameObject.SetActive(false);
+            _playAi();
+        }
+        private void CloseModal(SoundCue? cue = null)
+        {
+            if (!_modal.gameObject.activeInHierarchy || (_previewCard != null && !_previewActions.gameObject.activeSelf)) return;
+            if (cue.HasValue) UiButtons.Play(_modal, cue.Value);
             if(_previewCard==null){HideModalInstantly();return;}
             if(_previewRotation!=null)_previewRotation.Stop();
             _previewTween?.Kill();_previewActions.gameObject.SetActive(false);
@@ -233,8 +267,8 @@ namespace Game.Presentation.Menu
         private void ShowDeckActions()
         {
             var frame=ModalFrame("DeckActions",.68f,.70f,.28f,.20f);
-            _ui.Button(frame,"ClearDeck",L("clearDeck"),.08f,.53f,.84f,.33f,()=>{_app.Collection.Delete(_editing);_focused=null;CloseModal();Refresh();});
-            _ui.Button(frame,"Cancel",_app.Texts.Get(UiTextKeys.Cancel),.08f,.12f,.84f,.30f,CloseModal);
+            _ui.Button(frame,"ClearDeck",L("clearDeck"),.08f,.53f,.84f,.33f,()=>{_app.Collection.Delete(_editing);_focused=null;CloseModal();Refresh();},SoundCue.UiConfirm);
+            _ui.Button(frame,"Cancel",_app.Texts.Get(UiTextKeys.Cancel),.08f,.12f,.84f,.30f,()=>CloseModal(SoundCue.UiCancel),null);
         }
         private void ShowDetails()
         {
@@ -251,10 +285,10 @@ namespace Game.Presentation.Menu
             var height=Mathf.Min(safeHeight*_style.PreviewHeight,safeWidth*.92f/.7f);
             _previewCard=_ui.Rect(_modal,"CardPreview",.5f,.5f,0,0);_previewCard.sizeDelta=new Vector2(height*.7f,height);
             _modalContent.Add(_previewCard.gameObject);
-            var previewButton=_cardView.Create(_previewCard,_focused,0,false,false,"",()=>{},1,1);
+            var previewButton=_cardView.Create(_previewCard,_focused,0,false,false,"",null,1,1);
             previewButton.transition=UnityEngine.UI.Selectable.Transition.None;
             var rotation=previewButton.gameObject.AddComponent<CardPreviewRotation>();
-            rotation.Configure(_previewCard,_style,CloseModal);_previewRotation=rotation;
+            rotation.Configure(_previewCard,_style,()=>CloseModal(SoundCue.UiModalClose));_previewRotation=rotation;
             foreach(var text in _previewCard.GetComponentsInChildren<TMP_Text>()){
                 if (text.GetComponentInParent<CardFaceView>() != null) continue;
                 text.fontSizeMin=10;text.fontSizeMax=Mathf.Max(30,text.fontSizeMax);text.overflowMode=TextOverflowModes.Ellipsis;
@@ -273,8 +307,8 @@ namespace Game.Presentation.Menu
             _previewCard.anchoredPosition=_previewStart;_previewCard.localScale=Vector3.one*_previewStartScale;
             _previewActions=_ui.Rect(_modal,"PreviewActions",.30f,.035f,.40f,.065f);_modalContent.Add(_previewActions.gameObject);
             var inDeck=_app.Collection.Get(_editing).Cards.Contains(_focused.Id);
-            _ui.Button(_previewActions,"PreviewDeckAction",inDeck?L("removeCard"):T("replace"),0,0,.64f,1,()=>{HideModalInstantly();if(inDeck)Remove();else Add();Refresh();});
-            _ui.Button(_previewActions,"CloseDetails",L("close"),.68f,0,.32f,1,CloseModal);
+            _ui.Button(_previewActions,"PreviewDeckAction",inDeck?L("removeCard"):T("replace"),0,0,.64f,1,()=>{HideModalInstantly();if(inDeck)Remove();else Add();Refresh();},null);
+            _ui.Button(_previewActions,"CloseDetails",L("close"),.68f,0,.32f,1,()=>CloseModal(SoundCue.UiModalClose),null);
             var dim=_modal.GetComponent<UnityEngine.UI.Image>();dim.color=new Color(0,0,0,0);
             _previewTween=DOTween.Sequence().SetUpdate(true).SetTarget(this)
                 .Join(_previewCard.DOAnchorPos(end,_style.PreviewOpenSeconds).SetEase(Ease.OutCubic))

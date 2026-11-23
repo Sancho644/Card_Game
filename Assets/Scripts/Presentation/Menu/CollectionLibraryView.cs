@@ -25,12 +25,12 @@ namespace Game.Presentation.Menu
             Content=ui.Scroll(panel,"DeckScroll",.02f,.025f,.96f,.95f,out Scroll);
             var right=ui.Frame(Root,"PreviewPanel",.655f,.025f,.33f,.88f);
             Name=ui.Input(right,"LibraryDeckName",.04f,.915f,.76f,.065f,texts.Get("collection.name"),s=>Renamed?.Invoke(s));Name.characterLimit=32;
-            Clear=ui.Button(right,"ClearDeck",texts.Get("library.actions"),.82f,.915f,.14f,.065f,()=>ClearClicked?.Invoke());
+            Clear=ui.Button(right,"ClearDeck",texts.Get("library.actions"),.82f,.915f,.14f,.065f,()=>ClearClicked?.Invoke(),SoundCue.UiModalOpen);
             Status=ui.Text(right,"Validation","",.05f,.84f,.9f,.06f,style.SmallSize);Status.enableAutoSizing=true;Status.fontSizeMin=12;Status.fontSizeMax=style.SmallSize;
             Deck=ui.Rect(right,"DeckMatrix",.025f,.20f,.95f,.63f);
             Edit=ui.Button(right,"EditDeck",texts.Get("library.edit"),.05f,.115f,.42f,.065f,()=>EditClicked?.Invoke());
-            Play=ui.Button(right,"PlayAi",texts.Get("collection.play"),.50f,.115f,.45f,.065f,()=>PlayClicked?.Invoke());
-            Use=ui.Button(right,"UseDeck",texts.Get("collection.use"),.20f,.025f,.60f,.065f,()=>UseClicked?.Invoke());
+            Play=ui.Button(right,"PlayAi",texts.Get("collection.play"),.50f,.115f,.45f,.065f,()=>PlayClicked?.Invoke(),null);
+            Use=ui.Button(right,"UseDeck",texts.Get("collection.use"),.20f,.025f,.60f,.065f,()=>UseClicked?.Invoke(),null);
         }
     }
 }

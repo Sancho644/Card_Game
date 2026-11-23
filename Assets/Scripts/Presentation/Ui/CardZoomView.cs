@@ -53,7 +53,7 @@ namespace Game.Presentation.Ui
             icon.raycastTarget = true;
             _closeIcon = icon.rectTransform; _closeIcon.sizeDelta = new Vector2(68, 68);
             var button = icon.gameObject.AddComponent<Button>(); button.targetGraphic = icon;
-            UiButtons.Assign(button, Hide);
+            UiButtons.Assign(button, Hide, null);
         }
 
         private void LateUpdate()
@@ -90,7 +90,7 @@ namespace Game.Presentation.Ui
             _basePowerValue = face.Power;
             ShowFace(face);
             RefreshPower();
-            UiButtons.Bind(_close, Hide);
+            UiButtons.Bind(_close, Hide, null);
             _close.interactable = true;
             gameObject.SetActive(true);
             Fly(opening: true);
@@ -102,6 +102,7 @@ namespace Game.Presentation.Ui
             if (!IsOpen || !_close.interactable)
                 return;
             _close.interactable = false;
+            UiButtons.Play(this, Game.Data.Presentation.SoundCue.UiModalClose);
             Fly(opening: false);
         }
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Game.Data.Presentation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,8 +34,9 @@ namespace Game.Presentation.Ui
             header=ui.Button(safe,"LogHeader",_headerLabel,.015f,.02f,.17f,.065f,()=>{
                 var expanded=!_drawer.gameObject.activeSelf;
                 _drawer.gameObject.SetActive(expanded);ui.Select(header,expanded);
+                UiButtons.Play(header, expanded ? SoundCue.UiModalOpen : SoundCue.UiModalClose);
                 if(expanded)Refresh();
-            });
+            }, null);
             ui.Decorate(header,24);
             _text.font=ui.Font;_text.fontSize=20;_text.richText=false;_text.raycastTarget=false;
             _scroll.horizontal=false;_scroll.vertical=true;_scroll.movementType=ScrollRect.MovementType.Clamped;

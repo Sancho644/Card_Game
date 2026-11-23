@@ -280,7 +280,8 @@ namespace Game.Presentation.Tests
         {
             var settings = Load<SoundSettings>("Assets/Data/Config/SoundSettings.asset");
             var paths = new HashSet<string>();
-            foreach (var cue in Enum.GetValues(typeof(SoundCue)).Cast<SoundCue>().Where(cue => cue >= SoundCue.AbilityEpic))
+            foreach (var cue in Enum.GetValues(typeof(SoundCue)).Cast<SoundCue>()
+                .Where(cue => cue >= SoundCue.AbilityEpic && cue <= SoundCue.BattleDraw))
             {
                 var entry = settings.Find(cue);
                 Assert.That(entry.Variants?.Length ?? 0, Is.EqualTo(cue == SoundCue.AbilityEpic || cue == SoundCue.AbilityLegendary ? 1 : 0), cue.ToString());

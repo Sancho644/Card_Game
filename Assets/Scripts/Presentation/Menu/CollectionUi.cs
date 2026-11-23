@@ -19,7 +19,18 @@ namespace Game.Presentation.Menu
             _panel=Slice(style.PanelArt,style.PanelCrop,.045f,.065f);
             _button=Slice(style.ButtonArt,style.ButtonCrop,.065f,.15f);
         }
-        public void Dispose(){if(_panel!=null)UnityEngine.Object.Destroy(_panel);if(_button!=null)UnityEngine.Object.Destroy(_button);}
+        public void Dispose()
+        {
+            Release(_panel);
+            Release(_button);
+        }
+
+        private static void Release(Sprite generated)
+        {
+            if (generated == null) return;
+            if (Application.isPlaying) UnityEngine.Object.Destroy(generated);
+            else UnityEngine.Object.DestroyImmediate(generated);
+        }
         private static Sprite Slice(Sprite source,Rect crop,float horizontal,float vertical)
         {
             if(source==null)return null;
@@ -80,7 +91,8 @@ namespace Game.Presentation.Menu
             text.overflowMode = TextOverflowModes.Ellipsis;
             return text;
         }
-        public UnityEngine.UI.Button Button(Transform parent, string name, string label, float x, float y, float w, float h, Action clicked)
+        public UnityEngine.UI.Button Button(Transform parent, string name, string label, float x, float y, float w, float h,
+            Action clicked, SoundCue? cue = SoundCue.Button)
         {
             var rect = Panel(parent, name, x, y, w, h, _button==null?_style.Button:Color.white);
             Apply(rect.GetComponent<UnityEngine.UI.Image>(),_button);
@@ -90,7 +102,7 @@ namespace Game.Presentation.Menu
             text.alignment = TextAlignmentOptions.Midline;
             text.enableAutoSizing=true;text.fontSizeMin=12;text.fontSizeMax=_style.SmallSize;
             text.textWrappingMode=TextWrappingModes.NoWrap;
-            UiButtons.Assign(button, clicked);
+            UiButtons.Assign(button, clicked, cue);
             return button;
         }
         public TMP_InputField Input(Transform parent, string name, float x, float y, float w, float h, string placeholder, Action<string> changed, bool live=false)

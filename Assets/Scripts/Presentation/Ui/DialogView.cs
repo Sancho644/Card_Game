@@ -1,4 +1,5 @@
 using System;
+using Game.Data.Presentation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,16 +25,17 @@ namespace Game.Presentation.Ui
             _content = skin.Window(transform, _title, _body, _primary, _secondary, emblem, compact, opaque);
         }
 
-        public void Show(string title, string body, string primaryLabel, Action primary, string secondaryLabel = null, Action secondary = null)
+        public void Show(string title, string body, string primaryLabel, Action primary, string secondaryLabel = null,
+            Action secondary = null, SoundCue? primaryCue = SoundCue.UiModalClose, SoundCue? secondaryCue = SoundCue.UiModalClose)
         {
             if (_content != null) { _skin.Clear(_content); _content.gameObject.SetActive(false); }
             _title.text = title;
             _body.text = body ?? "";
             _body.gameObject.SetActive(!string.IsNullOrEmpty(body));
             UiButtons.SetLabel(_primary, primaryLabel);
-            UiButtons.Bind(_primary, primary == null ? (Action)null : () => { Hide(); primary(); });
+            UiButtons.Bind(_primary, primary == null ? (Action)null : () => { Hide(); primary(); }, primaryCue);
             UiButtons.SetLabel(_secondary, secondaryLabel);
-            UiButtons.Bind(_secondary, secondary == null ? (Action)null : () => { Hide(); secondary(); });
+            UiButtons.Bind(_secondary, secondary == null ? (Action)null : () => { Hide(); secondary(); }, secondaryCue);
             _skin?.SingleButton(_primary, _secondary);
             gameObject.SetActive(true);
             transform.SetAsLastSibling();
