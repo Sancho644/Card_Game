@@ -27,7 +27,7 @@ namespace Game.Presentation.Match
         {
             _body = body;
             _showCards = null;
-            UiButtons.Bind(_button, Show);
+            UiButtons.Bind(_button, Show, SoundCue.UiModalOpen);
         }
 
         public void RememberCards(string body, string hostCard, string guestCard, string hostName, string guestName,

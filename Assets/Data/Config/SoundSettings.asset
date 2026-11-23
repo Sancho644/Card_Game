@@ -163,3 +163,35 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: 9570c14b121533a42bfc52adcd0939e6, type: 3}
     Variants: []
     Volume: 0.82
+  - Cue: 35
+    Clip: {fileID: 8300000, guid: 8085f31eab48ad24e9da69509a486682, type: 3}
+    Variants: []
+    Volume: 0.88
+  - Cue: 36
+    Clip: {fileID: 8300000, guid: aa7379a66be2f914397b795189e96a9d, type: 3}
+    Variants: []
+    Volume: 0.82
+  - Cue: 37
+    Clip: {fileID: 8300000, guid: 818130900d6ebe74eb3cc670a12b9dbe, type: 3}
+    Variants: []
+    Volume: 0.8
+  - Cue: 38
+    Clip: {fileID: 8300000, guid: 91d0e390aa87493418c8b95cc021b2ca, type: 3}
+    Variants: []
+    Volume: 0.83
+  - Cue: 39
+    Clip: {fileID: 8300000, guid: e67dd843eaa0602409b71e5be2e47968, type: 3}
+    Variants: []
+    Volume: 0.79
+  - Cue: 40
+    Clip: {fileID: 8300000, guid: d461ee7355ac59b4199df2206ac1c6bd, type: 3}
+    Variants: []
+    Volume: 0.84
+  - Cue: 41
+    Clip: {fileID: 8300000, guid: 6207bacefdd8e3448801c81955e65964, type: 3}
+    Variants: []
+    Volume: 0.88
+  - Cue: 42
+    Clip: {fileID: 8300000, guid: cb58d0bfc95cb094cb81e2734a97c2e9, type: 3}
+    Variants: []
+    Volume: 0.86

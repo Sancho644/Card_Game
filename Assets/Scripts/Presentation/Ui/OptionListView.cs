@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Game.Data.Presentation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,16 +28,17 @@ namespace Game.Presentation.Ui
         public void ShowCards(string title, IReadOnlyList<string> labels, IReadOnlyList<string> ids,
             Action<int> chosen, string cancelLabel = null, Action cancel = null)
         {
-            if (_skin == null) { Show(title, labels, chosen, cancelLabel, cancel); return; }
+            if (_skin == null) { Show(title, labels, chosen, cancelLabel, cancel, null); return; }
             Clear(); _title.text = title;
             _optionsRoot.gameObject.SetActive(false);
             _skin.Gallery(_cardContent, ids, labels, index => { Hide(); chosen(index); });
             UiButtons.SetLabel(_cancel, cancelLabel);
-            UiButtons.Bind(_cancel, cancel == null ? (Action)null : () => { Hide(); cancel(); });
+            UiButtons.Bind(_cancel, cancel == null ? (Action)null : () => { Hide(); cancel(); }, SoundCue.UiCancel);
             gameObject.SetActive(true); transform.SetAsLastSibling();
         }
 
-        public void Show(string title, IReadOnlyList<string> labels, Action<int> chosen, string cancelLabel = null, Action cancel = null)
+        public void Show(string title, IReadOnlyList<string> labels, Action<int> chosen, string cancelLabel = null,
+            Action cancel = null, SoundCue? choiceCue = SoundCue.UiConfirm)
         {
             _title.text = title;
             Clear();
@@ -46,12 +48,12 @@ namespace Game.Presentation.Ui
                 var index = i;
                 var button = Instantiate(_optionTemplate, _optionsRoot);
                 UiButtons.SetLabel(button, labels[i]);
-                UiButtons.Bind(button, () => { Hide(); chosen(index); });
+                UiButtons.Bind(button, () => { Hide(); chosen(index); }, choiceCue);
                 _options.Add(button);
             }
 
             UiButtons.SetLabel(_cancel, cancelLabel);
-            UiButtons.Bind(_cancel, cancel == null ? (Action)null : () => { Hide(); cancel(); });
+            UiButtons.Bind(_cancel, cancel == null ? (Action)null : () => { Hide(); cancel(); }, SoundCue.UiCancel);
             gameObject.SetActive(true);
         }
 

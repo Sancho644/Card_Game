@@ -38,5 +38,13 @@ namespace Game.Data.Presentation
         BattleRetreat,
         TurnRemote,
         BattleDraw,
+        UiConfirm,
+        UiCancel,
+        UiDenied,
+        UiModalOpen,
+        UiModalClose,
+        UiCardSelect,
+        UiDeckSelect,
+        UiSettingsPreview,
     }
 }

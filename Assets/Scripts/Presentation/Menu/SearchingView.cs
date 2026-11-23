@@ -38,7 +38,7 @@ namespace Game.Presentation.Menu
             _title.text = title;
             _hint.text = hint;
             UiButtons.SetLabel(_cancel, cancelLabel);
-            UiButtons.Bind(_cancel, cancel);
+            UiButtons.Bind(_cancel, cancel, Game.Data.Presentation.SoundCue.UiCancel);
             gameObject.SetActive(true);
             _layout.RefreshDeck();
             _startedAt = Time.unscaledTime;

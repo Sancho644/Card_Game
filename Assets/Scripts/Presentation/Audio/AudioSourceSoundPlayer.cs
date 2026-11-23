@@ -10,8 +10,10 @@ namespace Game.Presentation.Audio
     {
         private const int Voices = 4;
         private const double MinimumDealSpacing = .045;
+        private const double MinimumDeniedSpacing = .20;
         private readonly Dictionary<SoundCue, int> _nextVariant = new Dictionary<SoundCue, int>();
         private double _lastDealAt = double.NegativeInfinity;
+        private double _lastDeniedAt = double.NegativeInfinity;
 
         private SoundSettings _settings;
         private AudioSource[] _sources;
@@ -25,6 +27,7 @@ namespace Game.Presentation.Audio
             {
                 _nextVariant.Clear();
                 _lastDealAt = double.NegativeInfinity;
+                _lastDeniedAt = double.NegativeInfinity;
             }
             _settings = settings;
             _music = music;
@@ -64,8 +67,17 @@ namespace Game.Presentation.Audio
             if (entry.Clip == null)
                 return;
 
-            if (cue == SoundCue.Button)
+            if (IsUiCue(cue))
             {
+                if (_ui.volume <= 0f)
+                    return;
+                if (cue == SoundCue.UiDenied)
+                {
+                    var now = Time.unscaledTimeAsDouble;
+                    if (now - _lastDeniedAt < MinimumDeniedSpacing)
+                        return;
+                    _lastDeniedAt = now;
+                }
                 _ui.PlayOneShot(entry.Clip, trim);
                 return;
             }
@@ -81,6 +93,9 @@ namespace Game.Presentation.Audio
             _sources[_next].PlayOneShot(NextClip(entry), trim);
             _next = (_next + 1) % _sources.Length;
         }
+
+        internal static bool IsUiCue(SoundCue cue) =>
+            cue == SoundCue.Button || cue >= SoundCue.UiConfirm && cue <= SoundCue.UiSettingsPreview;
 
         private AudioClip NextClip(SoundEntry entry)
         {

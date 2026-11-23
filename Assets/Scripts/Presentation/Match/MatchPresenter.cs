@@ -11,7 +11,6 @@ using Game.Presentation.Audio;
 using Game.Presentation.Table;
 using Game.Presentation.Ui;
 using Game.Services.Match;
-using UnityEngine;
 
 namespace Game.Presentation.Match
 {
@@ -41,6 +40,7 @@ namespace Game.Presentation.Match
         private readonly UiTexts _texts;
         private readonly Action _newMatch;
         private readonly OpponentPacingPresenter _pacing;
+        private readonly Action _showRejected;
         private readonly MatchResultAudio _resultAudio = new MatchResultAudio();
         private int _batchVersion;
         private PlayerView _lastView;
@@ -64,7 +64,7 @@ namespace Game.Presentation.Match
             CardNameLookup lookup,
             UiTexts texts,
             Action newMatch,
-            OpponentPacingPresenter pacing)
+            OpponentPacingPresenter pacing, Action showRejected)
         {
             _session = session;
             _presenters = presenters;
@@ -83,6 +83,7 @@ namespace Game.Presentation.Match
             _texts = texts;
             _newMatch = newMatch;
             _pacing = pacing;
+            _showRejected = showRejected;
         }
 
         /// <summary>The table is about to be handed to the other hot-seat player: nothing private may stay on screen.</summary>
@@ -224,18 +225,26 @@ namespace Game.Presentation.Match
             if (_disposed)
                 return;
 
+            var confirm = command is Ready && ViewerView().Battle?.IsReady(command.Player.Opponent()) == false;
             if (_session is IAsyncMatchSession online)
             {
                 foreach (var controller in _controllers) controller.CancelDecision();
-                online.SubmitAsync(command, result => { if (!_disposed && !result.IsAccepted) _queue.Enqueue(RequestDecision); });
+                online.SubmitAsync(command, Finished);
                 return;
             }
-            var result = _session.Submit(command);
-            if (result.IsAccepted)
-                return;
+            Finished(_session.Submit(command));
 
-            Debug.LogError($"The engine rejected an offered action {command.GetType().Name}: {result.Reason}");
-            _queue.Enqueue(RequestDecision);
+            void Finished(CommandResult result)
+            {
+                if (_disposed) return;
+                if (result.IsAccepted)
+                {
+                    if (confirm) _sound.Play(SoundCue.UiConfirm);
+                    return;
+                }
+                _showRejected();
+                _queue.Enqueue(RequestDecision);
+            }
         }
 
         /// <summary>An opaque screen hides the table; the table turns to the next player while it is up.</summary>
@@ -258,7 +267,7 @@ namespace Game.Presentation.Match
                         _lookup.Remember(_lastView);
                         _sync.Sync(_lastView, RevealedOpponent(), instant: true);
                         done();
-                    });
+                    }, primaryCue: null);
             });
 
         private void ShowMatchEnd(PlayerView view)

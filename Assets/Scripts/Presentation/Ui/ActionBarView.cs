@@ -37,12 +37,12 @@ namespace Game.Presentation.Ui
         /// <summary>Shows the buttons whose actions are given; a null action hides its button.</summary>
         public void Show(Action endTurn, Action ready, Action openField)
         {
-            UiButtons.Bind(_endTurn, endTurn);
-            UiButtons.Bind(_ready, ready);
-            UiButtons.Bind(_openField, openField);
+            UiButtons.Bind(_endTurn, endTurn, null);
+            UiButtons.Bind(_ready, ready, null);
+            UiButtons.Bind(_openField, openField, null);
         }
 
-        public void ShowCancel(Action cancel) => UiButtons.Bind(_cancel, cancel);
+        public void ShowCancel(Action cancel) => UiButtons.Bind(_cancel, cancel, Game.Data.Presentation.SoundCue.UiCancel);
 
         public void Hide()
         {

@@ -229,6 +229,7 @@ namespace Game.Presentation.Interaction
 
             _focus.Unpin();
             _selector.Cancel();
+            _sound.Play(SoundCue.UiCancel);
             return true;
         }
 
@@ -253,6 +254,7 @@ namespace Game.Presentation.Interaction
             _focus.Hover(null);
             var from = _raycaster.ScreenRectOf(card);
             card.SetVisible(false);
+            _sound.Play(SoundCue.UiCardSelect);
             _zoom.Show(_faces.Build(card.CardId), from, () =>
             {
                 if (card != null)
@@ -308,7 +310,8 @@ namespace Game.Presentation.Interaction
             }
 
             var target = TargetAt(position);
-            if (TryPlaceField(position, _raycaster.CardAt(position, dragged))) { }
+            var underDrop = _raycaster.CardAt(position, dragged);
+            if (TryPlaceField(position, underDrop)) { }
             else if (target != null)
             {
                 _selector.TapCard(target.Value);
@@ -316,7 +319,8 @@ namespace Game.Presentation.Interaction
             else
             {
                 _selector.Cancel();
-                _sound.Play(SoundCue.CardDrop);
+                if (CanAct)
+                    _sound.Play(underDrop != null && underDrop.IsInHand ? SoundCue.UiCancel : SoundCue.UiDenied);
             }
             ResyncRequested?.Invoke();
         }

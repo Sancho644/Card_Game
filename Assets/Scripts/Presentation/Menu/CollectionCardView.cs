@@ -24,7 +24,7 @@ namespace Game.Presentation.Menu
             var holder = _ui.Rect(padding, "CardBounds", 0, 0, 1, 1);
             var fit = holder.gameObject.AddComponent<UnityEngine.UI.AspectRatioFitter>();
             fit.aspectMode = UnityEngine.UI.AspectRatioFitter.AspectMode.FitInParent; fit.aspectRatio = .70f;
-            var button = _ui.Button(holder, "Card_" + card.Id, "", 0, 0, 1, 1, clicked);
+            var button = _ui.Button(holder, "Card_" + card.Id, "", 0, 0, 1, 1, clicked, SoundCue.UiCardSelect);
             button.GetComponentInChildren<TMP_Text>().gameObject.SetActive(false);
             button.GetComponent<UnityEngine.UI.Image>().sprite = null;
             button.GetComponent<UnityEngine.UI.Image>().color = selected ? _style.CardVisuals.Selected : face.RarityColor;

@@ -167,7 +167,17 @@ namespace Game.Presentation.Match
                 texts,
                 () => _app.Scenes.ToMainMenu(),
                 new OpponentPacingPresenter(_launch.Mode, _animation, (id, seconds) =>
-                    new OpponentHighlightStep(() => id.HasValue ? registry.Find(id.Value) : null, _visual.OpponentAction, seconds)));
+                    new OpponentHighlightStep(() => id.HasValue ? registry.Find(id.Value) : null, _visual.OpponentAction, seconds)),
+                () =>
+                {
+                    queue.Enqueue(() =>
+                    {
+                        _banner.Show("", texts.Get("match.actionRejected"));
+                        _app.Sound.Play(SoundCue.UiDenied);
+                    });
+                    queue.Enqueue(new DelayStep(_animation.TurnBannerSeconds));
+                    queue.Enqueue(_banner.Hide);
+                });
 
             _interaction.ResyncRequested += () => _presenter.Resync();
             _presenter.HandoffStarted += _interaction.StopLooking;

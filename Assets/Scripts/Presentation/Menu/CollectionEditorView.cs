@@ -25,7 +25,7 @@ namespace Game.Presentation.Menu
             Root=ui.Rect(parent,"Editor",0,0,1,1);
             ui.Button(Root,"MyDecks",texts.Get("library.myDecks"),.015f,.925f,.14f,.06f,()=>BackClicked?.Invoke());
             Name=ui.Input(Root,"DeckName",.17f,.925f,.34f,.06f,texts.Get("collection.name"),s=>Renamed?.Invoke(s));Name.characterLimit=32;
-            ui.Button(Root,"DeletePreset",texts.Get("library.actions"),.53f,.925f,.13f,.06f,()=>DeleteClicked?.Invoke());
+            ui.Button(Root,"DeletePreset",texts.Get("library.actions"),.53f,.925f,.13f,.06f,()=>DeleteClicked?.Invoke(),SoundCue.UiModalOpen);
             ui.Text(Root,"Saved",texts.Get("library.saved"),.69f,.925f,.14f,.06f,style.SmallSize);
             ui.Button(Root,"Close",texts.Get("collection.back"),.85f,.925f,.135f,.06f,()=>CloseClicked?.Invoke());
             var left=ui.Frame(Root,"CollectionPanel",.015f,.025f,.58f,.88f);
@@ -52,13 +52,13 @@ namespace Game.Presentation.Menu
             Next=ui.Button(left,"Next",">",.63f,.125f,.07f,.05f,()=>NextClicked?.Invoke());
             var bar=ui.Frame(left,"CardActions",.02f,.015f,.96f,.09f);
             Focused=ui.Text(bar,"Focused","",.025f,.15f,.45f,.7f,style.SmallSize);
-            Details=ui.Button(bar,"Details",texts.Get("library.details"),.49f,.15f,.16f,.7f,()=>DetailsClicked?.Invoke());
-            Remove=ui.Button(bar,"RemoveFromDeck",texts.Get("library.removeCard"),.66f,.15f,.14f,.7f,()=>RemoveClicked?.Invoke());
-            Add=ui.Button(bar,"AddToDeck",texts.Get("collection.replace"),.81f,.15f,.17f,.7f,()=>AddClicked?.Invoke());
+            Details=ui.Button(bar,"Details",texts.Get("library.details"),.49f,.15f,.16f,.7f,()=>DetailsClicked?.Invoke(),SoundCue.UiCardSelect);
+            Remove=ui.Button(bar,"RemoveFromDeck",texts.Get("library.removeCard"),.66f,.15f,.14f,.7f,()=>RemoveClicked?.Invoke(),null);
+            Add=ui.Button(bar,"AddToDeck",texts.Get("collection.replace"),.81f,.15f,.17f,.7f,()=>AddClicked?.Invoke(),null);
             Count=ui.Text(right,"DeckCount","",.05f,.91f,.90f,.06f,style.TitleSize);Count.alignment=TextAlignmentOptions.Midline;
             Deck=ui.Rect(right,"DeckMatrix",.025f,.18f,.95f,.69f);
             Status=ui.Text(right,"Validation","",.05f,.11f,.90f,.055f,style.SmallSize);Status.enableAutoSizing=true;Status.fontSizeMin=12;Status.fontSizeMax=style.SmallSize;
-            Play=ui.Button(right,"PlayAi",texts.Get("collection.play"),.08f,.025f,.84f,.075f,()=>PlayClicked?.Invoke());
+            Play=ui.Button(right,"PlayAi",texts.Get("collection.play"),.08f,.025f,.84f,.075f,()=>PlayClicked?.Invoke(),null);
             Play.GetComponentInChildren<TMP_Text>().fontSizeMax=style.TitleSize;
         }
     }

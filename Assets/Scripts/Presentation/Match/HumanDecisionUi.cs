@@ -134,7 +134,8 @@ namespace Game.Presentation.Match
                 _texts.Get(UiTextKeys.GoFirst),
                 first == null ? (Action)null : () => Submit(first),
                 _texts.Get(UiTextKeys.GoSecond),
-                second == null ? (Action)null : () => Submit(second));
+                second == null ? (Action)null : () => Submit(second),
+                primaryCue: null, secondaryCue: null);
         }
 
         private Action ButtonFor(GameCommand command) => command == null ? (Action)null : () => Submit(command);

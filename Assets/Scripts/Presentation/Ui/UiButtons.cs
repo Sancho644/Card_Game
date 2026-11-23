@@ -1,6 +1,7 @@
 using System;
 using Game.Data.Presentation;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Game.Presentation.Ui
@@ -9,14 +10,14 @@ namespace Game.Presentation.Ui
     public static class UiButtons
     {
         /// <summary>Shows the button with this action, or hides it when the action is null.</summary>
-        public static void Bind(Button button, Action action)
+        public static void Bind(Button button, Action action, SoundCue? cue = SoundCue.Button)
         {
             button.gameObject.SetActive(action != null);
-            Assign(button, action);
+            Assign(button, action, cue);
         }
 
         /// <summary>Binds a button without changing its visibility, including a newly generated button.</summary>
-        public static void Assign(Button button, Action action)
+        public static void Assign(Button button, Action action, SoundCue? cue = SoundCue.Button)
         {
             button.onClick.RemoveAllListeners();
             if (action == null)
@@ -24,14 +25,17 @@ namespace Game.Presentation.Ui
 
             button.onClick.AddListener(() =>
             {
-                if (!button.IsInteractable())
+                if (!button.IsActive() || !button.IsInteractable())
                     return;
 
-                var scope = button.GetComponentInParent<UiAudioScope>();
-                scope?.Sound?.Play(SoundCue.Button);
+                if (cue.HasValue)
+                    Play(button, cue.Value);
                 action();
             });
         }
+
+        public static void Play(Component control, SoundCue cue) =>
+            control.GetComponentInParent<UiAudioScope>()?.Sound?.Play(cue);
 
         public static void SetLabel(Button button, string text)
         {

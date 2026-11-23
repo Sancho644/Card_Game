@@ -47,7 +47,7 @@ namespace Game.Presentation.Menu
             Online = _ui.Button(root,"Online",app.Texts.Get("online.menu"),.29f,.275f,.42f,.065f,()=>{});
             HotSeat = Button(root, "HotSeat", .29f, .195f, .42f, .065f, 27);
             Collection = Button(root, "Collection", .29f, .115f, .42f, .065f, 32);
-            var settingsButton = _ui.Button(root, "Settings", app.Texts.Get("menu.settings"), .40f, .045f, .20f, .065f, OpenSettings);
+            var settingsButton = _ui.Button(root, "Settings", app.Texts.Get("menu.settings"), .40f, .045f, .20f, .065f, OpenSettings, SoundCue.UiModalOpen);
             settingsButton.GetComponentInChildren<TMP_Text>().fontSizeMax = 26;
             _settings = _ui.Panel(root, "SettingsModal", 0, 0, 1, 1, new Color(0, 0, 0, .82f));
             var panel = _ui.Frame(_settings, "SettingsPanel", .20f, .10f, .60f, .80f);
@@ -56,7 +56,7 @@ namespace Game.Presentation.Menu
             Difficulty = Button(panel, "Difficulty", .08f, .75f, .84f, .09f, 26);
             FastAnimations = Button(panel, "FastAnimations", .08f, .645f, .84f, .09f, 26);
             new MenuAudioSettings(panel, _ui, app.Texts, app.PlayerSettings);
-            _ui.Button(panel, "CloseSettings", app.Texts.Get("library.close"), .57f, .065f, .35f, .105f, CloseSettings);
+            _ui.Button(panel, "CloseSettings", app.Texts.Get("library.close"), .57f, .065f, .35f, .105f, CloseSettings, SoundCue.UiModalClose);
             _settings.gameObject.SetActive(false);
             _details = _ui.Panel(root, "CardDetails", 0, 0, 1, 1, new Color(0, 0, 0, .88f));
             var detailPanel = _ui.Frame(_details, "Panel", .12f, .07f, .76f, .86f);
@@ -64,7 +64,8 @@ namespace Game.Presentation.Menu
             _detailText = _ui.Text(detailPanel, "Description", "", .47f, .20f, .47f, .65f, 26);
             _detailText.enableAutoSizing = true; _detailText.fontSizeMin = 16; _detailText.fontSizeMax = 26;
             _detailText.alignment = TextAlignmentOptions.TopLeft;
-            _ui.Button(detailPanel, "CloseDetails", app.Texts.Get("library.close"), .64f, .045f, .30f, .09f, () => _details.gameObject.SetActive(false));
+            _ui.Button(detailPanel, "CloseDetails", app.Texts.Get("library.close"), .64f, .045f, .30f, .09f,
+                () => _details.gameObject.SetActive(false), SoundCue.UiModalClose);
             _details.gameObject.SetActive(false);
         }
         public void RefreshDeck()
@@ -110,7 +111,7 @@ namespace Game.Presentation.Menu
         private void Inspect(string id)
         {
             CollectionDeckGrid.Clear(_detailRendered);
-            var button = _cards.Create(_detailCard, _app.Database.Find(id), 0, false, false, "", () => { }, 1, 1);
+            var button = _cards.Create(_detailCard, _app.Database.Find(id), 0, false, false, "", null, 1, 1);
             _detailRendered.Add(button.transform.parent.parent.parent.gameObject);
             var face = _faces.Build(id);
             _detailText.text = face.Title + "\n\n" + face.TypeLabel + " · " + face.Rarity + "\n\n" + face.Stats + "\n\n" + face.Body;
